@@ -17,6 +17,8 @@ dependencies = [
     "slowapi>=0.1.9",
     "pandas>=2.2",
     "httpx>=0.27",
+    "pandas-market-calendars>=5.4",
+    "truststore>=0.9",
 ]
 
 [project.optional-dependencies]
@@ -30,6 +32,8 @@ dev = [
     "detect-secrets>=1.5",
     "pre-commit>=4.0",
     "types-requests",
+    "respx>=0.23",
+    "pandas-stubs>=2.2",
 ]
 docs = [
     "mkdocs>=1.6",
@@ -60,7 +64,11 @@ python_version = "3.12"
 strict = true
 mypy_path = "src"
 explicit_package_bases = true
-packages = ["surveillance"]
+files = ["src", "data", "evals", "tests"]
+
+[[tool.mypy.overrides]]
+module = "pandas_market_calendars.*"
+ignore_missing_imports = true
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

@@ -1,5 +1,5 @@
-/* Shared aesthetic for every generated chart in docs/assets/.
-   Portfolio palette, no chartjunk, readable at 800px. */
+# Shared aesthetic for every generated chart in docs/assets/.
+# Portfolio palette, no chartjunk, readable at 800px.
 figure.facecolor: white
 axes.facecolor: white
 axes.edgecolor: "#4b5563"
