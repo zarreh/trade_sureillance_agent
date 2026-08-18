@@ -12,6 +12,8 @@ from typing import Literal
 
 from pydantic import BaseModel, Field
 
+from surveillance.schemas.grounding import GroundingReport
+
 ExculpatoryKind = Literal[
     "reported_under_10b5_1", "tax_withholding", "option_exercise", "below_all_thresholds"
 ]
@@ -48,3 +50,12 @@ class ComplianceFinding(ComplianceFindingDraft):
     exculpatory_factors: list[ExculpatoryFactor] = Field(default_factory=list)
     incomplete: bool = False
     incomplete_reason: str | None = None
+
+
+class PublishedFinding(ComplianceFinding):
+    """The terminal artifact. `publish` (nodes/publish.py) builds this from
+    the judged draft's own `model_dump()` plus the grounding report — no
+    model call, so `finding_text` is always byte-identical to the judged
+    draft (docs/PLAN.md D-A2-1)."""
+
+    grounding_report: GroundingReport

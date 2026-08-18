@@ -13,6 +13,7 @@ from typing import Protocol
 from langchain_core.messages import BaseMessage
 
 from surveillance.schemas.finding import ComplianceFindingDraft
+from surveillance.schemas.grounding import ClaimJudgments, ExtractedClaims
 from surveillance.schemas.plan import InvestigationPlan
 
 
@@ -22,6 +23,14 @@ class PlannerChain(Protocol):
 
 class FindingWriterChain(Protocol):
     def invoke(self, input: dict[str, object]) -> ComplianceFindingDraft: ...
+
+
+class ClaimExtractorChain(Protocol):
+    def invoke(self, input: dict[str, object]) -> ExtractedClaims: ...
+
+
+class GroundingJudgeChain(Protocol):
+    def invoke(self, input: dict[str, object]) -> ClaimJudgments: ...
 
 
 class Investigator(Protocol):

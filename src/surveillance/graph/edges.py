@@ -10,6 +10,7 @@ from surveillance.graph.budget import budget_breach_reason
 from surveillance.graph.state import SurveillanceState
 
 MAX_REPLANS = 1
+MAX_EVIDENCE_PASSES = 2
 
 
 def route_after_check_plan(state: SurveillanceState) -> Literal["investigate", "replan"]:
@@ -33,3 +34,16 @@ def route_after_agent(
     if isinstance(last_message, AIMessage) and last_message.tool_calls:
         return "tools"
     return "draft_finding"
+
+
+def route_after_grounding(state: SurveillanceState) -> Literal["investigate", "publish"]:
+    report = state["grounding_report"]
+    assert report is not None
+    if report.unsupported == 0:
+        return "publish"
+    if state["evidence_pass"] < MAX_EVIDENCE_PASSES:
+        return "investigate"
+    # Evidence-pass budget spent and still unsupported claims remain: publish
+    # anyway rather than deadlock the graph — the report documents exactly
+    # what stayed unsupported (docs/PLAN.md §5.1, "capped at evidence_pass ≤ 2").
+    return "publish"

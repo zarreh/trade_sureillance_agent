@@ -5,16 +5,25 @@ from langgraph.graph.state import CompiledStateGraph
 from langgraph.prebuilt import ToolNode
 
 from surveillance.graph.agents.investigator import build_investigator
+from surveillance.graph.chains.claim_extractor import build_claim_extractor_chain
 from surveillance.graph.chains.finding_writer import build_finding_writer_chain
+from surveillance.graph.chains.grounding_judge import build_grounding_judge_chain
 from surveillance.graph.chains.planner import build_planner_chain
-from surveillance.graph.edges import route_after_agent, route_after_check_plan
+from surveillance.graph.edges import (
+    route_after_agent,
+    route_after_check_plan,
+    route_after_grounding,
+)
 from surveillance.graph.nodes.budget_exceeded import budget_exceeded_node
 from surveillance.graph.nodes.check_plan import build_check_plan_node
 from surveillance.graph.nodes.done import done_node
 from surveillance.graph.nodes.draft_finding import build_draft_finding_node
 from surveillance.graph.nodes.echo import echo_node
+from surveillance.graph.nodes.extract_claims import build_extract_claims_node
 from surveillance.graph.nodes.investigate import build_investigate_node
+from surveillance.graph.nodes.judge_grounding import build_judge_grounding_node
 from surveillance.graph.nodes.plan import build_plan_node
+from surveillance.graph.nodes.publish import publish_node
 from surveillance.graph.nodes.replan import build_replan_node
 from surveillance.graph.policies import build_fast_model, build_reasoning_model
 from surveillance.graph.state import SkeletonState, SurveillanceState
@@ -52,6 +61,8 @@ def build_surveillance_graph(settings: Settings) -> SurveillanceGraph:
     planner_chain = build_planner_chain(fast_model)
     finding_writer_chain = build_finding_writer_chain(reasoning_model)
     investigator = build_investigator(fast_model, tools)
+    claim_extractor_chain = build_claim_extractor_chain(fast_model)
+    grounding_judge_chain = build_grounding_judge_chain(reasoning_model)
 
     workflow = StateGraph(SurveillanceState)
     # mypy cannot resolve add_node's overloads against a factory-returned
@@ -74,6 +85,15 @@ def build_surveillance_graph(settings: Settings) -> SurveillanceGraph:
         "draft_finding",
         build_draft_finding_node(finding_writer_chain),  # type: ignore[arg-type]
     )
+    workflow.add_node(
+        "extract_claims",
+        build_extract_claims_node(claim_extractor_chain),  # type: ignore[arg-type]
+    )
+    workflow.add_node(
+        "judge_grounding",
+        build_judge_grounding_node(grounding_judge_chain),  # type: ignore[arg-type]
+    )
+    workflow.add_node("publish", publish_node)
     workflow.add_node("budget_exceeded", budget_exceeded_node)
 
     workflow.set_entry_point("plan")
@@ -88,6 +108,13 @@ def build_surveillance_graph(settings: Settings) -> SurveillanceGraph:
         {"tools": "tools", "draft_finding": "draft_finding", "budget_exceeded": "budget_exceeded"},
     )
     workflow.add_edge("tools", "investigate")
-    workflow.add_edge("draft_finding", END)
+    workflow.add_edge("draft_finding", "extract_claims")
+    workflow.add_edge("extract_claims", "judge_grounding")
+    workflow.add_conditional_edges(
+        "judge_grounding",
+        route_after_grounding,
+        {"investigate": "investigate", "publish": "publish"},
+    )
+    workflow.add_edge("publish", END)
     workflow.add_edge("budget_exceeded", END)
     return workflow.compile()

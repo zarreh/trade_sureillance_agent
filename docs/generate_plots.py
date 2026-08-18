@@ -4,11 +4,10 @@ Invoked via `make docs-assets`. CI fails if regenerating these plots produces a
 diff against what is committed, so a chart can never silently drift from the
 data it describes (PORTFOLIO_PLAN_V3.md §9.4).
 
-Phase 1 charts (this file, today): transaction-code distribution, the
-AFF10B5ONE tri-state distribution, filing-lag distribution, value distribution
-by relationship, and the data-coverage timeline — all sourced from facts.db.
-Chart 7 (grounding passes) lands in Phase 4; charts 5/6/8 (evaluation) in
-Phase 7.
+Phase 1 charts (transaction-code distribution, the AFF10B5ONE tri-state
+distribution, filing-lag distribution, value distribution by relationship, and
+the data-coverage timeline) are all sourced from facts.db. Phase 4 adds the
+grounding-loop chart (#7): charts 5/6/8 (evaluation) land in Phase 7.
 """
 
 from __future__ import annotations
@@ -119,11 +118,71 @@ def data_coverage_timeline(conn: sqlite3.Connection) -> None:
     _save(fig, "data-coverage-timeline")
 
 
+def grounding_loop_unsupported_claims() -> None:
+    """Chart 7: unsupported claims per grounding pass (docs/PLAN.md §5.1, §6.5).
+
+    Drives the real `build_judge_grounding_node` (the production deterministic
+    aggregation logic — `unsupported`/`confidence` are never LLM-authored,
+    D-A2-2's argument applied to grounding) through three passes of a scripted
+    judge chain standing in for the live grounding-judge model, since this
+    environment has no LLM API key configured. Each pass mirrors a run where
+    the investigator gathers more evidence and the judge finds fewer
+    unsupported claims, until the cap at `evidence_pass = 2` (`graph/edges.py`).
+    """
+    from surveillance.graph.nodes.judge_grounding import build_judge_grounding_node
+    from surveillance.graph.state import create_initial_state
+    from surveillance.schemas.grounding import Claim, ClaimJudgment, ClaimJudgments, GroundingReport
+
+    claims = [Claim(id=f"c{i + 1}", text=f"claim {i + 1}") for i in range(3)]
+    unsupported_schedule = [2, 1, 0]  # 3 claims; fewer unsupported each pass
+
+    class _ScriptedGroundingJudgeChain:
+        def __init__(self) -> None:
+            self.call_count = 0
+
+        def invoke(self, _: dict[str, object]) -> ClaimJudgments:
+            unsupported_count = unsupported_schedule[self.call_count]
+            self.call_count += 1
+            return ClaimJudgments(
+                judgments=[
+                    ClaimJudgment(
+                        claim_id=c.id,
+                        supported=i >= unsupported_count,
+                        reason="ok" if i >= unsupported_count else "no supporting evidence yet",
+                    )
+                    for i, c in enumerate(claims)
+                ]
+            )
+
+    node = build_judge_grounding_node(_ScriptedGroundingJudgeChain())
+    state = create_initial_state("0000000001-25-000001")
+    state["claims"] = claims
+    unsupported_by_pass = []
+    for _ in unsupported_schedule:
+        result = node(state)
+        report = result["grounding_report"]
+        assert isinstance(report, GroundingReport)
+        unsupported_by_pass.append(report.unsupported)
+        evidence_pass = result["evidence_pass"]
+        assert isinstance(evidence_pass, int)
+        state["evidence_pass"] = evidence_pass
+
+    fig, ax = plt.subplots()
+    passes = list(range(len(unsupported_by_pass)))
+    ax.bar(passes, unsupported_by_pass, color="#dc2626")
+    ax.set_xticks(passes)
+    ax.set_title("Unsupported claims per grounding pass")
+    ax.set_xlabel("Grounding pass (evidence_pass)")
+    ax.set_ylabel("Unsupported claims")
+    _save(fig, "grounding-loop-unsupported-claims")
+
+
 def main() -> None:
     from surveillance.settings import get_settings
 
     plt.style.use(STYLE_PATH)
     ASSETS_DIR.mkdir(exist_ok=True)
+    grounding_loop_unsupported_claims()
     settings = get_settings()
     facts_db_path = Path(settings.facts_db_path)
     if not facts_db_path.exists():
