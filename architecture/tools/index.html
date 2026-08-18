@@ -584,6 +584,24 @@
         
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tools
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="./" class="md-nav__link md-nav__link--active">
         
   
@@ -600,6 +618,36 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
+      
+        <li class="md-nav__item">
+  <a href="#design-decisions-carried-from-docsplanmd-34" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Design decisions carried from docs/PLAN.md §3–§4
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -913,6 +961,25 @@
     
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
+      
+        <li class="md-nav__item">
+  <a href="#design-decisions-carried-from-docsplanmd-34" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Design decisions carried from docs/PLAN.md §3–§4
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -937,10 +1004,73 @@
 
 
 <h1 id="tools">Tools</h1>
-<p><em>Filled in during Phase 2 — the six deterministic, parameterised-SQL tools the
-agent can call. See
-<a href="https://github.com/PLACEHOLDER/trade-surveillance-agent/blob/main/docs/PLAN.md">docs/PLAN.md</a>
-§7 Phase 2.</em></p>
+<div class="admonition info">
+<p class="admonition-title">In one paragraph, for a non-engineer</p>
+<p>The agent cannot invent facts. It can only call one of six fixed,
+deterministic lookups against real data — every answer it gives has to
+trace back to one of these calls.</p>
+</div>
+<p>Six tools, each wrapping a single, parameterised query — the agent cannot
+construct arbitrary SQL, and every tool result is addressable evidence the
+grounding judge can cite (see <a href="../../how-it-works/grounding/">Grounding</a>).</p>
+<table>
+<thead>
+<tr>
+<th>Tool</th>
+<th>Purpose</th>
+<th>Backing store</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>get_transaction_details</code></td>
+<td>Every transaction line reported in one filing, plus filing/insider context</td>
+<td><code>FactStore</code></td>
+</tr>
+<tr>
+<td><code>get_applicable_role_limits</code></td>
+<td>The synthetic firm-policy limits that <em>apply</em> to a relationship/title — never asserts authorisation</td>
+<td><code>PolicyStore</code></td>
+</tr>
+<tr>
+<td><code>get_compliance_rules</code></td>
+<td>The full severity-tiered rule table</td>
+<td><code>PolicyStore</code></td>
+</tr>
+<tr>
+<td><code>rolling_90d_trading_volume</code></td>
+<td>An insider's trading volume in a rolling 90-day window ending at a given date, by transaction code</td>
+<td><code>FactStore</code></td>
+</tr>
+<tr>
+<td><code>insider_trading_baseline</code></td>
+<td>An insider's own trailing transaction-value distribution, anchored to a given date</td>
+<td><code>FactStore</code></td>
+</tr>
+<tr>
+<td><code>get_material_events</code></td>
+<td>Whether a date falls inside a seeded corporate-event blackout window</td>
+<td><code>PolicyStore</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="design-decisions-carried-from-docsplanmd-34">Design decisions carried from docs/PLAN.md §3–§4</h2>
+<ul>
+<li><strong><code>get_transaction_details</code> returns every line in the filing, not one row.</strong>
+  A single accession can report a tax-withholding line and a sale together;
+  returning only one would make it impossible for the grounding judge to catch
+  an exemption bleeding from one line onto another (canonical scenario 7).</li>
+<li><strong>Every lookback is anchored to an explicit <code>as_of_date</code>, never <code>now()</code>.</strong>
+  The source notebook compared against the current wall-clock time while
+  investigating a fixed historical window, making its own lookback
+  meaningless.</li>
+<li><strong>One store connection per process, injected via a factory
+  (<code>tools/registry.py</code>), not reopened per call.</strong> <code>build_tools(fact_store,
+  policy_store)</code> returns all six tools bound to shared store instances.</li>
+<li><strong>Naming does not overclaim.</strong> <code>get_applicable_role_limits</code>, not
+  <code>get_insider_authorization</code> — see <a href="../../how-it-works/what-it-wont-do/">What it won't do</a>.</li>
+</ul>
+<p>Tested with no LLM and no network — see <code>tests/tools/</code>.</p>
 
 
 
