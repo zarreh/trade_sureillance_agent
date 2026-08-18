@@ -937,10 +937,102 @@
 
 
 <h1 id="state-and-flow">State and flow</h1>
-<p><em>Filled in during Phase 3/4 — the typed state, the narrow per-node projections,
-and the two bounded loops (<code>replan_count</code>, <code>evidence_pass</code>). See
-<a href="https://github.com/PLACEHOLDER/trade-surveillance-agent/blob/main/docs/PLAN.md">docs/PLAN.md</a>
-§5.1–§5.3.</em></p>
+<h1 id="state-and-flow_1">State and flow</h1>
+<h2 id="the-state-object">The state object</h2>
+<p><code>SurveillanceState</code> (<code>src/surveillance/graph/state.py</code>) is a <code>TypedDict</code> threaded
+through every node in the graph:</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>messages</code></td>
+<td><code>Annotated[Sequence[BaseMessage], add_messages]</code></td>
+<td>The investigator's conversation with the tool-calling model; append-only via LangGraph's <code>add_messages</code> reducer.</td>
+</tr>
+<tr>
+<td><code>accession_number</code></td>
+<td><code>str</code></td>
+<td>The SEC Form 4 filing under investigation.</td>
+</tr>
+<tr>
+<td><code>plan</code></td>
+<td><code>InvestigationPlan \| None</code></td>
+<td>The planner's proposed tool-call sequence.</td>
+</tr>
+<tr>
+<td><code>plan_check</code></td>
+<td><code>PlanCheck \| None</code></td>
+<td>Deterministic validation result for <code>plan</code> (never LLM-authored).</td>
+</tr>
+<tr>
+<td><code>replan_count</code></td>
+<td><code>int</code></td>
+<td>Bounded retry counter for the planning loop.</td>
+</tr>
+<tr>
+<td><code>started_at</code></td>
+<td><code>float</code></td>
+<td>Wall-clock start time, used for the budget guardrail.</td>
+</tr>
+<tr>
+<td><code>draft_finding</code></td>
+<td><code>ComplianceFinding \| None</code></td>
+<td>The investigator's conclusion, plus deterministically-derived exculpatory factors.</td>
+</tr>
+</tbody>
+</table>
+<p><code>create_initial_state(accession_number)</code> builds the starting state for a run.</p>
+<h2 id="graph-flow">Graph flow</h2>
+<pre class="mermaid"><code>flowchart TD
+    plan[plan] --&gt; check_plan[check_plan]
+    check_plan -- ok --&gt; investigate[investigate]
+    check_plan -- incomplete, replan_count &lt; 1 --&gt; replan[replan]
+    check_plan -- incomplete, replan_count exhausted --&gt; investigate
+    replan --&gt; check_plan
+    investigate -- tool_calls --&gt; tools[tools]
+    tools --&gt; investigate
+    investigate -- done --&gt; draft_finding[draft_finding]
+    investigate -- over budget --&gt; budget_exceeded[budget_exceeded]
+    draft_finding --&gt; END
+    budget_exceeded --&gt; END</code></pre>
+<h2 id="two-bounded-loops">Two bounded loops</h2>
+<ol>
+<li>
+<p><strong>Planning loop</strong> (<code>plan</code> → <code>check_plan</code> → <code>replan</code> → <code>check_plan</code> → ...).
+   <code>check_plan</code> is a deterministic node (<code>check_plan.py</code>) — it verifies the
+   plan calls <code>get_transaction_details</code> first and covers every mandatory tool
+   in <code>MANDATORY_TOOLS</code>. Per D-A2-2 ("plan once, validate in code"), only one
+   LLM call produces the plan; validation and replanning-feedback text are
+   both plain code. <code>replan_count</code> is capped at <code>MAX_REPLANS = 1</code>
+   (<code>graph/edges.py</code>) — after one failed replan, the graph proceeds to
+   <code>investigate</code> anyway rather than looping forever.</p>
+</li>
+<li>
+<p><strong>Investigation loop</strong> (<code>investigate</code> ⇄ <code>tools</code>). The investigator model
+   requests tool calls, <code>ToolNode</code> executes them against the real SQLite
+   stores, and results feed back into <code>investigate</code>. <code>route_after_agent</code>
+   (<code>graph/edges.py</code>) checks the real default <code>Budget</code>
+   (<code>graph/budget.py</code>, <code>max_tool_calls=15</code>, <code>max_wall_clock_seconds=120.0</code>)
+   on every turn and routes to <code>budget_exceeded</code> — which emits an
+   <code>incomplete=True</code>, <code>disposition="escalate"</code> finding — rather than letting
+   the loop run away.</p>
+</li>
+</ol>
+<h2 id="deterministic-evidence-not-model-authored">Deterministic evidence, not model-authored</h2>
+<p><code>graph/evidence.py</code> turns the raw <code>AIMessage</code>/<code>ToolMessage</code> pairs in
+<code>messages</code> into typed <code>ToolCallRecord</code>s (<code>extract_tool_call_records</code>) and
+derives <code>ExculpatoryFactor</code>s from them (<code>derive_exculpatory_factors</code>) —
+e.g. <code>reported_under_10b5_1</code>, <code>tax_withholding</code> (transaction code <code>F</code>),
+<code>option_exercise</code> (code <code>M</code>), and <code>below_all_thresholds</code>. This is deliberately
+code, not an LLM call: "don't spend a model call on a decision an <code>if</code> can
+make" (docs/PLAN.md). <code>draft_finding.py</code> attaches these factors to the LLM's
+narrative <code>ComplianceFindingDraft</code> to produce the final <code>ComplianceFinding</code>.</p>
 
 
 
