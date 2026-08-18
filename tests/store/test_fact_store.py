@@ -1,3 +1,4 @@
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 import pytest
@@ -13,6 +14,14 @@ def store(tmp_path: Path) -> FactStore:
     db_path = tmp_path / "facts.db"
     build_facts_db(FIXTURE_DIR, db_path)
     return FactStore(db_path)
+
+
+def test_queryable_from_a_different_thread(store: FactStore) -> None:
+    """LangGraph's ToolNode runs sync tools in a worker thread pool — a store
+    created on the main thread must still be queryable from there."""
+    with ThreadPoolExecutor(max_workers=1) as executor:
+        txn = executor.submit(store.get_transaction, "0000000001-25-000001").result()
+    assert txn is not None
 
 
 def test_get_transaction_returns_typed_record(store: FactStore) -> None:

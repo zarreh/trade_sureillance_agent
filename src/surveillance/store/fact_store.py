@@ -49,7 +49,9 @@ class FactStore:
     """Read-only access to the transactions table in facts.db."""
 
     def __init__(self, db_path: Path) -> None:
-        self._conn = sqlite3.connect(db_path)
+        # check_same_thread=False: LangGraph's ToolNode runs sync tools in a
+        # worker thread pool; this store is read-only, so cross-thread use is safe.
+        self._conn = sqlite3.connect(db_path, check_same_thread=False)
 
     def close(self) -> None:
         self._conn.close()
