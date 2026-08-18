@@ -1,0 +1,71 @@
+site_name: Trade Surveillance Agent
+site_description: Insider-trading surveillance that has to show its work.
+repo_url: https://github.com/PLACEHOLDER/trade-surveillance-agent
+edit_uri: edit/main/docs/
+
+# Internal build-planning documents live alongside the site source in docs/ but
+# are not part of the published site — see NOTICE.md for why PLAN.md stays local.
+exclude_docs: |
+  PLAN.md
+  PLAN_REVIEW_claude-sonnet-5.md
+  REVIEW_GITHUB_COPILOT.md
+  REVIEW_Kimi_K2_7_Code.md
+  generate_plots.py
+  assets/plot_style.mplstyle
+
+theme:
+  name: material
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.sections
+    - navigation.top
+    - content.code.copy
+    - content.action.edit
+
+plugins:
+  - search
+  - glightbox
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: [src]
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+
+nav:
+  - Home: index.md
+  - How it works:
+      - In plain language: how-it-works/in-plain-language.md
+      - The investigation: how-it-works/the-investigation.md
+      - Grounding: how-it-works/grounding.md
+      - What it won't do: how-it-works/what-it-wont-do.md
+  - Architecture:
+      - Overview: architecture/overview.md
+      - Data pipeline: architecture/data-pipeline.md
+      - Tools: architecture/tools.md
+      - State and flow: architecture/state-and-flow.md
+  - Evidence:
+      - Evaluation: evidence/evaluation.md
+      - False positives: evidence/false-positives.md
+      - Cost and latency: evidence/cost-and-latency.md
+      - Data profile: evidence/data-profile.md
+  - Regulatory basis: regulatory-basis.md
+  - Run it yourself: run-it-yourself.md
+  - API: api.md
