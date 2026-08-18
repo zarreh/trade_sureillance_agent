@@ -612,6 +612,24 @@
         
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    State and flow
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="./" class="md-nav__link md-nav__link--active">
         
   
@@ -628,6 +646,69 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
+      
+        <li class="md-nav__item">
+  <a href="#the-state-object" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The state object
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#graph-flow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Graph flow
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#three-bounded-loops" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Three bounded loops
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#deterministic-evidence-not-model-authored" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Deterministic evidence, not model-authored
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -913,6 +994,58 @@
     
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
+      
+        <li class="md-nav__item">
+  <a href="#the-state-object" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The state object
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#graph-flow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Graph flow
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#three-bounded-loops" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Three bounded loops
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#deterministic-evidence-not-model-authored" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Deterministic evidence, not model-authored
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -937,7 +1070,6 @@
 
 
 <h1 id="state-and-flow">State and flow</h1>
-<h1 id="state-and-flow_1">State and flow</h1>
 <h2 id="the-state-object">The state object</h2>
 <p><code>SurveillanceState</code> (<code>src/surveillance/graph/state.py</code>) is a <code>TypedDict</code> threaded
 through every node in the graph:</p>
@@ -985,6 +1117,26 @@ through every node in the graph:</p>
 <td><code>ComplianceFinding \| None</code></td>
 <td>The investigator's conclusion, plus deterministically-derived exculpatory factors.</td>
 </tr>
+<tr>
+<td><code>claims</code></td>
+<td><code>list[Claim]</code></td>
+<td>The draft finding's <code>finding_text</code> decomposed into discrete, tool_call_id-cited claims.</td>
+</tr>
+<tr>
+<td><code>grounding_report</code></td>
+<td><code>GroundingReport \| None</code></td>
+<td>Per-claim judgments plus the deterministically-aggregated <code>unsupported</code> count and <code>confidence</code>.</td>
+</tr>
+<tr>
+<td><code>evidence_pass</code></td>
+<td><code>int</code></td>
+<td>Bounded retry counter for the grounding loop.</td>
+</tr>
+<tr>
+<td><code>published_finding</code></td>
+<td><code>PublishedFinding \| None</code></td>
+<td>The terminal artifact: the judged draft plus its grounding report, assembled with no model call.</td>
+</tr>
 </tbody>
 </table>
 <p><code>create_initial_state(accession_number)</code> builds the starting state for a run.</p>
@@ -999,9 +1151,13 @@ through every node in the graph:</p>
     tools --&gt; investigate
     investigate -- done --&gt; draft_finding[draft_finding]
     investigate -- over budget --&gt; budget_exceeded[budget_exceeded]
-    draft_finding --&gt; END
+    draft_finding --&gt; extract_claims[extract_claims]
+    extract_claims --&gt; judge_grounding[judge_grounding]
+    judge_grounding -- unsupported, evidence_pass &lt; 2 --&gt; investigate
+    judge_grounding -- supported, or evidence_pass exhausted --&gt; publish[publish]
+    publish --&gt; END
     budget_exceeded --&gt; END</code></pre>
-<h2 id="two-bounded-loops">Two bounded loops</h2>
+<h2 id="three-bounded-loops">Three bounded loops</h2>
 <ol>
 <li>
 <p><strong>Planning loop</strong> (<code>plan</code> → <code>check_plan</code> → <code>replan</code> → <code>check_plan</code> → ...).
@@ -1023,6 +1179,15 @@ through every node in the graph:</p>
    <code>incomplete=True</code>, <code>disposition="escalate"</code> finding — rather than letting
    the loop run away.</p>
 </li>
+<li>
+<p><strong>Grounding loop</strong> (<code>draft_finding</code> → <code>extract_claims</code> → <code>judge_grounding</code> →
+   back to <code>investigate</code>, or on to <code>publish</code>). See
+   <a href="../../how-it-works/grounding/">How it works → Grounding</a> for the full design.
+   <code>evidence_pass</code> is capped at <code>MAX_EVIDENCE_PASSES = 2</code>
+   (<code>graph/edges.py</code>) — once the cap is reached, the run publishes anyway
+   rather than looping forever, with whatever stayed unsupported visible in
+   the published <code>grounding_report</code>.</p>
+</li>
 </ol>
 <h2 id="deterministic-evidence-not-model-authored">Deterministic evidence, not model-authored</h2>
 <p><code>graph/evidence.py</code> turns the raw <code>AIMessage</code>/<code>ToolMessage</code> pairs in
@@ -1033,6 +1198,10 @@ e.g. <code>reported_under_10b5_1</code>, <code>tax_withholding</code> (transacti
 code, not an LLM call: "don't spend a model call on a decision an <code>if</code> can
 make" (docs/PLAN.md). <code>draft_finding.py</code> attaches these factors to the LLM's
 narrative <code>ComplianceFindingDraft</code> to produce the final <code>ComplianceFinding</code>.</p>
+<p>The same discipline applies to the grounding loop: <code>judge_grounding.py</code>'s LLM
+call only scores each individual claim as supported or not; the <code>unsupported</code>
+count and the resulting <code>confidence</code> are computed afterwards in plain code,
+never authored by the model.</p>
 
 
 
