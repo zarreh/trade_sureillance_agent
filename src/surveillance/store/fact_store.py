@@ -61,6 +61,20 @@ class FactStore:
         ).fetchone()
         return _row_to_transaction(row) if row else None
 
+    def transactions_for_accession(self, accession_number: str) -> list[Transaction]:
+        """Every transaction line reported in one filing.
+
+        A single Form 4 accession can report several lines (e.g. a tax
+        withholding and a sale together) — an exemption established for one
+        line must never be read as clearing another (docs/PLAN.md §4.3).
+        """
+        rows = self._conn.execute(
+            f"SELECT {', '.join(_COLUMNS)} FROM transactions "
+            "WHERE accession_number = ? ORDER BY nonderiv_trans_sk",
+            (accession_number,),
+        ).fetchall()
+        return [_row_to_transaction(r) for r in rows]
+
     def transactions_in_window(
         self,
         rptowner_cik: str,
