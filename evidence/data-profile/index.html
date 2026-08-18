@@ -783,6 +783,24 @@
         
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Data profile
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="./" class="md-nav__link md-nav__link--active">
         
   
@@ -799,6 +817,91 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
+      
+        <li class="md-nav__item">
+  <a href="#transaction-codes-are-not-just-buy-and-sell" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Transaction codes are not just "buy" and "sell"
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#most-sales-are-not-made-under-a-10b5-1-plan" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Most sales are not made under a 10b5-1 plan
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#filing-lag-against-the-section-16a-deadline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Filing lag against the Section 16(a) deadline
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#transaction-value-by-relationship" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Transaction value by relationship
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#why-three-quarters-of-data-not-one" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why three quarters of data, not one
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#a-real-data-quality-finding" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A real data-quality finding
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -913,6 +1016,80 @@
     
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
+      
+        <li class="md-nav__item">
+  <a href="#transaction-codes-are-not-just-buy-and-sell" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Transaction codes are not just "buy" and "sell"
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#most-sales-are-not-made-under-a-10b5-1-plan" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Most sales are not made under a 10b5-1 plan
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#filing-lag-against-the-section-16a-deadline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Filing lag against the Section 16(a) deadline
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#transaction-value-by-relationship" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Transaction value by relationship
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#why-three-quarters-of-data-not-one" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why three quarters of data, not one
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#a-real-data-quality-finding" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A real data-quality finding
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -937,11 +1114,71 @@
 
 
 <h1 id="data-profile">Data profile</h1>
-<p><em>The distributions that drove design decisions — transaction codes, the
-<code>AFF10B5ONE</code> tri-state, filing-lag, and why three quarters of data are needed.
-Charts generated from <code>facts.db</code> during Phase 1. See
+<div class="admonition info">
+<p class="admonition-title">In one paragraph, for a non-engineer</p>
+<p>Before writing any investigation logic, we looked at what the real SEC data
+actually contains. That look changed the design in several places — most
+importantly, it caught a bug in the original source material that would
+have made two of five tools silently useless.</p>
+</div>
+<p>Generated from a real, live fetch of three SEC EDGAR quarters (2025 Q4 – 2026
+Q2), 273,482 transactions, via <code>make docs-assets</code> (<code>docs/generate_plots.py</code>).
+CI fails if regenerating these charts produces a diff, so they can never drift
+from the data they describe.</p>
+<h2 id="transaction-codes-are-not-just-buy-and-sell">Transaction codes are not just "buy" and "sell"</h2>
+<figure markdown="">
+![Transaction code distribution](../assets/transaction-code-distribution-light.svg#only-light)
+![Transaction code distribution](../assets/transaction-code-distribution-dark.svg#only-dark)
+</figure>
+
+<p><code>F</code> (tax withholding) and <code>M</code> (option exercise) are the third and fourth most
+common codes — more common than ordinary purchases. Both are routinely
+non-suspicious. A naive value-threshold rule would flag tens of thousands of
+these every quarter, which is exactly how a surveillance system gets switched
+off from alert fatigue. See
 <a href="https://github.com/PLACEHOLDER/trade-surveillance-agent/blob/main/docs/PLAN.md">docs/PLAN.md</a>
-§4.3.</em></p>
+§3.3.8.</p>
+<h2 id="most-sales-are-not-made-under-a-10b5-1-plan">Most sales are not made under a 10b5-1 plan</h2>
+<figure markdown="">
+![Reported 10b5-1 distribution](../assets/reported-10b5-1-distribution-light.svg#only-light)
+![Reported 10b5-1 distribution](../assets/reported-10b5-1-distribution-dark.svg#only-dark)
+</figure>
+
+<p>The minority that are reported under a plan are the exculpatory cases this
+system must never flag.</p>
+<h2 id="filing-lag-against-the-section-16a-deadline">Filing lag against the Section 16(a) deadline</h2>
+<figure markdown="">
+![Filing lag distribution](../assets/filing-lag-distribution-light.svg#only-light)
+![Filing lag distribution](../assets/filing-lag-distribution-dark.svg#only-dark)
+</figure>
+
+<p>Measured in NYSE trading days, not calendar days — the two diverge around
+exchange holidays, which is exactly where a generic business-day calendar would
+misjudge lateness.</p>
+<h2 id="transaction-value-by-relationship">Transaction value by relationship</h2>
+<figure markdown="">
+![Value by relationship](../assets/value-by-relationship-light.svg#only-light)
+![Value by relationship](../assets/value-by-relationship-dark.svg#only-dark)
+</figure>
+
+<h2 id="why-three-quarters-of-data-not-one">Why three quarters of data, not one</h2>
+<figure markdown="">
+![Data coverage timeline](../assets/data-coverage-timeline-light.svg#only-light)
+![Data coverage timeline](../assets/data-coverage-timeline-dark.svg#only-dark)
+</figure>
+
+<p>A rolling 90-day volume check and a 180-day trading-history baseline both need
+real history behind the target quarter. Fetching only the target quarter would
+silently starve both checks for every transaction early in that quarter.</p>
+<h2 id="a-real-data-quality-finding">A real data-quality finding</h2>
+<p>The live fetch surfaced something the reference sample didn't: SEC's own
+disclaimer states filer-submitted data "cannot guarantee accuracy," and in
+practice roughly 0.4% of transaction dates in this dataset are implausible
+(e.g. a year typo shifting a date by decades, or into the future). This is a
+known EDGAR data-quality limitation, not a bug in this pipeline — the
+zero-null-date assertion catches <em>unparseable</em> dates; implausible-but-parseable
+dates are a distinct problem, tracked for a future plausibility-bound filter
+rather than blocking Phase 1.</p>
 
 
 
