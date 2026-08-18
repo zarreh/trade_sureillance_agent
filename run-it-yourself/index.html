@@ -926,6 +926,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#investigating-a-filing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Investigating a filing
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1020,6 +1031,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#investigating-a-filing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Investigating a filing
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1066,6 +1088,20 @@ make<span class="w"> </span>dev
 <p>Fetches SEC EDGAR bulk data, builds the local fact and policy stores, and seeds
 the labelled scenarios. See <a href="https://github.com/PLACEHOLDER/trade-surveillance-agent/blob/main/docs/PLAN.md">docs/PLAN.md</a>
 §4 for what this does and why.</p>
+<h2 id="investigating-a-filing">Investigating a filing</h2>
+<div class="highlight"><pre><span></span><code>curl<span class="w"> </span>-sX<span class="w"> </span>POST<span class="w"> </span>localhost:8000/investigations<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-H<span class="w"> </span><span class="s1">'content-type: application/json'</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-d<span class="w"> </span><span class="s1">'{"accession_number": "0000000001-25-000001"}'</span>
+<span class="c1"># {"id": "…", "status": "running"}</span>
+
+curl<span class="w"> </span>-s<span class="w"> </span>localhost:8000/investigations/&lt;id&gt;
+curl<span class="w"> </span>-sN<span class="w"> </span>localhost:8000/investigations/&lt;id&gt;/events<span class="w">   </span><span class="c1"># SSE, node-by-node</span>
+</code></pre></div>
+<p><code>GET /investigations/{id}/events</code> replays every persisted node event from the
+start and then tails new ones until the run finishes — reconnecting later
+just replays from <code>RunStore</code> (<code>data/runs.db</code>), no run is lost. Requests are
+rate-limited (<code>SURVEILLANCE_RATE_LIMIT_PER_MINUTE</code>, default 20/minute) and
+request bodies are capped (<code>SURVEILLANCE_MAX_REQUEST_BODY_BYTES</code>, default 16KB).</p>
 
 
 
