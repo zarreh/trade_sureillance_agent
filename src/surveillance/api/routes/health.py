@@ -1,8 +1,11 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Request
+
+from surveillance.api.rate_limit import DEFAULT_RATE_LIMIT, limiter
 
 router = APIRouter(tags=["health"])
 
 
 @router.get("/healthz")
-def healthz() -> dict[str, str]:
+@limiter.limit(DEFAULT_RATE_LIMIT)
+def healthz(request: Request) -> dict[str, str]:
     return {"status": "ok"}

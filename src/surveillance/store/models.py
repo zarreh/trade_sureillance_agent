@@ -61,3 +61,40 @@ class MaterialEvent:
     event_date: str
     blackout_start: str
     blackout_end: str
+
+
+@dataclass(frozen=True)
+class RunRecord:
+    """A persisted investigation run (store/run_store.py, docs/PLAN.md §7 Phase 5)."""
+
+    id: str
+    accession_number: str
+    status: str  # "running" | "completed" | "failed"
+    created_at: str
+    updated_at: str
+    finding_kind: str | None  # "published" | "incomplete", set once terminal
+    finding_json: str | None
+    error: str | None
+
+
+@dataclass(frozen=True)
+class RunEvent:
+    """One persisted node step, in the same shape the SSE stream emits."""
+
+    run_id: str
+    sequence: int
+    node: str
+    payload_json: str
+    created_at: str
+
+
+@dataclass(frozen=True)
+class CostEntry:
+    """One LLM call's token usage and estimated cost, attributed to the graph
+    node that made it (graph/cost_tracking.py)."""
+
+    node: str
+    model: str
+    prompt_tokens: int
+    completion_tokens: int
+    cost_usd: float
