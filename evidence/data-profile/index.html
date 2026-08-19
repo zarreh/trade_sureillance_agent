@@ -99,7 +99,7 @@
 
   
 
-<header class="md-header md-header--shadow" data-md-component="header">
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
     <a href="../.." title="Trade Surveillance Agent" class="md-header__button md-logo" aria-label="Trade Surveillance Agent" data-md-component="logo">
       
@@ -184,6 +184,8 @@
         </button>
       </nav>
       
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
     </form>
     <div class="md-search__output">
       <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix="">
@@ -214,13 +216,166 @@
     
   </nav>
   
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../how-it-works/in-plain-language/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  How it works
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../architecture/overview/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Architecture
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../evaluation/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Evidence
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../regulatory-basis/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Regulatory basis
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../run-it-yourself/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Run it yourself
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../api/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  API
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
 </header>
     
     <div class="md-container" data-md-component="container">
       
       
-        
-          
         
       
       <main class="md-main" data-md-component="main">
@@ -234,8 +389,10 @@
                     
 
 
+  
 
-<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
     <a href="../.." title="Trade Surveillance Agent" class="md-nav__button md-logo" aria-label="Trade Surveillance Agent" data-md-component="logo">
       
@@ -295,22 +452,32 @@
   
     
     
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
     
     
       
-        
+      
         
       
     
     
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
         <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2">
         
           
-          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
             
   
   
@@ -466,22 +633,34 @@
   
     
     
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
     
     
       
-        
+      
         
       
     
     
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
         <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3">
         
           
-          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
             
   
   
@@ -630,8 +809,29 @@
   
     
     
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
     
     
+    
+      
+      
+        
       
     
     
@@ -642,8 +842,9 @@
         <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_5">
         
           
-          <label class="md-nav__link" for="__nav_3_5" id="__nav_3_5_label" tabindex="0">
-            
+          <div class="md-nav__link md-nav__container">
+            <a href="../../architecture/decisions/" class="md-nav__link ">
+              
   
   
   <span class="md-ellipsis">
@@ -657,8 +858,14 @@
   
   
 
-            <span class="md-nav__icon md-icon"></span>
-          </label>
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3_5" id="__nav_3_5_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
         
         <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_5_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_3_5">
@@ -671,32 +878,6 @@
           </label>
           <ul class="md-nav__list" data-md-scrollfix="">
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../architecture/decisions/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Index
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
               
             
               
@@ -892,10 +1073,23 @@
   
     
     
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
     
     
       
         
+        
+      
+      
         
       
     
@@ -1366,7 +1560,7 @@
   
 
 
-<h1 id="data-profile">Data profile</h1>
+<h1 id="data-profile">Data profile<a class="headerlink" href="#data-profile" title="Permanent link">¶</a></h1>
 <div class="admonition info">
 <p class="admonition-title">In one paragraph, for a non-engineer</p>
 <p>Before writing any investigation logic, we looked at what the real SEC data
@@ -1378,12 +1572,14 @@ have made two of five tools silently useless.</p>
 Q2), 273,482 transactions, via <code>make docs-assets</code> (<code>docs/generate_plots.py</code>).
 CI fails if regenerating these charts produces a diff, so they can never drift
 from the data they describe.</p>
-<h2 id="transaction-codes-are-not-just-buy-and-sell">Transaction codes are not just "buy" and "sell"</h2>
-<figure markdown="">
-![Transaction code distribution](../assets/transaction-code-distribution-light.svg#only-light)
-![Transaction code distribution](../assets/transaction-code-distribution-dark.svg#only-dark)
+<h2 id="transaction-codes-are-not-just-buy-and-sell">Transaction codes are not just "buy" and "sell"<a class="headerlink" href="#transaction-codes-are-not-just-buy-and-sell" title="Permanent link">¶</a></h2>
+<figure>
+<p><a class="glightbox" data-type="image" data-width="auto" data-height="auto" href="../../assets/transaction-code-distribution-light.svg#only-light" data-desc-position="bottom"><img alt="Transaction code distribution" src="../../assets/transaction-code-distribution-light.svg#only-light"></a>
+<a class="glightbox" data-type="image" data-width="auto" data-height="auto" href="../../assets/transaction-code-distribution-dark.svg#only-dark" data-desc-position="bottom"><img alt="Transaction code distribution" src="../../assets/transaction-code-distribution-dark.svg#only-dark"></a></p>
+<figcaption>
+<p>273,482 transactions, 2025 Q4 – 2026 Q2</p>
+</figcaption>
 </figure>
-
 <p><code>F</code> (tax withholding) and <code>M</code> (option exercise) are the third and fourth most
 common codes — more common than ordinary purchases. Both are routinely
 non-suspicious. A naive value-threshold rule would flag tens of thousands of
@@ -1391,39 +1587,47 @@ these every quarter, which is exactly how a surveillance system gets switched
 off from alert fatigue. See
 <a href="https://github.com/zarreh/trade_sureillance_agent/blob/main/docs/PLAN.md">docs/PLAN.md</a>
 §3.3.8.</p>
-<h2 id="most-sales-are-not-made-under-a-10b5-1-plan">Most sales are not made under a 10b5-1 plan</h2>
-<figure markdown="">
-![Reported 10b5-1 distribution](../assets/reported-10b5-1-distribution-light.svg#only-light)
-![Reported 10b5-1 distribution](../assets/reported-10b5-1-distribution-dark.svg#only-dark)
+<h2 id="most-sales-are-not-made-under-a-10b5-1-plan">Most sales are not made under a 10b5-1 plan<a class="headerlink" href="#most-sales-are-not-made-under-a-10b5-1-plan" title="Permanent link">¶</a></h2>
+<figure>
+<p><a class="glightbox" data-type="image" data-width="auto" data-height="auto" href="../../assets/reported-10b5-1-distribution-light.svg#only-light" data-desc-position="bottom"><img alt="Reported 10b5-1 distribution" src="../../assets/reported-10b5-1-distribution-light.svg#only-light"></a>
+<a class="glightbox" data-type="image" data-width="auto" data-height="auto" href="../../assets/reported-10b5-1-distribution-dark.svg#only-dark" data-desc-position="bottom"><img alt="Reported 10b5-1 distribution" src="../../assets/reported-10b5-1-distribution-dark.svg#only-dark"></a></p>
+<figcaption>
+<p><code>AFF10B5ONE</code> distribution across the fetched dataset</p>
+</figcaption>
 </figure>
-
 <p>The minority that are reported under a plan are the exculpatory cases this
 system must never flag.</p>
-<h2 id="filing-lag-against-the-section-16a-deadline">Filing lag against the Section 16(a) deadline</h2>
-<figure markdown="">
-![Filing lag distribution](../assets/filing-lag-distribution-light.svg#only-light)
-![Filing lag distribution](../assets/filing-lag-distribution-dark.svg#only-dark)
+<h2 id="filing-lag-against-the-section-16a-deadline">Filing lag against the Section 16(a) deadline<a class="headerlink" href="#filing-lag-against-the-section-16a-deadline" title="Permanent link">¶</a></h2>
+<figure>
+<p><a class="glightbox" data-type="image" data-width="auto" data-height="auto" href="../../assets/filing-lag-distribution-light.svg#only-light" data-desc-position="bottom"><img alt="Filing lag distribution" src="../../assets/filing-lag-distribution-light.svg#only-light"></a>
+<a class="glightbox" data-type="image" data-width="auto" data-height="auto" href="../../assets/filing-lag-distribution-dark.svg#only-dark" data-desc-position="bottom"><img alt="Filing lag distribution" src="../../assets/filing-lag-distribution-dark.svg#only-dark"></a></p>
+<figcaption>
+<p>Section 16(a) filing lag, in NYSE trading days</p>
+</figcaption>
 </figure>
-
 <p>Measured in NYSE trading days, not calendar days — the two diverge around
 exchange holidays, which is exactly where a generic business-day calendar would
 misjudge lateness.</p>
-<h2 id="transaction-value-by-relationship">Transaction value by relationship</h2>
-<figure markdown="">
-![Value by relationship](../assets/value-by-relationship-light.svg#only-light)
-![Value by relationship](../assets/value-by-relationship-dark.svg#only-dark)
+<h2 id="transaction-value-by-relationship">Transaction value by relationship<a class="headerlink" href="#transaction-value-by-relationship" title="Permanent link">¶</a></h2>
+<figure>
+<p><a class="glightbox" data-type="image" data-width="auto" data-height="auto" href="../../assets/value-by-relationship-light.svg#only-light" data-desc-position="bottom"><img alt="Value by relationship" src="../../assets/value-by-relationship-light.svg#only-light"></a>
+<a class="glightbox" data-type="image" data-width="auto" data-height="auto" href="../../assets/value-by-relationship-dark.svg#only-dark" data-desc-position="bottom"><img alt="Value by relationship" src="../../assets/value-by-relationship-dark.svg#only-dark"></a></p>
+<figcaption>
+<p>Transaction value distribution by <code>RPTOWNER_RELATIONSHIP</code></p>
+</figcaption>
 </figure>
-
-<h2 id="why-three-quarters-of-data-not-one">Why three quarters of data, not one</h2>
-<figure markdown="">
-![Data coverage timeline](../assets/data-coverage-timeline-light.svg#only-light)
-![Data coverage timeline](../assets/data-coverage-timeline-dark.svg#only-dark)
+<h2 id="why-three-quarters-of-data-not-one">Why three quarters of data, not one<a class="headerlink" href="#why-three-quarters-of-data-not-one" title="Permanent link">¶</a></h2>
+<figure>
+<p><a class="glightbox" data-type="image" data-width="auto" data-height="auto" href="../../assets/data-coverage-timeline-light.svg#only-light" data-desc-position="bottom"><img alt="Data coverage timeline" src="../../assets/data-coverage-timeline-light.svg#only-light"></a>
+<a class="glightbox" data-type="image" data-width="auto" data-height="auto" href="../../assets/data-coverage-timeline-dark.svg#only-dark" data-desc-position="bottom"><img alt="Data coverage timeline" src="../../assets/data-coverage-timeline-dark.svg#only-dark"></a></p>
+<figcaption>
+<p>Three fetched quarters vs. the single target quarter</p>
+</figcaption>
 </figure>
-
 <p>A rolling 90-day volume check and a 180-day trading-history baseline both need
 real history behind the target quarter. Fetching only the target quarter would
 silently starve both checks for every transaction early in that quarter.</p>
-<h2 id="a-real-data-quality-finding">A real data-quality finding</h2>
+<h2 id="a-real-data-quality-finding">A real data-quality finding<a class="headerlink" href="#a-real-data-quality-finding" title="Permanent link">¶</a></h2>
 <p>The live fetch surfaced something the reference sample didn't: SEC's own
 disclaimer states filer-submitted data "cannot guarantee accuracy," and in
 practice roughly 0.4% of transaction dates in this dataset are implausible
@@ -1487,7 +1691,7 @@ rather than blocking Phase 1.</p>
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.sections", "navigation.top", "content.code.copy", "content.action.edit"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "navigation.top", "navigation.indexes", "search.suggest", "search.highlight", "content.code.copy", "content.action.edit"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
       <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>

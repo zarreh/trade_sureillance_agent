@@ -99,7 +99,7 @@
 
   
 
-<header class="md-header md-header--shadow" data-md-component="header">
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
     <a href=".." title="Trade Surveillance Agent" class="md-header__button md-logo" aria-label="Trade Surveillance Agent" data-md-component="logo">
       
@@ -184,6 +184,8 @@
         </button>
       </nav>
       
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
     </form>
     <div class="md-search__output">
       <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix="">
@@ -214,13 +216,166 @@
     
   </nav>
   
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../how-it-works/in-plain-language/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  How it works
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../architecture/overview/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Architecture
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../evidence/evaluation/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Evidence
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    <li class="md-tabs__item md-tabs__item--active">
+      <a href="./" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Regulatory basis
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../run-it-yourself/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Run it yourself
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../api/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  API
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
 </header>
     
     <div class="md-container" data-md-component="container">
       
       
-        
-          
         
       
       <main class="md-main" data-md-component="main">
@@ -234,8 +389,10 @@
                     
 
 
+  
 
-<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
     <a href=".." title="Trade Surveillance Agent" class="md-nav__button md-logo" aria-label="Trade Surveillance Agent" data-md-component="logo">
       
@@ -295,22 +452,32 @@
   
     
     
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
     
     
       
-        
+      
         
       
     
     
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
         <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2">
         
           
-          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
             
   
   
@@ -466,22 +633,34 @@
   
     
     
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
     
     
       
-        
+      
         
       
     
     
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
         <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3">
         
           
-          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
             
   
   
@@ -630,8 +809,29 @@
   
     
     
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
     
     
+    
+      
+      
+        
       
     
     
@@ -642,8 +842,9 @@
         <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_5">
         
           
-          <label class="md-nav__link" for="__nav_3_5" id="__nav_3_5_label" tabindex="0">
-            
+          <div class="md-nav__link md-nav__container">
+            <a href="../architecture/decisions/" class="md-nav__link ">
+              
   
   
   <span class="md-ellipsis">
@@ -657,8 +858,14 @@
   
   
 
-            <span class="md-nav__icon md-icon"></span>
-          </label>
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3_5" id="__nav_3_5_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
         
         <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_5_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_3_5">
@@ -671,32 +878,6 @@
           </label>
           <ul class="md-nav__list" data-md-scrollfix="">
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../architecture/decisions/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Index
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
               
             
               
@@ -890,22 +1071,32 @@
   
     
     
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
     
     
       
-        
+      
         
       
     
     
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
         <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4">
         
           
-          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
             
   
   
@@ -1342,7 +1533,7 @@
   
 
 
-<h1 id="regulatory-basis">Regulatory basis</h1>
+<h1 id="regulatory-basis">Regulatory basis<a class="headerlink" href="#regulatory-basis" title="Permanent link">¶</a></h1>
 <div class="admonition danger">
 <p class="admonition-title">This is a research prototype, not legal or compliance advice</p>
 <p>Nothing on this page or produced by this system has been reviewed by a
@@ -1355,7 +1546,7 @@ program. Every rule, threshold, and role limit this system applies
 this project</strong>. Do not rely on any output of this system for a real
 compliance decision.</p>
 </div>
-<h2 id="what-this-system-actually-investigates">What this system actually investigates</h2>
+<h2 id="what-this-system-actually-investigates">What this system actually investigates<a class="headerlink" href="#what-this-system-actually-investigates" title="Permanent link">¶</a></h2>
 <p>This system reasons over <strong>SEC Form 4 filings</strong> — reports of changes in
 beneficial ownership that officers, directors, and beneficial owners of more
 than 10% of a registered class of equity securities must file under
@@ -1378,7 +1569,7 @@ implements a <strong>surveillance heuristic</strong> (transaction value against 
 limit, timing against a seeded corporate-events calendar, rolling volume
 against the insider's own history) that a human compliance reviewer would
 use as a starting point for the kind of inquiry Rule 10b-5 concerns.</p>
-<h2 id="rule-10b5-1-as-a-reported-not-verified-signal">Rule 10b5-1 as a reported, not verified, signal</h2>
+<h2 id="rule-10b5-1-as-a-reported-not-verified-signal">Rule 10b5-1 as a reported, not verified, signal<a class="headerlink" href="#rule-10b5-1-as-a-reported-not-verified-signal" title="Permanent link">¶</a></h2>
 <p><strong>Rule 10b5-1</strong> (17 CFR § 240.10b5-1) provides an <strong>affirmative defense</strong>
 against insider-trading liability for trades made under a written trading
 plan adopted in good faith, before the person was aware of material
@@ -1392,7 +1583,7 @@ including the UI, as <strong>"not established"</strong>, never as an absence of 
 (D-A2-5) — the distinction matters because a plan can be real and simply not
 captured by this field's encoding (SEC's own bulk data shows the field
 encoded inconsistently across filers, <code>docs/PLAN.md</code> §4.3).</p>
-<h2 id="why-a-human-reviewer-stays-in-the-loop">Why a human reviewer stays in the loop</h2>
+<h2 id="why-a-human-reviewer-stays-in-the-loop">Why a human reviewer stays in the loop<a class="headerlink" href="#why-a-human-reviewer-stays-in-the-loop" title="Permanent link">¶</a></h2>
 <p><strong>FINRA Rule 3110</strong> requires broker-dealers to establish and maintain a
 system to supervise the activities of their associated persons, including
 review of the kinds of transactions this system investigates. This system
@@ -1403,7 +1594,7 @@ supervisory determination on its own (<code>docs/how-it-works/what-it-wont-do.md
 Rule 3110 is cited here as the reason a system like this belongs <em>inside</em> a
 supervised compliance workflow with a human decision-maker, not as a
 claim that this prototype satisfies it.</p>
-<h2 id="what-is-synthetic">What is synthetic</h2>
+<h2 id="what-is-synthetic">What is synthetic<a class="headerlink" href="#what-is-synthetic" title="Permanent link">¶</a></h2>
 <ul>
 <li><strong>Role-based trading limits</strong> (<code>role_limits</code> table,
   <code>data/generate_compliance_db.py::ROLE_LIMITS</code>) — invented thresholds by
@@ -1421,7 +1612,7 @@ claim that this prototype satisfies it.</p>
   filer-entered typos, e.g. a four-digit year off by one — SEC's own bulk
   data disclaims this).</li>
 </ul>
-<h2 id="scope-this-system-does-not-claim">Scope this system does not claim</h2>
+<h2 id="scope-this-system-does-not-claim">Scope this system does not claim<a class="headerlink" href="#scope-this-system-does-not-claim" title="Permanent link">¶</a></h2>
 <p>See <a href="../how-it-works/what-it-wont-do/">What it won't do</a> for the complete
 list. In summary: it does not watch live trades or price feeds, it does not
 decide anything on its own, and it is not investment, legal, or compliance
@@ -1481,7 +1672,7 @@ advice.</p>
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.sections", "navigation.top", "content.code.copy", "content.action.edit"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "navigation.top", "navigation.indexes", "search.suggest", "search.highlight", "content.code.copy", "content.action.edit"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
       <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
