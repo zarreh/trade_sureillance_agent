@@ -12,6 +12,8 @@ exclude_docs: |
   REVIEW_Kimi_K2_7_Code.md
   generate_plots.py
   assets/plot_style.mplstyle
+  PORTFOLIO_CARD_DRAFT.md
+  WRITING_POST_DRAFT.md
 
 theme:
   name: material
@@ -61,6 +63,14 @@ nav:
       - Data pipeline: architecture/data-pipeline.md
       - Tools: architecture/tools.md
       - State and flow: architecture/state-and-flow.md
+      - Decisions:
+          - Index: architecture/decisions/index.md
+          - D-A2-1 Deterministic publication: architecture/decisions/D-A2-1-deterministic-publication.md
+          - D-A2-2 Plan once, validate in code: architecture/decisions/D-A2-2-plan-once-validate-in-code.md
+          - D-A2-3 No vector store: architecture/decisions/D-A2-3-no-vector-store.md
+          - D-A2-4 Fallback for availability: architecture/decisions/D-A2-4-fallback-for-availability.md
+          - D-A2-5 Vocabulary discipline: architecture/decisions/D-A2-5-vocabulary-discipline.md
+          - D-A2-6 Two evaluation layers: architecture/decisions/D-A2-6-two-evaluation-layers.md
   - Evidence:
       - Evaluation: evidence/evaluation.md
       - False positives: evidence/false-positives.md

@@ -60,4 +60,4 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium
       - name: E2E smoke test (mocked backend, all 4 UI states)
-        run: npx playwright test
+        run: npx playwright test investigation.spec.ts

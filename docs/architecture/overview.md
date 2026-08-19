@@ -18,9 +18,9 @@ graph TD
 ```
 
 See [docs/PLAN.md](https://github.com/PLACEHOLDER/trade-surveillance-agent/blob/main/docs/PLAN.md)
-§5 for the full design and the reasoning behind each decision. Architecture
-decision records land in Phase 8; this page grows alongside the implementation
-phases.
+§5 for the full design and the reasoning behind each decision. See
+[Decisions](decisions/index.md) for the six architecture decision records
+this build produced, each with the alternative it rejected and why.
 
 ## API and persistence
 

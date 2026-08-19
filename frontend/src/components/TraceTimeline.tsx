@@ -14,12 +14,14 @@ const NODE_LABELS: Record<string, string> = {
 };
 
 export function TraceTimeline({ events }: { events: TraceEvent[] }) {
-  if (events.length === 0) {
+  // __end__ is a stream-termination marker, not an investigation step.
+  const steps = events.filter((event) => event.node !== "__end__");
+  if (steps.length === 0) {
     return <p className="text-sm text-neutral-500">Waiting for the first step…</p>;
   }
   return (
     <ol className="space-y-2" aria-label="Investigation trace">
-      {events.map((event, i) => (
+      {steps.map((event, i) => (
         <li
           key={i}
           className="flex items-baseline gap-3 rounded border border-neutral-200 p-3 text-sm dark:border-neutral-800"

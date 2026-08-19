@@ -8,7 +8,10 @@ export default function Home() {
         A grounded insider-trading investigation, streamed node-by-node. Every
         published finding is judged against the evidence before you see it —
         see{" "}
-        <a className="underline" href="https://github.com/zarreh/trade_sureillance_agent">
+        <a
+          className="underline"
+          href="https://github.com/zarreh/trade_sureillance_agent/blob/main/docs/how-it-works/grounding.md"
+        >
           docs/how-it-works/grounding.md
         </a>{" "}
         for how.

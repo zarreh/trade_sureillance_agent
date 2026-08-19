@@ -38,7 +38,7 @@ docs-assets:
 	PYTHONPATH=. uv run python docs/generate_plots.py
 
 docs-screenshots:
-	uv run python -m tests.e2e.capture_screenshots
+	cd frontend && npx playwright test capture-screenshots.spec.ts
 
 frontend-dev:
 	cd frontend && npm run dev
@@ -51,4 +51,4 @@ frontend-types:
 	cd frontend && npm run gen:types
 
 frontend-e2e:
-	cd frontend && npx playwright test
+	cd frontend && npx playwright test investigation.spec.ts
