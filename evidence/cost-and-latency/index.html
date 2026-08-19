@@ -937,8 +937,31 @@
 
 
 <h1 id="cost-and-latency">Cost and latency</h1>
-<p><em>Per-node cost and p50/p95 latency per investigation, generated from real run
-data. Filled in during Phase 5/7.</em></p>
+<div class="admonition info">
+<p class="admonition-title">In one paragraph, for a non-engineer</p>
+<p>Every investigation has a real cost and a real time-to-answer, and both
+are tracked per run rather than estimated after the fact.</p>
+</div>
+<p><code>graph/cost_tracking.py</code>'s <code>CostTrackingHandler</code> attributes every LLM call's
+tokens and estimated cost to the LangGraph node that made it, using each
+call's <code>langgraph_node</code> run metadata — no manual threading through node code.
+<code>RunStore</code> (<code>store/run_store.py</code>) persists this per real API investigation
+run; the chart below instead comes from the Layer 1 canonical eval run
+(<code>evals/canonical.py</code>), the only run this environment can generate on demand.</p>
+<p><a class="glightbox" data-type="image" data-width="auto" data-height="auto" href="../../assets/cost-and-latency-per-investigation-light.svg#only-light" data-desc-position="bottom"><img alt="Latency per investigation" src="../../assets/cost-and-latency-per-investigation-light.svg#only-light"></a>
+<a class="glightbox" data-type="image" data-width="auto" data-height="auto" href="../../assets/cost-and-latency-per-investigation-dark.svg#only-dark" data-desc-position="bottom"><img alt="Latency per investigation" src="../../assets/cost-and-latency-per-investigation-dark.svg#only-dark"></a></p>
+<p><strong>Cost is $0 for every canonical scenario</strong> — an honest consequence of
+Layer 1 using <code>evals/oracle.py</code>'s deterministic chains rather than a live
+model in this environment (see <a href="../evaluation/">Evaluation</a>), not a
+placeholder. The cost-tracking arithmetic itself is exercised directly
+against real <code>LLMResult</code> payloads in <code>tests/graph/test_cost_tracking.py</code>, and
+will show real per-node dollar figures the first time <code>POST /investigations</code>
+runs against a live model with <code>SURVEILLANCE_OPENAI_API_KEY</code> set — visible
+via <code>GET /investigations/{id}</code> and the UI cost meter (Phase 6).</p>
+<p>Latency here is real: each canonical investigation's full graph run —
+planning, tool calls against the real SQLite stores, the grounding loop —
+timed end to end, p50/p95 computed the same way <code>evals/metrics.py</code> would for
+a live-model Layer 1 or Layer 2 run.</p>
 
 
 

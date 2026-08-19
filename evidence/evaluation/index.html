@@ -699,6 +699,24 @@
         
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Evaluation
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="./" class="md-nav__link md-nav__link--active">
         
   
@@ -715,6 +733,75 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
+      
+        <li class="md-nav__item">
+  <a href="#two-layers-never-conflated" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Two layers, never conflated
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#layer-1-canonical-regression-set-n10" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Layer 1 — canonical regression set (n=10)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Layer 1 — canonical regression set (n=10)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#latest-run" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Latest run
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#layer-2-stratified-evaluation-set" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Layer 2 — stratified evaluation set
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -913,6 +1000,64 @@
     
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
+      
+        <li class="md-nav__item">
+  <a href="#two-layers-never-conflated" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Two layers, never conflated
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#layer-1-canonical-regression-set-n10" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Layer 1 — canonical regression set (n=10)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Layer 1 — canonical regression set (n=10)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#latest-run" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Latest run
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#layer-2-stratified-evaluation-set" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Layer 2 — stratified evaluation set
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -937,11 +1082,134 @@
 
 
 <h1 id="evaluation">Evaluation</h1>
-<p><em>Filled in during Phase 7 — the two-layer evaluation design (canonical regression
-set vs. stratified published metrics), with sample size, label source, model
-version and confidence intervals on every published number. See
-<a href="https://github.com/PLACEHOLDER/trade-surveillance-agent/blob/main/docs/PLAN.md">docs/PLAN.md</a>
-§4.5.</em></p>
+<div class="admonition info">
+<p class="admonition-title">In one paragraph, for a non-engineer</p>
+<p>Every published number here states how many cases it's based on, where
+the labels came from, and what model version produced it — a claim
+without that context is exactly what this project exists to argue
+against.</p>
+</div>
+<h2 id="two-layers-never-conflated">Two layers, never conflated</h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Layer 1 — canonical</th>
+<th>Layer 2 — stratified</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Size</td>
+<td>10 hand-designed cases</td>
+<td>150–300, sampled across code/relationship/value/10b5-1/amendment status</td>
+</tr>
+<tr>
+<td>Purpose</td>
+<td>Regression smoke test</td>
+<td>Published metrics</td>
+</tr>
+<tr>
+<td>Runs</td>
+<td>Every pull request</td>
+<td>Scheduled / manual, pinned model versions</td>
+</tr>
+<tr>
+<td>Labels</td>
+<td>Designed by construction</td>
+<td>Hand-labelled</td>
+</tr>
+</tbody>
+</table>
+<h2 id="layer-1-canonical-regression-set-n10">Layer 1 — canonical regression set (n=10)</h2>
+<p><code>make eval</code> (<code>evals/run.py</code>) runs all 10 scenarios from <code>data/scenarios.py</code>
+through the real compiled graph — real nodes, real tools, real SQLite
+stores — and gates pull-request CI (<code>.github/workflows/ci.yml</code>) on an exact
+disposition match.</p>
+<p><strong>This environment has no LLM API key, so Layer 1 cannot use recorded live
+model responses.</strong> <code>evals/oracle.py</code> substitutes a deterministic, rules-based
+decision function — a reference oracle applying the same objective
+thresholds (single-trade limit, rolling 90-day limit, blackout window,
+filing lateness) a compliance officer would check, built from the <em>same</em>
+real tool outputs and the <em>same</em> deterministic exculpatory-factor logic
+(<code>graph/evidence.py</code>) the real graph uses. It is not a claim about LLM
+reasoning quality — it exercises the pipeline's plumbing (planning, tool
+wiring, evidence derivation, the grounding loop, publication) against a
+known-correct answer. <code>evals/record_responses.py</code>, capturing real transcripts
+once a live LLM is available, would replace it without changing
+<code>evals/metrics.py</code> or the CI gate.</p>
+<h3 id="latest-run">Latest run</h3>
+<p><a class="glightbox" data-type="image" data-width="auto" data-height="auto" href="../../assets/disposition-confusion-matrix-light.svg#only-light" data-desc-position="bottom"><img alt="Disposition confusion matrix" src="../../assets/disposition-confusion-matrix-light.svg#only-light"></a>
+<a class="glightbox" data-type="image" data-width="auto" data-height="auto" href="../../assets/disposition-confusion-matrix-dark.svg#only-dark" data-desc-position="bottom"><img alt="Disposition confusion matrix" src="../../assets/disposition-confusion-matrix-dark.svg#only-dark"></a></p>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Value</th>
+<th>n</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Disposition accuracy</td>
+<td>100%</td>
+<td>10</td>
+</tr>
+<tr>
+<td>Flag precision / recall</td>
+<td>100% / 100%</td>
+<td>10</td>
+</tr>
+<tr>
+<td>Severity-miss rate</td>
+<td>0%</td>
+<td>10</td>
+</tr>
+<tr>
+<td>False-positive rate on <code>clear</code> labels</td>
+<td>0%</td>
+<td>10</td>
+</tr>
+<tr>
+<td>Citation coverage</td>
+<td>100%</td>
+<td>10</td>
+</tr>
+<tr>
+<td>Unsupported-claim rate</td>
+<td>0%</td>
+<td>10</td>
+</tr>
+<tr>
+<td>Tool-call accuracy (plan passed <code>check_plan</code>)</td>
+<td>100%</td>
+<td>10</td>
+</tr>
+</tbody>
+</table>
+<p>Model version: n/a (oracle, <code>evals/oracle.py</code>) · label source: designed by
+construction (<code>data/scenarios.py</code>) · run date: generated by <code>make
+docs-assets</code> at doc-build time, never hand-typed — see
+<a href="../cost-and-latency/">Cost and latency</a> for the same run's timing, and
+<a href="../false-positives/">False positives</a> for why the alert-fatigue chart isn't
+published yet.</p>
+<p>Two scenarios needed a data-authoring fix discovered <em>by building this
+harness</em>, not before: scenario 8's original trade value already exceeded the
+single-trade limit on its own, so it would have escalated regardless of
+rolling-volume logic — fixed by splitting it into two smaller trades so the
+scenario actually isolates the rolling-90-day rule. Scenario 9's amendment
+was, on its own, just an ordinary small trade with nothing to amend away —
+fixed by injecting the large superseded original it corrects, so the
+scenario genuinely exercises supersession-exclusion
+(<code>FactStore.transactions_in_window</code>) rather than trivially clearing.</p>
+<h2 id="layer-2-stratified-evaluation-set">Layer 2 — stratified evaluation set</h2>
+<p><strong>Not populated.</strong> A published precision/recall figure needs a hand-labelled,
+stratified sample (150–300 cases) graded against pinned model versions —
+this requires both a live LLM and real human labelling effort, neither of
+which this environment has. The harness this layer needs (<code>evals/metrics.py</code>,
+the same <code>compute_metrics()</code> Layer 1 already uses) is ready; nothing here
+fabricates a placeholder number in its absence, per the standard this project
+holds everyone else to.</p>
 
 
 
