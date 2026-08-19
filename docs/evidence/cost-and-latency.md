@@ -11,8 +11,11 @@ call's `langgraph_node` run metadata — no manual threading through node code.
 run; the chart below instead comes from the Layer 1 canonical eval run
 (`evals/canonical.py`), the only run this environment can generate on demand.
 
+<figure markdown>
 ![Latency per investigation](../assets/cost-and-latency-per-investigation-light.svg#only-light)
 ![Latency per investigation](../assets/cost-and-latency-per-investigation-dark.svg#only-dark)
+<figcaption markdown>Per-node latency, Layer 1 canonical run</figcaption>
+</figure>
 
 **Cost is $0 for every canonical scenario** — an honest consequence of
 Layer 1 using `evals/oracle.py`'s deterministic chains rather than a live

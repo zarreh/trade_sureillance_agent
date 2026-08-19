@@ -16,6 +16,7 @@ from the data they describe.
 <figure markdown>
 ![Transaction code distribution](../assets/transaction-code-distribution-light.svg#only-light)
 ![Transaction code distribution](../assets/transaction-code-distribution-dark.svg#only-dark)
+<figcaption markdown>273,482 transactions, 2025 Q4 – 2026 Q2</figcaption>
 </figure>
 
 `F` (tax withholding) and `M` (option exercise) are the third and fourth most
@@ -31,6 +32,7 @@ off from alert fatigue. See
 <figure markdown>
 ![Reported 10b5-1 distribution](../assets/reported-10b5-1-distribution-light.svg#only-light)
 ![Reported 10b5-1 distribution](../assets/reported-10b5-1-distribution-dark.svg#only-dark)
+<figcaption markdown>`AFF10B5ONE` distribution across the fetched dataset</figcaption>
 </figure>
 
 The minority that are reported under a plan are the exculpatory cases this
@@ -41,6 +43,7 @@ system must never flag.
 <figure markdown>
 ![Filing lag distribution](../assets/filing-lag-distribution-light.svg#only-light)
 ![Filing lag distribution](../assets/filing-lag-distribution-dark.svg#only-dark)
+<figcaption markdown>Section 16(a) filing lag, in NYSE trading days</figcaption>
 </figure>
 
 Measured in NYSE trading days, not calendar days — the two diverge around
@@ -52,6 +55,7 @@ misjudge lateness.
 <figure markdown>
 ![Value by relationship](../assets/value-by-relationship-light.svg#only-light)
 ![Value by relationship](../assets/value-by-relationship-dark.svg#only-dark)
+<figcaption markdown>Transaction value distribution by `RPTOWNER_RELATIONSHIP`</figcaption>
 </figure>
 
 ## Why three quarters of data, not one
@@ -59,6 +63,7 @@ misjudge lateness.
 <figure markdown>
 ![Data coverage timeline](../assets/data-coverage-timeline-light.svg#only-light)
 ![Data coverage timeline](../assets/data-coverage-timeline-dark.svg#only-dark)
+<figcaption markdown>Three fetched quarters vs. the single target quarter</figcaption>
 </figure>
 
 A rolling 90-day volume check and a 180-day trading-history baseline both need

@@ -37,8 +37,11 @@ once a live LLM is available, would replace it without changing
 
 ### Latest run
 
+<figure markdown>
 ![Disposition confusion matrix](../assets/disposition-confusion-matrix-light.svg#only-light)
 ![Disposition confusion matrix](../assets/disposition-confusion-matrix-dark.svg#only-dark)
+<figcaption markdown>Layer 1 canonical run, n=10</figcaption>
+</figure>
 
 | Metric | Value | n |
 |---|---|---|
