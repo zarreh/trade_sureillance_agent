@@ -35,7 +35,7 @@ docs:
 	uv run mkdocs serve
 
 docs-assets:
-	uv run python docs/generate_plots.py
+	PYTHONPATH=. uv run python docs/generate_plots.py
 
 docs-screenshots:
 	uv run python -m tests.e2e.capture_screenshots

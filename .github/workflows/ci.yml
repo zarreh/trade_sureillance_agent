@@ -26,6 +26,8 @@ jobs:
         run: PYTHONPATH=src uv run lint-imports
       - name: Pytest
         run: uv run pytest -v --cov=surveillance --cov-report=term-missing
+      - name: Layer 1 canonical eval (gates on regression)
+        run: make eval
 
   docs-build:
     runs-on: ubuntu-latest

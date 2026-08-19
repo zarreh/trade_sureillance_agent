@@ -9,7 +9,7 @@ Scenarios double as the goldset consumed by evals/ in Phase 7.
 from __future__ import annotations
 
 import sqlite3
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import Literal
 
@@ -44,6 +44,19 @@ class Scenario:
 ISSUER_CIK = "0000320193"
 ISSUER_NAME = "Acme Corp"
 ISSUER_TICKER = "ACME"
+
+# A deterministic blackout window covering scenarios 1 and 5's trans_date
+# (2025-07-18), injected separately from generate_compliance_db.py's random
+# per-issuer seeding — the canonical set must be self-contained and not
+# depend on whatever month/day that seeding happens to land on for this
+# issuer (docs/PLAN.md §4.5: scenarios are deterministic goldset cases).
+SCENARIO_MATERIAL_EVENT = {
+    "issuer_cik": ISSUER_CIK,
+    "event_type": "earnings",
+    "event_date": "2025-07-20",
+    "blackout_start": "2025-07-10",
+    "blackout_end": "2025-07-22",
+}
 
 SCENARIOS: list[Scenario] = [
     Scenario(
@@ -203,7 +216,7 @@ SCENARIOS: list[Scenario] = [
         trans_date="2025-07-01",
         filing_date="2025-07-02",
         trans_code="S",
-        trans_shares=400_000,
+        trans_shares=50_000,
         trans_priceper_share=40.0,
         reported_under_10b5_1="unknown",
         filing_lag_trading_days=1,
@@ -307,6 +320,21 @@ def inject_scenarios_into(db_path: Path, scenarios: list[Scenario] = SCENARIOS) 
         for s in scenarios:
             conn.execute(_INSERT_TRANSACTION_SQL, _scenario_row(s))
         _inject_scenario_07_companion_row(conn)
+        _inject_scenario_08_prior_trade(conn)
+        _inject_scenario_09_superseded_original(conn)
+        conn.commit()
+
+
+def inject_scenario_material_event(policy_db_path: Path) -> None:
+    """Appends the deterministic scenario blackout window to an existing
+    policy.db (built by generate_compliance_db.py)."""
+    with sqlite3.connect(policy_db_path) as conn:
+        conn.execute(
+            "INSERT INTO material_events "
+            "(issuer_cik, event_type, event_date, blackout_start, blackout_end) "
+            "VALUES (:issuer_cik, :event_type, :event_date, :blackout_start, :blackout_end)",
+            SCENARIO_MATERIAL_EVENT,
+        )
         conn.commit()
 
 
@@ -325,12 +353,53 @@ def _inject_scenario_07_companion_row(conn: sqlite3.Connection) -> None:
     conn.execute(_INSERT_TRANSACTION_SQL, companion)
 
 
+def _inject_scenario_08_prior_trade(conn: sqlite3.Connection) -> None:
+    """Scenario 8 needs a separate prior filing for the same insider, 30 days
+    before the transaction under investigation: $2M (this transaction) plus
+    $14M (this prior one) clears the $15M rolling 90-day limit while neither
+    trade alone clears the $3M single-trade limit — so the scenario actually
+    isolates the rolling-volume rule rather than also tripping the single-trade
+    one (docs/PLAN.md §4.5)."""
+    scenario_08 = next(s for s in SCENARIOS if s.id == "scenario-08-rolling-90d-over-limit")
+    prior = replace(
+        scenario_08,
+        accession_number="SCENARIO-0000000001-25-000008-PRIOR",
+        trans_date="2025-06-01",
+        filing_date="2025-06-02",
+        trans_shares=350_000,
+        trans_priceper_share=40.0,
+    )
+    conn.execute(_INSERT_TRANSACTION_SQL, _scenario_row(prior))
+
+
+def _inject_scenario_09_superseded_original(conn: sqlite3.Connection) -> None:
+    """Scenario 9's amendment (already in SCENARIOS) is small and in-limit on
+    its own; to actually exercise supersession-exclusion (docs/PLAN.md §4.4:
+    "aggregates read only non-superseded rows") rather than just an ordinary
+    small trade, inject the ORIGINAL large, over-limit filing it amends —
+    marked superseded so FactStore's rolling-volume aggregate must exclude it
+    for the scenario to clear."""
+    scenario_09 = next(s for s in SCENARIOS if s.id == "scenario-09-amend-away")
+    original = replace(
+        scenario_09,
+        accession_number="SCENARIO-0000000001-25-000009",
+        document_type="4",
+        trans_shares=500_000,
+        trans_priceper_share=30.0,
+        superseded=True,
+        superseded_by=scenario_09.accession_number,
+    )
+    conn.execute(_INSERT_TRANSACTION_SQL, _scenario_row(original))
+
+
 def main() -> None:
     from surveillance.settings import get_settings
 
     settings = get_settings()
     inject_scenarios_into(Path(settings.facts_db_path))
+    inject_scenario_material_event(Path(settings.policy_db_path))
     print(f"Injected {len(SCENARIOS)} canonical scenarios into {settings.facts_db_path}")
+    print(f"Injected the scenario blackout window into {settings.policy_db_path}")
 
 
 if __name__ == "__main__":

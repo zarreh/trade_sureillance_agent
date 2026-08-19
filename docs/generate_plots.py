@@ -6,8 +6,14 @@ data it describes (PORTFOLIO_PLAN_V3.md §9.4).
 
 Phase 1 charts (transaction-code distribution, the AFF10B5ONE tri-state
 distribution, filing-lag distribution, value distribution by relationship, and
-the data-coverage timeline) are all sourced from facts.db. Phase 4 adds the
-grounding-loop chart (#7): charts 5/6/8 (evaluation) land in Phase 7.
+the data-coverage timeline) are all sourced from facts.db. Phase 4 added the
+grounding-loop chart (#7). Phase 7 adds #5 (disposition confusion matrix) and
+#8 (cost + latency per investigation), both from a real Layer 1 canonical eval
+run (evals/canonical.py) — see that module and evals/oracle.py for why this
+environment's Layer 1 uses a deterministic oracle rather than a live model,
+and why per-investigation cost is $0 as a result. Chart #6 (precision/recall
+vs alert volume) needs the larger stratified Layer 2 set, not yet populated
+(docs/evidence/evaluation.md), so it isn't generated here.
 """
 
 from __future__ import annotations
@@ -177,12 +183,61 @@ def grounding_loop_unsupported_claims() -> None:
     _save(fig, "grounding-loop-unsupported-claims")
 
 
+def disposition_confusion_matrix() -> None:
+    """Chart 5: expected vs. actual disposition, from a real Layer 1 canonical
+    eval run (evals/canonical.py, n=10, oracle-scored — see evals/oracle.py).
+    """
+    from evals.canonical import run_canonical_eval
+
+    order = ["clear", "flag", "escalate"]
+    results, _ = run_canonical_eval()
+    counts = {(e, a): 0 for e in order for a in order}
+    for r in results:
+        counts[(r.expected_disposition, r.actual_disposition)] += 1
+    matrix = [[counts[(expected, actual)] for actual in order] for expected in order]
+
+    fig, ax = plt.subplots()
+    ax.imshow(matrix, cmap="Blues")
+    ax.set_xticks(range(len(order)), labels=order)
+    ax.set_yticks(range(len(order)), labels=order)
+    ax.set_xlabel("Actual disposition")
+    ax.set_ylabel("Expected disposition")
+    ax.set_title(f"Disposition confusion matrix (Layer 1, n={len(results)})")
+    for i, expected in enumerate(order):
+        for j, actual in enumerate(order):
+            ax.text(j, i, str(counts[(expected, actual)]), ha="center", va="center")
+    _save(fig, "disposition-confusion-matrix")
+
+
+def cost_and_latency_per_investigation() -> None:
+    """Chart 8: cost and latency per investigation, from the same real Layer 1
+    run. Cost is $0 for every scenario because Layer 1's oracle chains
+    (evals/oracle.py) never call a live model in this environment — an honest
+    consequence of that design, not a placeholder value; the cost-tracking
+    plumbing itself (graph/cost_tracking.py) is exercised in
+    tests/graph/test_cost_tracking.py against real LLMResult payloads.
+    """
+    from evals.canonical import run_canonical_eval
+
+    results, _ = run_canonical_eval()
+    labels = [r.scenario_id.removeprefix("scenario-") for r in results]
+    latencies_ms = [r.latency_seconds * 1000 for r in results]
+
+    fig, ax = plt.subplots(figsize=(8, 5))
+    ax.barh(labels, latencies_ms, color="#2563eb")
+    ax.set_title("Latency per investigation (Layer 1 canonical run)")
+    ax.set_xlabel("Latency (ms)")
+    _save(fig, "cost-and-latency-per-investigation")
+
+
 def main() -> None:
     from surveillance.settings import get_settings
 
     plt.style.use(STYLE_PATH)
     ASSETS_DIR.mkdir(exist_ok=True)
     grounding_loop_unsupported_claims()
+    disposition_confusion_matrix()
+    cost_and_latency_per_investigation()
     settings = get_settings()
     facts_db_path = Path(settings.facts_db_path)
     if not facts_db_path.exists():
