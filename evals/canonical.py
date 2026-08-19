@@ -65,30 +65,30 @@ def _build_scenario_graph(tools: list[StructuredTool], accession_number: str) ->
     planner_chain = OraclePlannerChain()
     workflow = StateGraph(SurveillanceState)
     # See src/surveillance/graph/builder.py for why these need type: ignore.
-    workflow.add_node("plan", build_plan_node(planner_chain))  # type: ignore[call-overload]
+    workflow.add_node("plan", build_plan_node(planner_chain))  # type: ignore
     workflow.add_node(
         "check_plan",
-        build_check_plan_node(frozenset(t.name for t in tools)),  # type: ignore[call-overload]
+        build_check_plan_node(frozenset(t.name for t in tools)),  # type: ignore
     )
-    workflow.add_node("replan", build_replan_node(planner_chain))  # type: ignore[call-overload]
+    workflow.add_node("replan", build_replan_node(planner_chain))  # type: ignore
     workflow.add_node(
         "investigate",
-        build_investigate_node(  # type: ignore[call-overload]
+        build_investigate_node(  # type: ignore
             OracleInvestigator(accession_number), "oracle investigator"
         ),
     )
     workflow.add_node("tools", ToolNode(tools))
     workflow.add_node(
         "draft_finding",
-        build_draft_finding_node(OracleFindingWriterChain()),  # type: ignore[call-overload]
+        build_draft_finding_node(OracleFindingWriterChain()),  # type: ignore
     )
     workflow.add_node(
         "extract_claims",
-        build_extract_claims_node(OracleClaimExtractorChain()),  # type: ignore[call-overload]
+        build_extract_claims_node(OracleClaimExtractorChain()),  # type: ignore
     )
     workflow.add_node(
         "judge_grounding",
-        build_judge_grounding_node(OracleGroundingJudgeChain()),  # type: ignore[call-overload]
+        build_judge_grounding_node(OracleGroundingJudgeChain()),  # type: ignore
     )
     workflow.add_node("publish", publish_node)
     workflow.add_node("budget_exceeded", budget_exceeded_node)
