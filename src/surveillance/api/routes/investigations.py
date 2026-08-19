@@ -9,6 +9,7 @@ from surveillance.api.deps import get_compiled_graph, get_run_store, get_surveil
 from surveillance.api.rate_limit import DEFAULT_RATE_LIMIT, limiter
 from surveillance.api.run_executor import execute_investigation
 from surveillance.api.schemas import (
+    CostSummaryEntry,
     CreateInvestigationRequest,
     CreateInvestigationResponse,
     InvestigationResponse,
@@ -66,6 +67,16 @@ async def get_investigation(
     if run is None:
         raise HTTPException(status_code=404, detail="Investigation not found")
     finding = json.loads(run.finding_json) if run.finding_json else None
+    costs = [
+        CostSummaryEntry(
+            node=c.node,
+            model=c.model,
+            prompt_tokens=c.prompt_tokens,
+            completion_tokens=c.completion_tokens,
+            cost_usd=c.cost_usd,
+        )
+        for c in run_store.get_costs(run_id)
+    ]
     return InvestigationResponse(
         id=run.id,
         accession_number=run.accession_number,
@@ -75,6 +86,8 @@ async def get_investigation(
         finding_kind=run.finding_kind,
         finding=finding,
         error=run.error,
+        total_cost_usd=sum(c.cost_usd for c in costs),
+        costs=costs,
     )
 
 

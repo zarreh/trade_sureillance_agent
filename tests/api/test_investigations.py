@@ -63,6 +63,10 @@ def test_create_and_fetch_investigation_publishes_a_finding(client: TestClient) 
     assert body["status"] == "completed"
     assert body["finding_kind"] == "published"
     assert body["finding"]["finding_text"] == "fake finding"
+    # The fake chains in this test never call a real chat model, so no LLM
+    # callback fires and cost stays exactly zero — not a placeholder.
+    assert body["total_cost_usd"] == 0.0
+    assert body["costs"] == []
 
 
 def test_investigation_events_replays_every_node(client: TestClient) -> None:

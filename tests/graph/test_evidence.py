@@ -5,7 +5,11 @@ from langchain_core.messages import AIMessage, BaseMessage, ToolMessage
 
 from data.build_store import build_facts_db
 from data.generate_compliance_db import build_policy_db
-from surveillance.graph.evidence import derive_exculpatory_factors, extract_tool_call_records
+from surveillance.graph.evidence import (
+    derive_exculpatory_factors,
+    derive_reported_under_10b5_1,
+    extract_tool_call_records,
+)
 from surveillance.store.fact_store import FactStore
 from surveillance.store.policy_store import PolicyStore
 from surveillance.tools.get_applicable_role_limits import build_get_applicable_role_limits_tool
@@ -79,3 +83,15 @@ def test_tax_withholding_produces_exemption(stores: tuple[FactStore, PolicyStore
 
 def test_missing_transaction_details_yields_no_factors() -> None:
     assert derive_exculpatory_factors([]) == []
+
+
+def test_derive_reported_under_10b5_1_reads_the_filing_level_tri_state(
+    stores: tuple[FactStore, PolicyStore],
+) -> None:
+    conversation = _conversation_for("0000000001-25-000001", stores)  # 10b5_1=true
+    records = extract_tool_call_records(conversation)
+    assert derive_reported_under_10b5_1(records) == "true"
+
+
+def test_derive_reported_under_10b5_1_defaults_to_unknown_with_no_evidence() -> None:
+    assert derive_reported_under_10b5_1([]) == "unknown"

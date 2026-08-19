@@ -15,6 +15,14 @@ class CreateInvestigationResponse(BaseModel):
     status: str
 
 
+class CostSummaryEntry(BaseModel):
+    node: str
+    model: str
+    prompt_tokens: int
+    completion_tokens: int
+    cost_usd: float
+
+
 class InvestigationResponse(BaseModel):
     id: str
     accession_number: str
@@ -24,11 +32,5 @@ class InvestigationResponse(BaseModel):
     finding_kind: str | None
     finding: dict[str, object] | None
     error: str | None
-
-
-class CostSummaryEntry(BaseModel):
-    node: str
-    model: str
-    prompt_tokens: int
-    completion_tokens: int
-    cost_usd: float
+    total_cost_usd: float
+    costs: list[CostSummaryEntry]

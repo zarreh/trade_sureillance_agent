@@ -40,4 +40,5 @@ def test_attaches_deterministic_exculpatory_factors_to_llm_draft() -> None:
     assert finding.disposition == "clear"
     assert finding.finding_text == "looks fine"
     assert any(f.kind == "reported_under_10b5_1" for f in finding.exculpatory_factors)
+    assert finding.reported_under_10b5_1 == "true"
     assert stub.last_input == {"messages": messages}

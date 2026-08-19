@@ -1,4 +1,4 @@
-.PHONY: dev test lint typecheck imports eval up down data docs docs-assets docs-screenshots
+.PHONY: dev test lint typecheck imports eval up down data docs docs-assets docs-screenshots frontend-dev frontend-build frontend-types frontend-e2e
 
 dev:
 	uv run uvicorn surveillance.api.main:app --reload --port 8000
@@ -39,3 +39,16 @@ docs-assets:
 
 docs-screenshots:
 	uv run python -m tests.e2e.capture_screenshots
+
+frontend-dev:
+	cd frontend && npm run dev
+
+frontend-build:
+	cd frontend && npm run build
+
+frontend-types:
+	PYTHONPATH=src uv run python -c "from surveillance.api.main import app; import json; json.dump(app.openapi(), open('frontend/openapi.json', 'w'), indent=2)"
+	cd frontend && npm run gen:types
+
+frontend-e2e:
+	cd frontend && npx playwright test

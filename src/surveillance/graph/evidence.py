@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import json
 from collections.abc import Sequence
+from typing import Literal
 
 from langchain_core.messages import AIMessage, BaseMessage, ToolMessage
 
@@ -44,6 +45,23 @@ def extract_tool_call_records(messages: Sequence[BaseMessage]) -> list[ToolCallR
 def _latest(records: list[ToolCallRecord], tool_name: str) -> ToolCallRecord | None:
     matches = [r for r in records if r.tool_name == tool_name]
     return matches[-1] if matches else None
+
+
+def derive_reported_under_10b5_1(
+    records: list[ToolCallRecord],
+) -> Literal["true", "false", "unknown"]:
+    """The filing-level 10b5-1 tri-state, straight from `get_transaction_details`
+    — never inferred from its absence. Surfaced on the finding so the UI can
+    render `unknown` as "not established", never as "no plan" (docs/PLAN.md §3.4)."""
+    details = _latest(records, "get_transaction_details")
+    if details is None:
+        return "unknown"
+    try:
+        payload = json.loads(details.result)
+    except json.JSONDecodeError:
+        return "unknown"
+    value = payload.get("reported_under_10b5_1")
+    return value if value in ("true", "false", "unknown") else "unknown"
 
 
 def derive_exculpatory_factors(records: list[ToolCallRecord]) -> list[ExculpatoryFactor]:

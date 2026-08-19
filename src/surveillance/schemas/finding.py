@@ -48,6 +48,7 @@ class ComplianceFindingDraft(BaseModel):
 
 class ComplianceFinding(ComplianceFindingDraft):
     exculpatory_factors: list[ExculpatoryFactor] = Field(default_factory=list)
+    reported_under_10b5_1: Literal["true", "false", "unknown"] = "unknown"
     incomplete: bool = False
     incomplete_reason: str | None = None
 
