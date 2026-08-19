@@ -937,6 +937,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#frontend" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Frontend
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1042,6 +1053,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#frontend" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Frontend
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1097,6 +1119,29 @@ the labelled scenarios. See <a href="https://github.com/PLACEHOLDER/trade-survei
 curl<span class="w"> </span>-s<span class="w"> </span>localhost:8000/investigations/&lt;id&gt;
 curl<span class="w"> </span>-sN<span class="w"> </span>localhost:8000/investigations/&lt;id&gt;/events<span class="w">   </span><span class="c1"># SSE, node-by-node</span>
 </code></pre></div>
+<p><code>GET /investigations/{id}/events</code> replays every persisted node event from the
+start and then tails new ones until the run finishes — reconnecting later
+just replays from <code>RunStore</code> (<code>data/runs.db</code>), no run is lost. Requests are
+rate-limited (<code>SURVEILLANCE_RATE_LIMIT_PER_MINUTE</code>, default 20/minute) and
+request bodies are capped (<code>SURVEILLANCE_MAX_REQUEST_BODY_BYTES</code>, default 16KB).</p>
+<h2 id="frontend">Frontend</h2>
+<div class="highlight"><pre><span></span><code><span class="nb">cd</span><span class="w"> </span>frontend
+npm<span class="w"> </span>install
+cp<span class="w"> </span>.env.local.example<span class="w"> </span>.env.local<span class="w">   </span><span class="c1"># NEXT_PUBLIC_API_BASE, defaults to :8000</span>
+npm<span class="w"> </span>run<span class="w"> </span>dev
+</code></pre></div>
+<p>Visit <code>http://localhost:3000</code> — the page starts a real investigation the
+moment it loads (no typing required) and streams it node-by-node via
+<code>RunConsole</code>, <code>TraceTimeline</code>, <code>ValidatorStrip</code>, <code>EvidencePanel</code> and
+<code>CostMeter</code>. Requires the backend running with a real <code>SURVEILLANCE_OPENAI_API_KEY</code>
+to produce a genuine finding; against a placeholder key the run still streams
+but ultimately fails, exercising the error state honestly rather than faking one.</p>
+<p>Types are generated from the FastAPI OpenAPI schema, never hand-written:</p>
+<div class="highlight"><pre><span></span><code>make<span class="w"> </span>frontend-types<span class="w">    </span><span class="c1"># backend schema -&gt; frontend/src/lib/api-types.ts</span>
+</code></pre></div>
+<p><code>make frontend-e2e</code> runs the Playwright smoke test covering all four UI
+states (loading, success, empty, error) against a fully mocked backend — no
+live LLM, network, or Python process required.</p>
 <p><code>GET /investigations/{id}/events</code> replays every persisted node event from the
 start and then tails new ones until the run finishes — reconnecting later
 just replays from <code>RunStore</code> (<code>data/runs.db</code>), no run is lost. Requests are

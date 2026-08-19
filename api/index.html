@@ -1374,8 +1374,7 @@
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/surveillance/api/routes/investigations.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tbody><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">40</span>
-<span class="normal">41</span>
+              <div class="highlight"><table class="highlighttable"><tbody><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">41</span>
 <span class="normal">42</span>
 <span class="normal">43</span>
 <span class="normal">44</span>
@@ -1391,7 +1390,8 @@
 <span class="normal">54</span>
 <span class="normal">55</span>
 <span class="normal">56</span>
-<span class="normal">57</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@router</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">""</span><span class="p">,</span> <span class="n">status_code</span><span class="o">=</span><span class="mi">202</span><span class="p">)</span>
+<span class="normal">57</span>
+<span class="normal">58</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@router</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">""</span><span class="p">,</span> <span class="n">status_code</span><span class="o">=</span><span class="mi">202</span><span class="p">)</span>
 <span class="nd">@limiter</span><span class="o">.</span><span class="n">limit</span><span class="p">(</span><span class="n">DEFAULT_RATE_LIMIT</span><span class="p">)</span>
 <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">create_investigation</span><span class="p">(</span>
     <span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">,</span>
@@ -1435,14 +1435,14 @@
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/surveillance/api/routes/investigations.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tbody><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">30</span>
-<span class="normal">31</span>
+              <div class="highlight"><table class="highlighttable"><tbody><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">31</span>
 <span class="normal">32</span>
 <span class="normal">33</span>
 <span class="normal">34</span>
 <span class="normal">35</span>
 <span class="normal">36</span>
-<span class="normal">37</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@router</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/skeleton/events"</span><span class="p">)</span>
+<span class="normal">37</span>
+<span class="normal">38</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@router</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/skeleton/events"</span><span class="p">)</span>
 <span class="nd">@limiter</span><span class="o">.</span><span class="n">limit</span><span class="p">(</span><span class="n">DEFAULT_RATE_LIMIT</span><span class="p">)</span>
 <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">skeleton_events</span><span class="p">(</span>
     <span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">,</span> <span class="n">graph</span><span class="p">:</span> <span class="n">GraphDep</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"hello"</span>
