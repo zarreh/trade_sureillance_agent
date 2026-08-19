@@ -9,7 +9,7 @@
     it says so when it isn't sure.
 
 **Status:** in development. This site is being built alongside the code, phase by
-phase — see the [build plan](https://github.com/PLACEHOLDER/trade-surveillance-agent/blob/main/docs/PLAN.md)
+phase — see the [build plan](https://github.com/zarreh/trade_sureillance_agent/blob/main/docs/PLAN.md)
 for what exists today.
 
 ## What it does

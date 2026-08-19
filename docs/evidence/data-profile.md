@@ -23,7 +23,7 @@ common codes — more common than ordinary purchases. Both are routinely
 non-suspicious. A naive value-threshold rule would flag tens of thousands of
 these every quarter, which is exactly how a surveillance system gets switched
 off from alert fatigue. See
-[docs/PLAN.md](https://github.com/PLACEHOLDER/trade-surveillance-agent/blob/main/docs/PLAN.md)
+[docs/PLAN.md](https://github.com/zarreh/trade_sureillance_agent/blob/main/docs/PLAN.md)
 §3.3.8.
 
 ## Most sales are not made under a 10b5-1 plan

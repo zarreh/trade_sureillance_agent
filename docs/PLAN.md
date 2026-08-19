@@ -515,6 +515,17 @@ preloaded example to capture the UI shots used in
 
 ## 7. Phases
 
+**Status (2026-08-19): `base` is fully built.** Phases 0–8 below are all
+complete, tested, and pushed with CI+CD green at every step — see the repo's
+`git log` for the phase-by-phase commits. What's genuinely deferred (Layer 2
+evaluation, cross-provider profiles, live deployment, the `pro` tier) is
+listed in [§7 Stretch](#stretch-pro-tier-gated-only-after-base-is-deployed-and-phase-7-metrics-are-published)
+below and cross-referenced from the specific docs pages each item touches
+(`docs/architecture/decisions/D-A2-4-fallback-for-availability.md`,
+`docs/evidence/evaluation.md`). This section is kept as written during
+planning — a historical record of the reasoning behind each phase — not
+rewritten after the fact to match what was actually built.
+
 ### Phase 0 — Template shakedown *(time-boxed; ~⅓ of base effort)*
 
 Repo scaffold per §9.3 with every folder present, even near-empty. `uv` +

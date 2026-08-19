@@ -1,6 +1,6 @@
 site_name: Trade Surveillance Agent
 site_description: Insider-trading surveillance that has to show its work.
-repo_url: https://github.com/PLACEHOLDER/trade-surveillance-agent
+repo_url: https://github.com/zarreh/trade_sureillance_agent
 edit_uri: edit/main/docs/
 
 # Internal build-planning documents live alongside the site source in docs/ but

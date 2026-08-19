@@ -17,7 +17,7 @@ graph TD
   judge -- supported --> publish[publish]
 ```
 
-See [docs/PLAN.md](https://github.com/PLACEHOLDER/trade-surveillance-agent/blob/main/docs/PLAN.md)
+See [docs/PLAN.md](https://github.com/zarreh/trade_sureillance_agent/blob/main/docs/PLAN.md)
 §5 for the full design and the reasoning behind each decision. See
 [Decisions](decisions/index.md) for the six architecture decision records
 this build produced, each with the alternative it rejected and why.

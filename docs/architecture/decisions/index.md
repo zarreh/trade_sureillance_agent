@@ -1,7 +1,7 @@
 # ADR index
 
 Architecture decision records for the trade surveillance agent, referenced
-from [docs/PLAN.md](https://github.com/PLACEHOLDER/trade-surveillance-agent/blob/main/docs/PLAN.md)
+from [docs/PLAN.md](https://github.com/zarreh/trade_sureillance_agent/blob/main/docs/PLAN.md)
 §8. Each records a decision, the alternative it rejected, and why — not just
 what was built.
 
