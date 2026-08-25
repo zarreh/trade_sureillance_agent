@@ -20,6 +20,7 @@ from surveillance.graph.state import create_initial_state
 from surveillance.observability import get_logger
 from surveillance.schemas.finding import ComplianceFinding, PublishedFinding
 from surveillance.settings import Settings
+from surveillance.store.models import CostEntry
 from surveillance.store.run_store import RunStore
 
 logger = get_logger(__name__)
@@ -93,7 +94,13 @@ async def execute_investigation(
             )
             sequence += 1
 
-        run_store.record_costs(run_id, cost_handler.entries)
+        run_store.record_costs(
+            run_id,
+            [
+                CostEntry(e.node, e.model, e.prompt_tokens, e.completion_tokens, e.cost_usd)
+                for e in cost_handler.entries
+            ],
+        )
         _finalize(run_store, run_id, final_state)
     except Exception as exc:
         logger.error("investigation_failed", run_id=run_id, error=str(exc))

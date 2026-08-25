@@ -2,26 +2,13 @@ import asyncio
 import json
 from collections.abc import AsyncIterator
 
-from surveillance.graph.builder import SkeletonGraph
-from surveillance.graph.state import SkeletonState
+from zarreh_agentkit.serialization import stream_graph_events
+
 from surveillance.store.run_store import RunStore
 
 _POLL_INTERVAL_SECONDS = 0.25
 
-
-async def stream_graph_events(
-    graph: SkeletonGraph, initial_state: SkeletonState
-) -> AsyncIterator[str]:
-    """Bridges a LangGraph run to Server-Sent Events, one event per node step."""
-    async for event in graph.astream_events(initial_state, version="v2"):
-        if event["event"] != "on_chain_end":
-            continue
-        payload = {
-            "node": event.get("name"),
-            "output": event.get("data", {}).get("output"),
-        }
-        yield json.dumps(payload, default=str)
-    yield json.dumps({"node": "__end__", "output": None})
+__all__ = ["stream_graph_events", "stream_investigation_events"]
 
 
 async def stream_investigation_events(run_store: RunStore, run_id: str) -> AsyncIterator[str]:

@@ -1,22 +1,7 @@
-import structlog
+"""Logging is provided by `zarreh_agentkit.observability` (extracted substrate);
+this module re-exports it so existing `surveillance.observability` imports keep
+working."""
 
+from zarreh_agentkit.observability import configure_logging, get_logger
 
-def configure_logging(environment: str) -> None:
-    """Configure structlog: pretty console in dev, JSON in production."""
-    renderer = (
-        structlog.dev.ConsoleRenderer()
-        if environment == "development"
-        else structlog.processors.JSONRenderer()
-    )
-    structlog.configure(
-        processors=[
-            structlog.contextvars.merge_contextvars,
-            structlog.processors.add_log_level,
-            structlog.processors.TimeStamper(fmt="iso"),
-            renderer,
-        ],
-    )
-
-
-def get_logger(name: str) -> structlog.stdlib.BoundLogger:
-    return structlog.get_logger(name)  # type: ignore[no-any-return]
+__all__ = ["configure_logging", "get_logger"]
