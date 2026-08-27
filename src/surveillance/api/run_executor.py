@@ -11,8 +11,8 @@ from __future__ import annotations
 import json
 
 import structlog
-from langchain_core.callbacks.base import BaseCallbackHandler
 from pydantic import BaseModel
+from zarreh_agentkit.observability import build_tracing_callbacks
 
 from surveillance.graph.builder import SurveillanceGraph
 from surveillance.graph.cost_tracking import CostTrackingHandler
@@ -52,14 +52,6 @@ def _json_default(value: object) -> object:
     return str(value)
 
 
-def _build_tracing_callbacks(settings: Settings) -> list[BaseCallbackHandler]:
-    if not settings.langsmith_api_key:
-        return []
-    from langchain_core.tracers.langchain import LangChainTracer
-
-    return [LangChainTracer(project_name=settings.langsmith_project)]
-
-
 async def execute_investigation(
     run_id: str,
     accession_number: str,
@@ -70,7 +62,10 @@ async def execute_investigation(
     structlog.contextvars.bind_contextvars(correlation_id=run_id)
     try:
         cost_handler = CostTrackingHandler()
-        callbacks = [cost_handler, *_build_tracing_callbacks(settings)]
+        callbacks = [
+            cost_handler,
+            *build_tracing_callbacks(settings.langsmith_api_key, settings.langsmith_project),
+        ]
         final_state: dict[str, object] = {}
         sequence = 0
 

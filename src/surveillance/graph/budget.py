@@ -1,43 +1,30 @@
 """Per-investigation cost guardrail (docs/PLAN.md §5.5).
 
-On breach the run terminates with a partial finding marked `incomplete` — it
-never silently truncates. This is what makes the per-investigation cost
-figure honest and keeps a public demo from running unbounded.
+The ceiling and the LangChain-messages counting are provided by
+`zarreh_agentkit.guardrails.budget` (extracted here and in A3, converging on
+an identical shape). This module adapts the kit's message-count-agnostic
+signature back to the messages-based one this app's call sites already use,
+and keeps the app's own choice of what a breach means: on breach the run
+terminates with a partial finding marked `incomplete` — it never silently
+truncates. That is what makes the per-investigation cost figure honest and
+keeps a public demo from running unbounded.
 """
 
 from __future__ import annotations
 
-import time
 from collections.abc import Sequence
-from dataclasses import dataclass
 
-from langchain_core.messages import AIMessage, BaseMessage
-
-
-@dataclass(frozen=True)
-class Budget:
-    max_tool_calls: int = 15
-    max_wall_clock_seconds: float = 120.0
-
+from langchain_core.messages import BaseMessage
+from zarreh_agentkit.guardrails.budget import Budget, count_tool_calls
+from zarreh_agentkit.guardrails.budget import budget_breach_reason as _budget_breach_reason
 
 DEFAULT_BUDGET = Budget()
 
-
-def count_tool_calls(messages: Sequence[BaseMessage]) -> int:
-    return sum(len(m.tool_calls) for m in messages if isinstance(m, AIMessage) and m.tool_calls)
+__all__ = ["Budget", "DEFAULT_BUDGET", "budget_breach_reason", "count_tool_calls"]
 
 
 def budget_breach_reason(
     messages: Sequence[BaseMessage], started_at: float, budget: Budget = DEFAULT_BUDGET
 ) -> str | None:
     """Returns a human-readable breach reason, or None if within budget."""
-    calls = count_tool_calls(messages)
-    if calls > budget.max_tool_calls:
-        return f"exceeded max_tool_calls={budget.max_tool_calls} (used {calls})"
-    elapsed = time.time() - started_at
-    if elapsed > budget.max_wall_clock_seconds:
-        return (
-            f"exceeded max_wall_clock_seconds={budget.max_wall_clock_seconds} "
-            f"(elapsed {elapsed:.1f}s)"
-        )
-    return None
+    return _budget_breach_reason(count_tool_calls(messages), started_at, budget)
