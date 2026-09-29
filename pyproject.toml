@@ -108,4 +108,4 @@ source_modules = ["surveillance"]
 forbidden_modules = ["dspy", "deepeval"]
 
 [tool.uv.sources]
-zarreh-agentkit = { git = "ssh://git@github.com/zarreh/zarreh_agentkit.git", branch = "main" }
+zarreh-agentkit = { git = "https://github.com/zarreh/zarreh_agentkit.git", tag = "v0.2.0" }

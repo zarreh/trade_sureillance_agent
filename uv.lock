@@ -2708,7 +2708,7 @@ requires-dist = [
     { name = "truststore", specifier = ">=0.9" },
     { name = "types-requests", marker = "extra == 'dev'" },
     { name = "uvicorn", extras = ["standard"], specifier = ">=0.32" },
-    { name = "zarreh-agentkit", git = "ssh://git@github.com/zarreh/zarreh_agentkit.git?branch=main" },
+    { name = "zarreh-agentkit", git = "https://github.com/zarreh/zarreh_agentkit.git?tag=v0.2.0" },
 ]
 provides-extras = ["dev", "docs"]
 
@@ -3345,8 +3345,8 @@ wheels = [
 
 [[package]]
 name = "zarreh-agentkit"
-version = "0.1.0"
-source = { git = "ssh://git@github.com/zarreh/zarreh_agentkit.git?branch=main#8a61be180224533322d7e3826d206705ed2c37a7" }
+version = "0.2.0"
+source = { git = "https://github.com/zarreh/zarreh_agentkit.git?tag=v0.2.0#6456743e258f99922933d24d6b2f4c077ccdb788" }
 dependencies = [
     { name = "fastapi" },
     { name = "langchain-core" },
