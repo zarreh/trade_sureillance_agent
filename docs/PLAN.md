@@ -805,7 +805,7 @@ document amended in parallel — see `PORTFOLIO_PLAN_V3.md` §9.4, §14, §13, �
 
 ## 13. v4 upgrade — process audit, RL environment, and UI/readiness pass
 
-*Added 2026-10-29 from `PORTFOLIO_PLAN_V4.md` (§0a, §6a, §9.5, §10.1, §13). This section is the build plan for a separate implementation conversation; nothing here has been built yet. Sections 0–12 above remain the record of the `base` build.*
+*Added 2026-10-29 from `PORTFOLIO_PLAN_V4.md` (§0a, §6a, §9.5, §10.1, §13). P, R, U and the optional R7 live run were built on 2026-10-29; see §13.10 for what changed from this text. Sections 0–12 above remain the record of the `base` build.*
 
 ### 13.0 Purpose and framing
 
@@ -1067,6 +1067,27 @@ Order: **P → R1–R6 → U1–U4 → R7 (optional)**. U1 (readiness fixes and 
 | Process audit changes the judged draft | Record-only; regression test on published == judged draft |
 | Gate margins set from guesses | Record actual means on the first run, then set the 0.5 margin as a floor and keep it |
 | Copying `ui/` creates a third copy | Portfolio decision D20; record as extraction debt in `docs/HARVEST.md` either way |
+
+---
+
+### 13.10 Implementation status and deviations (2026-10-29)
+
+**Built:** Phase P, Phase R (including a live-model run, R7), Phase U. Not built: pushing and deploying (no Docker in the authoring environment, so the new images are written but not built), and a replay harness that would use the recorded live transcripts in place of the scripted stand-in.
+
+Where the build differs from the text above:
+
+- **Gate strengthened.** The gate as specified (every policy at least 0.5 below the reference) could not catch two deliberate bugs: scaling penalties by the trajectory score, and removing the fabricated-id check. Added `blind_always_clear` (no evidence, always clears) with a gate check that skipping evidence never beats gathering it, and made `citation_fabricator` cite one real and one invented id. There are now nine policies, not eight, and each mutation fails `make eval`.
+- **Budget.** The environment enforces the tool-call count only. The wall-clock limit would make episodes nondeterministic, so it is not shown or enforced.
+- **Invalid-action reward.** Non-terminal steps return 0; the 0.05 penalty is added in the terminal reward, so the final return is a single `RewardBreakdown`.
+- **Truncation** is a flat -0.5 that subsumes other penalties.
+- **One CI step was added.** `make eval` covers the RL gate with no workflow change, but the drift check on the generated JSON is a new CI step.
+- **OpenAPI.** The `finding` field is opaque JSON in the OpenAPI document, so there is no schema snapshot of `process_audit`; the frontend validates it with Zod (`frontend/src/lib/schemas.ts`).
+- **Process audit in the product.** `PublishedFinding` also carries the judged `claims` so the UI can show claim text. An empty claim list scores 0 on citation validity, not a vacuous 1. Exemption mentions in claim text are found with a negation-aware keyword map (D-A2-7).
+- **File names.** The regulatory-basis page is `docs/regulatory-basis.md`. D-A2-11 (judge excluded from the reward) is folded into D-A2-8, and D-A2-9 records the gymnasium contract.
+- **Home page.** It opens on a recorded example (written by `evals/export_example.py`) instead of starting a live run on every page view, which would spend model credits per visitor. **Run it live** starts a real run and puts its id in the URL so a reload replays it.
+- **Duplicate starts** are allowed (recorded in `docs/HARVEST.md`).
+- **Extra fixes found by the readiness review and the live run** (all in `docs/HARVEST.md`): no CORS policy; runs cut off by a restart stayed `running`; the API image did not trust proxy headers; and every real investigation through the API failed on LangGraph's default recursion limit of 25.
+- **Live result (not gated):** 4 of 10 dispositions correct, mean reward -0.03, $0.43 in total, and the process audit scored 0 on five runs because the claim extractor cited no tool-call ids. See `docs/evidence/rl-environment.md`.
 
 ---
 
