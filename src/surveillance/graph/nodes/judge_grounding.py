@@ -10,35 +10,23 @@ gap directly rather than retrying blindly.
 from __future__ import annotations
 
 from collections.abc import Callable
-from typing import Literal
 
 from langchain_core.messages import HumanMessage
+from zarreh_agentkit.guardrails.grounding import (
+    count_unsupported,
+    grounding_confidence,
+    unsupported_claims_feedback,
+)
 
 from surveillance.graph.evidence import extract_tool_call_records
 from surveillance.graph.protocols import GroundingJudgeChain
 from surveillance.graph.state import SurveillanceState
-from surveillance.schemas.grounding import ClaimJudgment, GroundingReport
+from surveillance.schemas.grounding import GroundingReport
 
-
-def _confidence_for(unsupported: int) -> Literal["high", "medium", "low"]:
-    if unsupported == 0:
-        return "high"
-    if unsupported == 1:
-        return "medium"
-    return "low"
-
-
-def _feedback_text(claims_by_id: dict[str, str], judgments: list[ClaimJudgment]) -> str:
-    lines = [
-        f'- "{claims_by_id.get(j.claim_id, j.claim_id)}" — {j.reason}'
-        for j in judgments
-        if not j.supported
-    ]
-    header = (
-        "The following claims in the draft finding are not supported by evidence "
-        "gathered so far. Investigate further to either substantiate or drop them:"
-    )
-    return header + "\n" + "\n".join(lines)
+_FEEDBACK_HEADER = (
+    "The following claims in the draft finding are not supported by evidence "
+    "gathered so far. Investigate further to either substantiate or drop them:"
+)
 
 
 def build_judge_grounding_node(
@@ -54,11 +42,11 @@ def build_judge_grounding_node(
             }
         )
         judgments = result.judgments
-        unsupported = sum(1 for j in judgments if not j.supported)
+        unsupported = count_unsupported(judgments)
         report = GroundingReport(
             claims=judgments,
             unsupported=unsupported,
-            confidence=_confidence_for(unsupported),
+            confidence=grounding_confidence(unsupported),
         )
         delta: dict[str, object] = {
             "grounding_report": report,
@@ -66,7 +54,11 @@ def build_judge_grounding_node(
         }
         if unsupported > 0:
             claims_by_id = {c.id: c.text for c in claims}
-            delta["messages"] = [HumanMessage(content=_feedback_text(claims_by_id, judgments))]
+            delta["messages"] = [
+                HumanMessage(
+                    content=unsupported_claims_feedback(judgments, _FEEDBACK_HEADER, claims_by_id)
+                )
+            ]
         return delta
 
     return judge_grounding_node
