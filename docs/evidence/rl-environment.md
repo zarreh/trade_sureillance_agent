@@ -113,6 +113,43 @@ A further CI step fails if the generated results file differs from the
 committed one. The scorer is the scripted stand-in; **no live-model number is
 gated.**
 
+## Live-model run (not gated)
+
+The same ten scenarios were run once through the real graph with real models and
+scored with the same `compute_reward` (`make eval-live`, `evals/live_run.py`).
+It is **not** part of `make eval` and no CI check depends on it.
+
+| | |
+|---|---|
+| n | 10 canonical scenarios |
+| Models | `gpt-4o-mini-2024-07-18` (plan, investigate, claims), `gpt-4o-2024-08-06` (finding, judge) |
+| Run date | 2026-10-29 |
+| Labels | designed with the scenarios, as above |
+| Disposition accuracy | 4 of 10 |
+| Mean reward | -0.03 (outcome only: 0.09) |
+| Cost | $0.43 in total, about $0.04 per investigation |
+| Mean latency | 33.5 s per investigation |
+| Uncertainty | none computed; n=10 supports no precision claim, and one run varies from the next |
+
+Per-scenario results and every transcript are in
+`evals/recordings/live-2026-10-29/`. Two things stand out.
+
+- **The model missed three of the four `flag` cases** by clearing them, which the
+  outcome table penalises hardest. The accuracy figure says nothing about model
+  quality in general: ten cases, one run, one prompt version.
+- **The process audit scored 0 on five of ten runs, and for a real reason.** In
+  those five the claim extractor cited no tool-call ids at all, so the audit's
+  citation check failed. The grounding judge also marked many claims unsupported
+  (between 1 and 5 per run), and those findings were still published once the
+  two evidence passes were spent, with the unsupported count visible. A
+  record-only audit and a judge that sees only the claims it is given are doing
+  different jobs; here the audit surfaced a weakness in the claim extractor that
+  the grounding report alone did not.
+
+The recorded transcripts are what a later replay harness would use to replace the
+scripted stand-in (`evals/oracle.py`) with real responses. That replacement is not
+built yet.
+
 ## Lessons learned
 
 1. **Outcome-only scoring rewards `always_flag`.** It gets 100% flag recall while

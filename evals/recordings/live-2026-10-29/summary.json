@@ -1,0 +1,239 @@
+{
+  "run_date": "2026-10-29",
+  "n": 10,
+  "n_failed_to_run": 0,
+  "label_source": "canonical scenarios in data/scenarios.py, designed with their labels",
+  "scorer": "live model, scored with evals.rl_env.compute_reward; not gated",
+  "models": [
+    "gpt-4o-2024-08-06",
+    "gpt-4o-mini-2024-07-18"
+  ],
+  "disposition_accuracy": 0.4,
+  "reward_mean": -0.032000000000000015,
+  "outcome_only_mean": 0.09,
+  "total_cost_usd": 0.4264,
+  "mean_latency_seconds": 33.54,
+  "uncertainty": "none computed; n=10 supports no precision claim",
+  "per_scenario": [
+    {
+      "scenario_id": "scenario-01-blackout-sale",
+      "expected": "flag",
+      "submitted": "escalate",
+      "published": true,
+      "incomplete": false,
+      "correct": false,
+      "reward": -0.12000000000000001,
+      "outcome_only": -0.1,
+      "trajectory_score": 0.0,
+      "tool_calls": 8,
+      "evidence_passes": 2,
+      "unsupported_claims": 5,
+      "cost_usd": 0.0384645,
+      "latency_seconds": 34.02,
+      "models": [
+        "gpt-4o-2024-08-06",
+        "gpt-4o-mini-2024-07-18"
+      ],
+      "claims": 5,
+      "claims_with_citation": 0
+    },
+    {
+      "scenario_id": "scenario-02-volume-spike",
+      "expected": "flag",
+      "submitted": "clear",
+      "published": true,
+      "incomplete": false,
+      "correct": false,
+      "reward": -0.77,
+      "outcome_only": -0.75,
+      "trajectory_score": 1.0,
+      "tool_calls": 8,
+      "evidence_passes": 2,
+      "unsupported_claims": 3,
+      "cost_usd": 0.0442416,
+      "latency_seconds": 35.88,
+      "models": [
+        "gpt-4o-2024-08-06",
+        "gpt-4o-mini-2024-07-18"
+      ],
+      "claims": 6,
+      "claims_with_citation": 6
+    },
+    {
+      "scenario_id": "scenario-03-over-limit",
+      "expected": "escalate",
+      "submitted": "escalate",
+      "published": true,
+      "incomplete": false,
+      "correct": true,
+      "reward": 0.98,
+      "outcome_only": 1.0,
+      "trajectory_score": 1.0,
+      "tool_calls": 8,
+      "evidence_passes": 2,
+      "unsupported_claims": 1,
+      "cost_usd": 0.04103015,
+      "latency_seconds": 32.74,
+      "models": [
+        "gpt-4o-2024-08-06",
+        "gpt-4o-mini-2024-07-18"
+      ],
+      "claims": 5,
+      "claims_with_citation": 5
+    },
+    {
+      "scenario_id": "scenario-04-late-filing",
+      "expected": "flag",
+      "submitted": "clear",
+      "published": true,
+      "incomplete": false,
+      "correct": false,
+      "reward": -0.78,
+      "outcome_only": -0.75,
+      "trajectory_score": 1.0,
+      "tool_calls": 9,
+      "evidence_passes": 2,
+      "unsupported_claims": 3,
+      "cost_usd": 0.044142,
+      "latency_seconds": 33.66,
+      "models": [
+        "gpt-4o-2024-08-06",
+        "gpt-4o-mini-2024-07-18"
+      ],
+      "claims": 7,
+      "claims_with_citation": 7
+    },
+    {
+      "scenario_id": "scenario-05-10b5-1-sale",
+      "expected": "clear",
+      "submitted": "escalate",
+      "published": true,
+      "incomplete": false,
+      "correct": false,
+      "reward": -0.52,
+      "outcome_only": -0.5,
+      "trajectory_score": 0.0,
+      "tool_calls": 8,
+      "evidence_passes": 2,
+      "unsupported_claims": 4,
+      "cost_usd": 0.04205435,
+      "latency_seconds": 32.62,
+      "models": [
+        "gpt-4o-2024-08-06",
+        "gpt-4o-mini-2024-07-18"
+      ],
+      "claims": 7,
+      "claims_with_citation": 0
+    },
+    {
+      "scenario_id": "scenario-06-tax-withholding",
+      "expected": "clear",
+      "submitted": "clear",
+      "published": true,
+      "incomplete": false,
+      "correct": true,
+      "reward": 1.0,
+      "outcome_only": 1.0,
+      "trajectory_score": 1.0,
+      "tool_calls": 6,
+      "evidence_passes": 2,
+      "unsupported_claims": 3,
+      "cost_usd": 0.03976565,
+      "latency_seconds": 33.62,
+      "models": [
+        "gpt-4o-2024-08-06",
+        "gpt-4o-mini-2024-07-18"
+      ],
+      "claims": 7,
+      "claims_with_citation": 7
+    },
+    {
+      "scenario_id": "scenario-07-f-does-not-clear-s",
+      "expected": "escalate",
+      "submitted": "escalate",
+      "published": true,
+      "incomplete": false,
+      "correct": true,
+      "reward": -0.02,
+      "outcome_only": 1.0,
+      "trajectory_score": 0.0,
+      "tool_calls": 8,
+      "evidence_passes": 2,
+      "unsupported_claims": 3,
+      "cost_usd": 0.0438649,
+      "latency_seconds": 33.14,
+      "models": [
+        "gpt-4o-2024-08-06",
+        "gpt-4o-mini-2024-07-18"
+      ],
+      "claims": 6,
+      "claims_with_citation": 0
+    },
+    {
+      "scenario_id": "scenario-08-rolling-90d-over-limit",
+      "expected": "flag",
+      "submitted": "clear",
+      "published": true,
+      "incomplete": false,
+      "correct": false,
+      "reward": -0.77,
+      "outcome_only": -0.75,
+      "trajectory_score": 0.0,
+      "tool_calls": 8,
+      "evidence_passes": 2,
+      "unsupported_claims": 4,
+      "cost_usd": 0.0439969,
+      "latency_seconds": 35.53,
+      "models": [
+        "gpt-4o-2024-08-06",
+        "gpt-4o-mini-2024-07-18"
+      ],
+      "claims": 7,
+      "claims_with_citation": 0
+    },
+    {
+      "scenario_id": "scenario-09-amend-away",
+      "expected": "clear",
+      "submitted": "flag",
+      "published": true,
+      "incomplete": false,
+      "correct": false,
+      "reward": -0.29,
+      "outcome_only": -0.25,
+      "trajectory_score": 0.0,
+      "tool_calls": 10,
+      "evidence_passes": 2,
+      "unsupported_claims": 4,
+      "cost_usd": 0.0450881,
+      "latency_seconds": 32.58,
+      "models": [
+        "gpt-4o-2024-08-06",
+        "gpt-4o-mini-2024-07-18"
+      ],
+      "claims": 8,
+      "claims_with_citation": 0
+    },
+    {
+      "scenario_id": "scenario-10-ordinary-purchase",
+      "expected": "clear",
+      "submitted": "clear",
+      "published": true,
+      "incomplete": false,
+      "correct": true,
+      "reward": 0.97,
+      "outcome_only": 1.0,
+      "trajectory_score": 1.0,
+      "tool_calls": 9,
+      "evidence_passes": 2,
+      "unsupported_claims": 2,
+      "cost_usd": 0.043759599999999996,
+      "latency_seconds": 31.58,
+      "models": [
+        "gpt-4o-2024-08-06",
+        "gpt-4o-mini-2024-07-18"
+      ],
+      "claims": 6,
+      "claims_with_citation": 6
+    }
+  ]
+}

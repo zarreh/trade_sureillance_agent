@@ -1,4 +1,4 @@
-.PHONY: dev test lint typecheck imports eval up down data docs docs-assets docs-screenshots frontend-dev frontend-build frontend-types frontend-e2e
+.PHONY: dev test lint typecheck imports eval eval-live up down data docs docs-assets docs-screenshots frontend-dev frontend-build frontend-types frontend-e2e
 
 dev:
 	uv run uvicorn surveillance.api.main:app --reload --port 8000
@@ -20,6 +20,9 @@ eval:
 	uv run python -m evals.run
 	uv run python -m evals.run_rl
 	uv run python -m evals.export_example
+
+eval-live:
+	uv run python -m evals.live_run
 
 up:
 	docker compose up --build

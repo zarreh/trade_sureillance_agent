@@ -19,6 +19,14 @@ on 2026-10-29, ranked by severity, with what was done about each.
 | Low | `docs/PLAN.md` §11 says every chart regenerates byte-identically, but CI has no such check and the SVGs embed run-specific data (latency, metadata), so regenerating them changes the files. | Open. Only the RL results JSON, which is deterministic, has a CI drift check. |
 | Low | The API's `finding` field is opaque JSON in the OpenAPI document, so generated types do not describe it. | Accepted. `frontend/src/lib/schemas.ts` validates it at runtime and is the frontend's source of truth. |
 
+## Found by the live run
+
+| Severity | Finding |
+|---|---|
+| High | Every real investigation through the API failed: LangGraph's default recursion limit of 25 is below a real run's length (about two steps per tool call, plus two evidence passes). Tests passed because the eval harness set its own limit of 100 and the API tests use fake chains. | Fixed: the run executor injects a limit of 100 (`WithRecursionLimit`; `astream_events` ignores a limit bound with `with_config`). Confirmed with one live run in a browser: it completed, and a reload replayed it with no console errors. |
+| Medium | With real models the claim extractor cited no tool-call ids in 5 of 10 runs (provider ids such as `call_...` are long and opaque), so those findings scored 0 on the process audit's citation check. The audit worked as designed; the extractor is the weak point. Candidate fix: give the extractor short ids (`t1`, `t2`, ...) that map back to the real ones. |
+| Medium | After the two evidence passes, findings are published even when the judge still marks claims unsupported (1 to 5 per run here). The count is shown, but a reader can miss it. Candidate fix: label such findings as partially grounded in the UI. |
+
 ## Failure visibility
 
 A background failure reaches the UI as a run `error`: `RunConsole` renders the
