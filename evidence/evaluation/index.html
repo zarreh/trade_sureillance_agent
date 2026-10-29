@@ -8,10 +8,10 @@
       
       
       
-        <link rel="prev" href="../../architecture/decisions/D-A2-6-two-evaluation-layers/">
+        <link rel="prev" href="../../architecture/decisions/D-A2-9-gymnasium-dev-only/">
       
       
-        <link rel="next" href="../false-positives/">
+        <link rel="next" href="../rl-environment/">
       
       
         
@@ -341,6 +341,25 @@
     
   
   Run it yourself
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../deploy/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Deploy to a server
 
       </a>
     </li>
@@ -826,6 +845,12 @@
       
         
       
+        
+      
+        
+      
+        
+      
     
     
     
@@ -1048,6 +1073,90 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/decisions/D-A2-7-process-audit/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    D-A2-7 Process audit
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/decisions/D-A2-8-reward-design/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    D-A2-8 Reward design
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/decisions/D-A2-9-gymnasium-dev-only/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    D-A2-9 Gymnasium dev-only
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1073,6 +1182,8 @@
   
     
     
+      
+        
       
         
       
@@ -1236,6 +1347,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#process-audit-and-rl-gate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Process audit and RL gate
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#layer-2-stratified-evaluation-set" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1250,6 +1372,34 @@
   
 </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../rl-environment/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RL environment
+  
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -1407,6 +1557,33 @@
   
   
     <li class="md-nav__item">
+      <a href="../../deploy/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deploy to a server
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../api/" class="md-nav__link">
         
   
@@ -1489,6 +1666,17 @@
         
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#process-audit-and-rl-gate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Process audit and RL gate
+      
+    </span>
+  </a>
   
 </li>
       
@@ -1654,6 +1842,10 @@ was, on its own, just an ordinary small trade with nothing to amend away —
 fixed by injecting the large superseded original it corrects, so the
 scenario genuinely exercises supersession-exclusion
 (<code>FactStore.transactions_in_window</code>) rather than trivially clearing.</p>
+<h2 id="process-audit-and-rl-gate">Process audit and RL gate<a class="headerlink" href="#process-audit-and-rl-gate" title="Permanent link">¶</a></h2>
+<p><code>make eval</code> also runs <code>evals/run_rl.py</code>, which scores nine scripted policies
+through a Gymnasium environment to show that shortcuts cannot score well. See
+<a href="../rl-environment/">RL environment</a>.</p>
 <h2 id="layer-2-stratified-evaluation-set">Layer 2 — stratified evaluation set<a class="headerlink" href="#layer-2-stratified-evaluation-set" title="Permanent link">¶</a></h2>
 <p><strong>Not populated.</strong> A published precision/recall figure needs a hand-labelled,
 stratified sample (150–300 cases) graded against pinned model versions —

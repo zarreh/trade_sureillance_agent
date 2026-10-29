@@ -11,7 +11,7 @@
         <link rel="prev" href="../regulatory-basis/">
       
       
-        <link rel="next" href="../api/">
+        <link rel="next" href="../deploy/">
       
       
         
@@ -341,6 +341,25 @@
     
   
   Run it yourself
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../deploy/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Deploy to a server
 
       </a>
     </li>
@@ -826,6 +845,12 @@
       
         
       
+        
+      
+        
+      
+        
+      
     
     
     
@@ -1048,6 +1073,90 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture/decisions/D-A2-7-process-audit/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    D-A2-7 Process audit
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture/decisions/D-A2-8-reward-design/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    D-A2-8 Reward design
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture/decisions/D-A2-9-gymnasium-dev-only/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    D-A2-9 Gymnasium dev-only
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1071,6 +1180,8 @@
   
     
     
+      
+        
       
         
       
@@ -1140,6 +1251,34 @@
     
   
     Evaluation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../evidence/rl-environment/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RL environment
   
 
     
@@ -1407,6 +1546,33 @@
   
   
     <li class="md-nav__item">
+      <a href="../deploy/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deploy to a server
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../api/" class="md-nav__link">
         
   
@@ -1574,23 +1740,29 @@ request bodies are capped (<code>SURVEILLANCE_MAX_REQUEST_BODY_BYTES</code>, def
 <a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>cp<span class="w"> </span>.env.local.example<span class="w"> </span>.env.local<span class="w">   </span><span class="c1"># NEXT_PUBLIC_API_BASE, defaults to :8000</span>
 <a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>npm<span class="w"> </span>run<span class="w"> </span>dev
 </code></pre></div>
-<p>Visit <code>http://localhost:3000</code> — the page starts a real investigation the
-moment it loads (no typing required) and streams it node-by-node via
-<code>RunConsole</code>, <code>TraceTimeline</code>, <code>ValidatorStrip</code>, <code>EvidencePanel</code> and
-<code>CostMeter</code>. Requires the backend running with a real <code>SURVEILLANCE_OPENAI_API_KEY</code>
-to produce a genuine finding; against a placeholder key the run still streams
-but ultimately fails, exercising the error state honestly rather than faking one.</p>
+<p>Visit <code>http://localhost:3000</code>. The home page opens on a recorded example, so it
+shows a full investigation without calling the API. <strong>Run it live</strong> starts a real
+one and streams it step by step; its id goes into the URL, so a reload replays
+the stored run. A real finding needs the backend running with a real
+<code>SURVEILLANCE_OPENAI_API_KEY</code>; against a placeholder key the run still streams
+but ultimately fails, exercising the error state honestly rather than faking one.
+The <strong>How we know it works</strong> page reads <code>frontend/src/generated/rl-policies.json</code>.</p>
+<p><code>NEXT_PUBLIC_API_BASE</code> and <code>NEXT_PUBLIC_DOCS_URL</code> are baked in at build time.</p>
+<p>The generated files in <code>frontend/src/generated/</code> (the example run and the RL
+results) are written by <code>make eval</code> and checked for drift in CI.</p>
 <p>Types are generated from the FastAPI OpenAPI schema, never hand-written:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>make<span class="w"> </span>frontend-types<span class="w">    </span><span class="c1"># backend schema -&gt; frontend/src/lib/api-types.ts</span>
 </code></pre></div>
-<p><code>make frontend-e2e</code> runs the Playwright smoke test covering all four UI
-states (loading, success, empty, error) against a fully mocked backend — no
-live LLM, network, or Python process required.</p>
-<p><code>GET /investigations/{id}/events</code> replays every persisted node event from the
-start and then tails new ones until the run finishes — reconnecting later
-just replays from <code>RunStore</code> (<code>data/runs.db</code>), no run is lost. Requests are
-rate-limited (<code>SURVEILLANCE_RATE_LIMIT_PER_MINUTE</code>, default 20/minute) and
-request bodies are capped (<code>SURVEILLANCE_MAX_REQUEST_BODY_BYTES</code>, default 16KB).</p>
+<p><code>make frontend-e2e</code> runs the Playwright smoke test (the recorded example, loading,
+success, reload replay, empty, error, a failed audit and the evaluation page)
+against a fully mocked backend, with no live LLM, network or Python process.
+<code>make docs-screenshots</code> captures every page and state in light and dark and fails
+on any console error.</p>
+<p>An accession that is not in <code>facts.db</code> is rejected up front with <code>404</code> and an
+actionable <code>detail</code>; no run is created. Browser calls are allowed from
+<code>SURVEILLANCE_FRONTEND_ORIGINS</code> (default <code>http://localhost:3000</code>; in
+<code>development</code> any localhost port is also allowed). To put it on a server, see
+<a href="../deploy/">Deploy to a server</a>.</p>
 
 
 
