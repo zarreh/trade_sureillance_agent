@@ -94,4 +94,5 @@ nav:
       - Data profile: evidence/data-profile.md
   - Regulatory basis: regulatory-basis.md
   - Run it yourself: run-it-yourself.md
+  - Deploy to a server: deploy.md
   - API: api.md

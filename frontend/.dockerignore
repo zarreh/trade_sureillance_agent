@@ -1,0 +1,9 @@
+node_modules
+.next
+.env
+.env.*
+!.env.example
+openapi.json
+e2e
+test-results
+playwright-report
