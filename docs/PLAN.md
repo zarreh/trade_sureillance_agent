@@ -803,6 +803,273 @@ document amended in parallel — see `PORTFOLIO_PLAN_V3.md` §9.4, §14, §13, �
 
 ---
 
+## 13. v4 upgrade — process audit, RL environment, and UI/readiness pass
+
+*Added 2026-10-29 from `PORTFOLIO_PLAN_V4.md` (§0a, §6a, §9.5, §10.1, §13). This section is the build plan for a separate implementation conversation; nothing here has been built yet. Sections 0–12 above remain the record of the `base` build.*
+
+### 13.0 Purpose and framing
+
+**A2 is still an insider-trading surveillance product.** Its job, its architecture and its `base` acceptance criteria (§11) do not change. v4 adds three things, in this order:
+
+| Part | What | Why |
+|---|---|---|
+| **P — process audit** | A deterministic audit of *how* the investigator got to its finding, run on every real investigation, stored on the finding, shown in the UI | The product currently verifies the *plan* (`check_plan`) and the *claims* (LLM grounding judge). Nothing deterministic checks what the investigator actually did |
+| **R — RL environment** | The same investigation loop as a Gymnasium environment (`reset`/`step`), a reward built from the process audit plus an outcome table, scripted reference and gaming policies, and a CI gate | Shows exactly how the product's checks work as verifier and reward design, and proves they cannot be gamed. This is the evidence for the AI-evaluation and RL-environment goal (G6) |
+| **U — UI and deployment readiness** | Bring the frontend and deployment files up to the A3/A12 standard (`PORTFOLIO_PLAN_V4.md` §10.1) | A stranger should understand the app in 30 seconds, and the repo should be deployable. Currently it is one unstyled page and has no production compose, frontend Dockerfile or deploy doc |
+
+**The RL layer is an extra, not the point.** Every RL artefact must be explained in terms of a product behaviour it protects, and the product must work and read well with R removed.
+
+#### How the RL layer helps the product — the "before and after" for the case study
+
+| Question | Before v4 | After v4 |
+|---|---|---|
+| Did it reach the right disposition? | Disposition accuracy, n=10, scored by the scripted stand-in (`evals/oracle.py`) | Unchanged |
+| Did it gather every required piece of evidence, in the right order, on the real run? | Only the *plan* is checked (`check_plan`), not what was executed | Checked on every real investigation (process audit) |
+| Is every citation a real tool call? | Only the LLM grounding judge looks at claims | Deterministic citation-validity check on every real investigation |
+| Is a stated exemption (10b5-1, tax withholding, option exercise) backed by data? | Exculpatory factors are derived from tool results in code, but exemption language in the narrative is unchecked | Narrative exemption mentions are checked against the derived factors |
+| Can a lazy or gaming investigator still score well? | Yes. `always_flag` gets 100% flag recall from `compute_metrics`; skipping evidence is invisible | No. A CI gate proves seven shortcut/gaming policies score at least 0.5 below the reference policy |
+| Can a reviewer see any of this? | No | The investigation page shows the process audit; a new `/evaluation` page shows the policy table and chart |
+
+**What R proves, precisely.** The reference policy scoring 1.0 on all ten scenarios is a *consistency check* of the environment and reward (the reference reuses the oracle's logic and the scenario labels were designed to match it). It is not a performance claim and must never be presented as one. The valuable result is the *other* column: each gaming policy loses, and *why* (§13.4).
+
+### 13.1 Decisions
+
+| # | Decision | Status |
+|---|---|---|
+| D-A2-7 | The process audit lives in `src/` and is the reward's trajectory component: one source of truth, no separate reward logic | Decided |
+| D-A2-8 | Reward design: outcome table, trajectory multiplier applied only to positive outcomes, penalties never scaled, LLM judge excluded | Decided (§13.4) |
+| D-A2-9 | `gymnasium` is a dev-only dependency, used only under `evals/`; an import-linter contract forbids `surveillance` from importing it | Decided |
+| D-A2-10 | The `ui/` primitives are copied from A3 for now; extraction into X3 is portfolio decision D20 | Open, see `PORTFOLIO_PLAN_V4.md` §15 |
+| D-A2-11 | The LLM grounding judge stays in the product and stays *out* of the reward (a persuasive claim must not raise a score) | Decided |
+
+### 13.2 Phase P — process audit (product)
+
+**Goal.** One pure function, no I/O, no LLM, no gymnasium import, that audits an investigation's *process*.
+
+**Where.** `src/surveillance/graph/trajectory_audit.py` (graph layer, beside `evidence.py`). It imports only schemas and `graph/evidence.py`, so the existing layering contract holds, and `evals/` can import it.
+
+**Inputs.** `records: list[ToolCallRecord]` (from `extract_tool_call_records` in `graph/evidence.py`, in call order), `claims: list[Claim]` (each with `cited_tool_call_ids`), and `claimed_exemptions: list[ClaimedExemption]` (kind plus optional transaction sk).
+
+**Output.** `ProcessAudit` (a new Pydantic model in `schemas/finding.py`):
+
+| Field | Meaning |
+|---|---|
+| `mandatory_tools_called` / `mandatory_tools_missing` | Against `MANDATORY_TOOLS` in `graph/nodes/check_plan.py` |
+| `coverage` | called ÷ 6 |
+| `details_first` | `get_transaction_details` was the first call |
+| `fabricated_citation_ids` | cited IDs that match no record |
+| `citation_validity` | 0 if any ID is fabricated, otherwise the fraction of claims with at least one valid ID |
+| `unsupported_exemptions` | claimed exemptions not present in `derive_exculpatory_factors(records)`, limited to the true exemptions (`reported_under_10b5_1`, `tax_withholding`, `option_exercise`); `below_all_thresholds` is never an exemption (same rule as `evals/oracle.py`) |
+| `exemption_validity` | 0 if any exemption is unsupported, otherwise 1 |
+| `trajectory_score` | coverage × ordering factor (1, or 0.5 if not `details_first`) × `citation_validity` × `exemption_validity` |
+
+**How the product uses it.** `publish_node` (`graph/nodes/publish.py`) computes the audit from state and attaches it to `PublishedFinding` as `process_audit`. It is **record-only**: it never changes the disposition and never routes the graph. For the live product the claimed exemptions are extracted from `finding_text` by a small documented keyword map (10b5-1, tax withholding, option exercise); for the RL environment they are passed explicitly, with the transaction sk.
+
+**Open detail to settle in the ADR (D-A2-7).** Because exculpatory factors are *derived* in code, an exemption in the structured field is valid by construction; the audit's value in the product is the *narrative* mention and the citation and coverage checks. State this plainly in the ADR.
+
+**Tests.**
+- One unit test per field, including: a fabricated ID zeroes `citation_validity`; a `below_all_thresholds` claim is not an exemption; `F` does not support an exemption on an unrelated `S` line (mirrors canonical case 7).
+- Regression: the "published == judged draft" test (§11 item 4) still passes — the audit is added alongside, not folded into, the judged draft.
+- API schema: the OpenAPI snapshot includes `process_audit`; `make frontend-types` regenerates `frontend/src/lib/api-types.ts`.
+
+**Mutation check.** Removing the fabricated-ID check must fail both the unit tests and, after Phase R, the RL gate.
+
+### 13.3 Phase R — RL environment
+
+All RL code lives under `evals/`. Three files, mirroring how `evals/` is already organised:
+
+| File | Contents |
+|---|---|
+| `evals/rl_env.py` | `SurveillanceEnv(gymnasium.Env)`, `compute_reward`, `RewardBreakdown` |
+| `evals/rl_policies.py` | The scripted policies |
+| `evals/run_rl.py` | The runner and CI gate; writes the generated results JSON |
+
+**R1 — environment (`rl_env.py`).**
+- Subclass `gymnasium.Env`. Observation and action spaces are `gymnasium.spaces.Text`. Observations and actions are **JSON strings**, which is what an LLM policy would emit.
+  - Gymnasium's default `Text` charset is alphanumeric only, so set a printable charset and a `max_length` (about 20,000) explicitly, or `check_env` will fail.
+- `reset(seed=None, options={"scenario_id": ...})`
+  - Builds the stores once with `_build_eval_stores` from `evals/canonical.py` and the tools with `build_tools`.
+  - Returns an observation `{accession_number, tools: [{name, args_schema}], budget: {max_tool_calls, max_wall_clock_seconds}}`, and `info = {"episode_id": ...}`.
+  - **Never returns** a label, scenario id, scenario name or expected disposition. A test enforces this (§13.5).
+  - With `seed` and no `scenario_id`, picks a scenario deterministically.
+- `step(action: str)` — action is JSON:
+  - `{"type":"tool_call","name":...,"args":{...}}` runs the real tool and returns `{"tool_call_id":"t1","result":...}`. IDs are `t1`, `t2`, … in call order.
+  - `{"type":"submit","disposition":"clear|flag|escalate","claims":[{"text":...,"cited_tool_call_ids":[...]}],"exemptions":[{"kind":...,"transaction_sk":...}]}` ends the episode (`terminated=True`) and returns the reward.
+  - Anything unparseable, an unknown tool, or bad arguments: reward −0.05, counts toward the budget, episode continues.
+  - Exceeding the budget (`DEFAULT_BUDGET` in `graph/budget.py`: tool-call count and wall clock): `truncated=True`, reward −0.5, no submit scored.
+- Step reward is 0 until `submit` or truncation; the invalid-action penalty is accumulated and added at the end, so the final return is a single `RewardBreakdown`.
+
+**R2 — reward (`compute_reward`).**
+
+*Outcome table* (expected → submitted):
+
+| Expected → submitted | Outcome |
+|---|---|
+| correct | +1.0 |
+| clear → flag | −0.25 |
+| clear → escalate | −0.5 |
+| flag → clear | −0.75 |
+| flag → escalate | −0.10 |
+| escalate → flag | −0.25 |
+| escalate → clear | −1.0 |
+
+Rationale, which belongs in the ADR: missing a violation is worse than over-alerting; a severity miss (flag vs escalate) is milder than a wrong direction; alert fatigue is the real cost of false positives (`docs/evidence/false-positives.md`).
+
+*Trajectory multiplier* `P` is `ProcessAudit.trajectory_score` from Phase P.
+
+*Total.*
+- If outcome > 0: `total = outcome × P`.
+- If outcome ≤ 0: `total = outcome` — **penalties are never scaled by `P`**.
+- Then subtract 0.01 per tool call beyond the six mandatory ones, and 0.05 per invalid action.
+
+*Why the unscaled-penalty rule matters.* If a wrong answer were multiplied by `P`, an agent that skips all evidence (`P = 0`) would turn every wrong answer into a score of 0 and, whenever it is unsure, skipping evidence would beat investigating. This is the central reward-design lesson and the case study's "lessons learned" (§13.7). A regression test pins it.
+
+*Judge excluded.* The LLM grounding judge is not part of the reward (D-A2-11).
+
+**R3 — scripted policies (`rl_policies.py`).** Each is a function from observation history to the next action.
+
+| Policy | Behaviour | What it demonstrates | Expected mean (to be recorded, not trusted) |
+|---|---|---|---|
+| `reference` | Reuses the oracle's decision logic (refactor `evals/oracle.py` to expose a public `decide(records)`; do not import the private `_line_verdict`) after gathering all six tools with arguments derived from real results | Consistency of env + reward | 1.00 on every scenario |
+| `always_flag` | Gathers full evidence, cites real IDs, always submits `flag` | Outcome-only metrics reward a degenerate policy: it gets 100% flag recall from `compute_metrics` | ≈ +0.25 |
+| `always_escalate` | Same, always `escalate` | Over-alerting | ≈ −0.04 |
+| `always_clear` | Same, always `clear` | Missing violations | ≈ −0.10 |
+| `no_evidence_guesser` | Is handed the correct label, calls no tools, submits it | Right answer without investigating: coverage zero | 0.00 |
+| `citation_fabricator` | Right answer, cites tool-call IDs that never existed | Citation validity | 0.00 |
+| `exemption_claimer` | Right answer, always claims a 10b5-1 exemption | Unsupported exemption; correct only where scenario 05 really is 10b5-1 | ≈ 0.10 |
+| `tool_spammer` | Calls tools until the budget ends | Budget handling and the efficiency penalty | −0.50 |
+
+The "expected mean" column is arithmetic from the outcome table (for example `always_flag` = (4 flag correct + 4 clear→flag × −0.25 + 2 escalate→flag × −0.25) ÷ 10 = 0.25) and must be replaced by the actual recorded values after the first run.
+
+**R4 — gate (`run_rl.py`, wired into `make eval`).**
+- Reference mean must equal 1.00 and every episode must terminate by `submit`.
+- Every other policy's mean must be ≤ reference − 0.5.
+- No observation contains a scenario id or name (leakage).
+- Any failure exits non-zero. Use the shared `run_eval_cli` shell from `zarreh_agentkit.evals` as `evals/run.py` does, with one `EvalOutcome` per (policy, check). The Makefile `eval` target runs the existing canonical eval and then the RL gate, so CI (`make eval` in `.github/workflows/ci.yml`) enforces both with no workflow change.
+- Writes `frontend/src/generated/rl-policies.json` (policy, mean, per-scenario scores, outcome-only mean, trajectory-aware mean, n, scorer = "scripted stand-in", run date). Deterministic content only (no latency), so a CI step can fail on regeneration drift, as `make docs-assets` already does.
+
+**R5 — tests and configuration.**
+- `tests/evals/test_rl_env.py`:
+  - `gymnasium.utils.env_checker.check_env` passes;
+  - `reset` with the same seed and scenario is deterministic;
+  - leakage test (no scenario id or name anywhere in any observation or `info`);
+  - one unit test per reward component, and the "penalties are never scaled" regression;
+  - budget truncation returns −0.5.
+- `tests/graph/test_trajectory_audit.py` (from Phase P).
+- `pyproject.toml`: add `gymnasium` to the `dev` extra; add `gymnasium` to the existing forbidden-imports contract (`dspy`, `deepeval`), renaming it "no DSPy, DeepEval or gymnasium outside evals/optimize".
+- mypy `files` already includes `evals`; keep `strict`.
+
+**R6 — documentation.**
+- `docs/evidence/rl-environment.md` (a page in the Evidence section) following the §9.5 case-study structure.
+- ADRs `D-A2-7` (process audit is the reward's trajectory component) and `D-A2-8` (reward design), plus index entries.
+- `docs/generate_plots.py`: a chart per policy of *outcome-only score* against *trajectory-aware score*, light and dark, generated from the committed JSON.
+- `mkdocs.yml` nav entry; link from `docs/evidence/evaluation.md`.
+- README: replace "deterministic claim verification" wording with the exact statement that each claim's support is judged by an LLM while the process audit and the reward are deterministic.
+
+**R7 — optional live run (needs an OpenAI key).**
+- Run the real compiled graph on the ten scenarios with a live model, score each published finding with the same `compute_reward` offline (no adapter needed: the audit already runs on the real transcript), and publish n=10, model version, cost and run date. State that n=10 supports no precision claim.
+- Not gated in CI. Clearly labelled "live model, not gated" per the §9.5 honesty rule.
+
+### 13.4 What each gaming policy shows (for the case study)
+
+| Policy | Naive scoring says | Reward says | Product behaviour it protects |
+|---|---|---|---|
+| `always_flag` | 100% flag recall | +0.25, far below the reference | Alert fatigue: analysts drown in false positives |
+| `no_evidence_guesser` | Correct on every case | 0.00 | The finding must rest on gathered evidence, not on a lucky guess |
+| `citation_fabricator` | Correct on every case | 0.00 | Every assertion traces to a retrieved fact |
+| `exemption_claimer` | Mostly correct | ≈ 0.10 | A 10b5-1 narrative must be backed by the filing's own flag |
+| `tool_spammer` | n/a | −0.50 | The per-investigation cost guardrail |
+
+### 13.5 Phase U — UI and deployment readiness
+
+Follows `cohort_risk_lab/UI-ENHANCEMENT-GUIDE.md`; reference implementation is `clinical_care_navigator/frontend/src` (A3).
+
+**U1 — readiness review and fixes.**
+- **Unknown accession returns 202 then fails in the background.** `POST /investigations` (`src/surveillance/api/routes/investigations.py`) must look the accession up in `FactStore` first and return 404 with an actionable `detail`. The frontend surfaces `detail`. Route test: unknown accession → 404 and no run row created.
+- **Double start.** The run store creates a run per POST; confirm whether two POSTs for the same accession are acceptable. If they are not, add an atomic claim (one conditional UPDATE, `rowcount == 1`, 409 on the loser). Record the decision in an ADR line.
+- **Missing deployment files.** Add `compose.prod.yaml`, `.dockerignore` (exclude data, `.env`, `reference/`), a frontend `Dockerfile` with `ARG`/`ENV NEXT_PUBLIC_DOCS_URL`, and `docs/deploy.md` (Caddy basic auth example, the proxy overwriting `X-Forwarded-For`, no host ports published, env values, rebuild steps). Copy and adapt A3's versions.
+- Run the guide's Part A checklist (quality gates, container, network, auth, config, data, concurrency, failure visibility, repo hygiene) and record findings by severity in `docs/HARVEST.md`.
+- Failure visibility: a background-task failure must reach the UI as a run `error`, not only the server log (the run store already has `error`; confirm the UI renders it).
+
+**U2 — visual foundation.**
+- Copy `components/ui/` from A3 (`AppHeader`, `AppFooter`, `PageHeader`, `Card`, `Badge` / `StatusBadge`, `Callout`, `InfoTip`, `Meter`). Add `lucide-react`, `lib/docs.ts` and `lib/glossary.ts`. Remove any global font override; add dark mode (`prefers-color-scheme`, `dark:` variants). Verify each icon name exists in the installed `lucide-react` version.
+- `PrototypeBanner` becomes a `Callout`; keep the "research prototype, not a supervisory system of record" text on every page.
+- Glossary terms (one sentence each): Form 4, 10b5-1 plan, blackout window, rolling 90-day limit, grounding, claim, exculpatory factor, process audit, disposition (clear / flag / escalate), severity, and the three `reported_under_10b5_1` states (true / false / unknown — "unknown" means *not established*, never "no plan").
+
+**U3 — pages.**
+
+| Page | Contents |
+|---|---|
+| **Home** (`app/page.tsx`) | Hero (one-sentence purpose, two buttons); numbered "How it works" strip with an owner per step: Plan (AI) → Check plan (code) → Investigate (AI + read-only tools) → Draft and extract claims (AI) → Grounding check (AI judge, code totals) → Publish and audit (code). A **preloaded example** run on first paint. Docs links. `RunConsole` below |
+| **Investigation** (inside `RunConsole`, or `app/investigations/[id]`) | Status stepper; progress timeline with plain-language labels and the raw node name beneath; finding card (disposition and severity badges, rules cited, exculpatory factors, the 10b5-1 state explained in a tooltip); claims check in the style of A3's `ClaimsCheck`; the **Process audit** panel (§ below); restyled `ValidatorStrip`; `CostMeter`; replay stored events after a reload |
+| **`/evaluation`** (new) | "How we know the investigator isn't cutting corners." Key-finding card; the policy table and the outcome-only vs trajectory-aware chart, both read from `frontend/src/generated/rl-policies.json`; callouts disclosing real SEC data, synthetic firm policy, and that scores come from the scripted stand-in, not a live model; links to `docs/evidence/rl-environment.md` and the ADRs |
+
+*Process audit panel.* Four rows: required evidence gathered (n of 6, with the missing ones named), transaction details first, citations all real, exemptions all supported — each a badge with a one-line explanation and an `InfoTip`. Never shows a bare score.
+
+**U4 — verification (from the guide's Part B6).**
+1. `npx tsc --noEmit` and `npm run build`.
+2. Update `e2e/investigation.spec.ts` for the new structure, add an evaluation-page spec, scope navigation selectors to `getByRole("navigation", { name: "Main" })`.
+3. Extend `e2e/capture-screenshots.spec.ts` to capture every page and state (home, loading, running, success with process audit, error, empty, evaluation) in light **and** dark; zero console errors.
+4. Start the real API and `next dev`; run one real end-to-end investigation; reload and confirm results persist.
+5. Regenerate docs screenshots (`make docs-screenshots`) and confirm no drift in `make docs-assets`.
+6. Update `docs/run-it-yourself.md` and `docs/deploy.md` for the new env vars.
+
+**Gotchas from the guide to apply.** Format dates deterministically (no `toLocaleString()` in server components); wrap mixed text and links in one `<span>` inside flex rows; scope e2e selectors when a header adds a second nav; state that lived only in the SSE stream must be replayed from stored events for finished runs.
+
+### 13.6 Files touched or added
+
+```
+src/surveillance/graph/trajectory_audit.py      NEW  (Phase P)
+src/surveillance/graph/nodes/publish.py         EDIT attach ProcessAudit
+src/surveillance/schemas/finding.py             EDIT ProcessAudit, PublishedFinding.process_audit
+src/surveillance/api/routes/investigations.py   EDIT 404 on unknown accession (Phase U1)
+evals/oracle.py                                 EDIT expose public decide()
+evals/rl_env.py · rl_policies.py · run_rl.py    NEW  (Phase R)
+frontend/src/generated/rl-policies.json         NEW  generated, committed
+frontend/src/components/ui/*                    NEW  copied from A3
+frontend/src/lib/docs.ts · glossary.ts          NEW
+frontend/src/app/{page,layout,evaluation/page}.tsx  EDIT/NEW
+frontend/Dockerfile · .dockerignore · compose.prod.yaml · docs/deploy.md   NEW
+tests/graph/test_trajectory_audit.py · tests/evals/test_rl_env.py          NEW
+docs/evidence/rl-environment.md · ADRs D-A2-7..D-A2-9 · generate_plots.py  NEW/EDIT
+Makefile (eval runs both gates) · pyproject.toml (gymnasium dev + contract) EDIT
+```
+
+### 13.7 Case study outline (§9.5 structure)
+
+- **Problem.** An insider-trading investigator can look right while cutting corners: skipping evidence, citing things it never retrieved, or asserting a 10b5-1 exemption the filing does not support. Wrong dispositions have asymmetric costs (missed violation versus alert fatigue). Regulatory frame: SEC Rule 10b-5, Section 16(a), Rule 10b5-1, FINRA 3110.
+- **Verification.** Deterministic: plan check, exculpatory-factor derivation, claim and grounding totals, process audit. Model-judged: per-claim support (LLM grounding judge). State this split explicitly.
+- **Gate.** `make eval` in CI: canonical disposition match (n=10) **and** the RL gate (reference = 1.00; seven gaming policies ≤ reference − 0.5; no leakage). Scorer is the scripted stand-in; no live-model number is gated.
+- **Lessons learned.** (1) Outcome-only scoring rewards `always_flag`. (2) Scaling penalties by the trajectory score makes skipping evidence the best strategy when unsure. (3) Harness-building already exposed two scenarios that were trivially passable (see `docs/evidence/evaluation.md`); the RL gate is the same discipline applied to the reward. (4) Add whatever the implementation discovers.
+
+### 13.8 Acceptance criteria
+
+1. `process_audit` is present on every published finding, record-only, and `published == judged draft` still holds.
+2. `check_env` passes; same seed + scenario gives identical observations; no observation or `info` contains a scenario id or name.
+3. Reference policy scores 1.00 on all ten scenarios; every gaming policy is ≤ reference − 0.5; mutation checks (scale penalties by `P`; drop the fabricated-ID check) each make `make eval` fail.
+4. Unknown accession → 404 with `detail`, no run created; the UI shows the message.
+5. Every page and state captured in light and dark with zero console errors; one real end-to-end run persists across a reload.
+6. Every published number on the new pages states n, label source, scorer, model version (or "n/a, stand-in"), run date and uncertainty.
+7. `make lint`, `make typecheck`, `make imports`, `make test`, `make eval`, `uv run mkdocs build --strict`, `npm run build`, Playwright all green; `make docs-assets` produces no diff.
+
+### 13.9 Order, dependencies, and out of scope
+
+Order: **P → R1–R6 → U1–U4 → R7 (optional)**. U1 (readiness fixes and deployment files) is independent and can run alongside P or R. U3's investigation page needs P (for the audit panel); the `/evaluation` page needs R4 (for the JSON).
+
+**Out of scope for this upgrade:** a seeded scenario-variant generator; running the full graph's plan and judge nodes inside the environment; Layer 2 hand-labelled evaluation (still needs labelling effort); the `pro` tier; live public deployment (infrastructure access).
+
+**Risks.**
+
+| Risk | Mitigation |
+|---|---|
+| The RL layer reads as the product | Every RL artefact is written in terms of a product behaviour (§13.4); the home page and README lead with the surveillance product |
+| `Text` space limits break `check_env` | Explicit charset and `max_length` (R1) |
+| Process audit changes the judged draft | Record-only; regression test on published == judged draft |
+| Gate margins set from guesses | Record actual means on the first run, then set the 0.5 margin as a floor and keep it |
+| Copying `ui/` creates a third copy | Portfolio decision D20; record as extraction debt in `docs/HARVEST.md` either way |
+
+---
+
 ## Appendix A — Course compliance DB schema (reference only)
 
 Reproduced for shape. **Values must be regenerated by
