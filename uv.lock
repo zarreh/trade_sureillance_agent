@@ -2708,7 +2708,7 @@ requires-dist = [
     { name = "truststore", specifier = ">=0.9" },
     { name = "types-requests", marker = "extra == 'dev'" },
     { name = "uvicorn", extras = ["standard"], specifier = ">=0.32" },
-    { name = "zarreh-agentkit", git = "https://github.com/zarreh/zarreh_agentkit.git?tag=v0.2.0" },
+    { name = "zarreh-agentkit", git = "https://github.com/zarreh/zarreh_agentkit.git?tag=v0.3.0" },
 ]
 provides-extras = ["dev", "docs"]
 
@@ -3345,12 +3345,13 @@ wheels = [
 
 [[package]]
 name = "zarreh-agentkit"
-version = "0.2.0"
-source = { git = "https://github.com/zarreh/zarreh_agentkit.git?tag=v0.2.0#6456743e258f99922933d24d6b2f4c077ccdb788" }
+version = "0.3.0"
+source = { git = "https://github.com/zarreh/zarreh_agentkit.git?tag=v0.3.0#69c0b897a2e56314caf02efbeb0528fdca527475" }
 dependencies = [
     { name = "fastapi" },
     { name = "langchain-core" },
     { name = "langgraph" },
+    { name = "langsmith" },
     { name = "pydantic" },
     { name = "pydantic-settings" },
     { name = "slowapi" },
