@@ -12,7 +12,7 @@ from typing import Literal
 
 from pydantic import BaseModel, Field
 
-from surveillance.schemas.grounding import GroundingReport
+from surveillance.schemas.grounding import Claim, GroundingReport
 
 ExculpatoryKind = Literal[
     "reported_under_10b5_1", "tax_withholding", "option_exercise", "below_all_thresholds"
@@ -82,4 +82,5 @@ class PublishedFinding(ComplianceFinding):
     inside it."""
 
     grounding_report: GroundingReport
+    claims: list[Claim] = Field(default_factory=list)
     process_audit: ProcessAudit | None = None

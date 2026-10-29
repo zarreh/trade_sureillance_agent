@@ -19,6 +19,7 @@ imports:
 eval:
 	uv run python -m evals.run
 	uv run python -m evals.run_rl
+	uv run python -m evals.export_example
 
 up:
 	docker compose up --build

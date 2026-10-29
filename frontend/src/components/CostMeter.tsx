@@ -1,27 +1,25 @@
+import { Card, CardTitle } from "@/components/ui/Card";
 import type { InvestigationResponse } from "@/lib/api";
 
 export function CostMeter({ investigation }: { investigation: InvestigationResponse }) {
   return (
-    <section
-      aria-label="Cost"
-      className="space-y-2 rounded border border-neutral-200 p-4 dark:border-neutral-800"
-    >
+    <Card aria-label="Cost" className="space-y-3">
       <div className="flex items-baseline justify-between">
-        <h3 className="text-xs font-semibold uppercase text-neutral-500">
-          Cost for this investigation
-        </h3>
-        <span className="font-mono text-sm">${investigation.total_cost_usd.toFixed(4)}</span>
+        <CardTitle>Cost for this investigation</CardTitle>
+        <span className="font-mono text-sm text-slate-900 dark:text-white">
+          ${investigation.total_cost_usd.toFixed(4)}
+        </span>
       </div>
       {investigation.costs.length === 0 ? (
-        <p className="text-xs text-neutral-500">
-          No LLM cost recorded for this run — see docs/evidence/cost-and-latency.md for why a
-          demo run can legitimately show $0.
+        <p className="text-xs text-slate-500 dark:text-slate-400">
+          No model cost was recorded for this run. Rules, tools and checks cost nothing; only the AI
+          steps do.
         </p>
       ) : (
         <table className="w-full text-xs">
           <thead>
-            <tr className="text-left text-neutral-500">
-              <th className="font-normal">Node</th>
+            <tr className="text-left text-slate-500 dark:text-slate-400">
+              <th className="font-normal">Step</th>
               <th className="font-normal">Model</th>
               <th className="font-normal">Tokens</th>
               <th className="font-normal">Cost</th>
@@ -39,6 +37,6 @@ export function CostMeter({ investigation }: { investigation: InvestigationRespo
           </tbody>
         </table>
       )}
-    </section>
+    </Card>
   );
 }

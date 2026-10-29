@@ -1,0 +1,125 @@
+{
+  "accession_number": "SCENARIO-0000000001-25-000001",
+  "scorer": "scripted stand-in (evals/oracle.py); no live model",
+  "events": [
+    {
+      "node": "plan"
+    },
+    {
+      "node": "check_plan"
+    },
+    {
+      "node": "investigate"
+    },
+    {
+      "node": "tools"
+    },
+    {
+      "node": "investigate"
+    },
+    {
+      "node": "tools"
+    },
+    {
+      "node": "investigate"
+    },
+    {
+      "node": "tools"
+    },
+    {
+      "node": "investigate"
+    },
+    {
+      "node": "tools"
+    },
+    {
+      "node": "investigate"
+    },
+    {
+      "node": "tools"
+    },
+    {
+      "node": "investigate"
+    },
+    {
+      "node": "tools"
+    },
+    {
+      "node": "investigate"
+    },
+    {
+      "node": "draft_finding"
+    },
+    {
+      "node": "extract_claims"
+    },
+    {
+      "node": "judge_grounding"
+    },
+    {
+      "node": "publish"
+    }
+  ],
+  "finding": {
+    "disposition": "flag",
+    "severity": "Medium",
+    "rules_cited": [],
+    "confidence": "high",
+    "finding_text": "transaction date falls within a material-event blackout window (accession SCENARIO-0000000001-25-000001).",
+    "exculpatory_factors": [
+      {
+        "kind": "below_all_thresholds",
+        "evidence_tool_call_id": "call_get_applicable_role_limits",
+        "applies_to_transaction_sk": 1
+      }
+    ],
+    "reported_under_10b5_1": "unknown",
+    "incomplete": false,
+    "incomplete_reason": null,
+    "grounding_report": {
+      "claims": [
+        {
+          "claim_id": "c1",
+          "supported": true,
+          "evidence_span": null,
+          "reason": "cited real tool_call_ids gathered during the investigation"
+        }
+      ],
+      "unsupported": 0,
+      "confidence": "high"
+    },
+    "claims": [
+      {
+        "id": "c1",
+        "text": "transaction date falls within a material-event blackout window (accession SCENARIO-0000000001-25-000001).",
+        "cited_tool_call_ids": [
+          "call_get_transaction_details",
+          "call_get_applicable_role_limits",
+          "call_get_compliance_rules",
+          "call_rolling_90d_trading_volume",
+          "call_insider_trading_baseline",
+          "call_get_material_events"
+        ]
+      }
+    ],
+    "process_audit": {
+      "mandatory_tools_called": [
+        "get_transaction_details",
+        "get_applicable_role_limits",
+        "get_compliance_rules",
+        "rolling_90d_trading_volume",
+        "insider_trading_baseline",
+        "get_material_events"
+      ],
+      "mandatory_tools_missing": [],
+      "coverage": 1.0,
+      "details_first": true,
+      "fabricated_citation_ids": [],
+      "citation_validity": 1.0,
+      "claimed_exemptions": [],
+      "unsupported_exemptions": [],
+      "exemption_validity": 1.0,
+      "trajectory_score": 1.0
+    }
+  }
+}

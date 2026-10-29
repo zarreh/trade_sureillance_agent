@@ -1,6 +1,6 @@
 from surveillance.graph.nodes.publish import publish_node
 from surveillance.schemas.finding import ComplianceFinding, PublishedFinding
-from surveillance.schemas.grounding import GroundingReport
+from surveillance.schemas.grounding import Claim, GroundingReport
 
 from ._state_helpers import make_state
 
@@ -29,3 +29,14 @@ def test_publish_attaches_a_record_only_process_audit() -> None:
     assert published.process_audit is not None
     assert published.process_audit.coverage == 0.0
     assert published.disposition == "escalate"
+
+
+def test_publish_carries_the_judged_claims() -> None:
+    draft = ComplianceFinding(disposition="flag", confidence="medium", finding_text="text")
+    report = GroundingReport(claims=[], unsupported=0, confidence="high")
+    claims = [Claim(id="c1", text="a claim", cited_tool_call_ids=["t1"])]
+    published = publish_node(
+        make_state(draft_finding=draft, grounding_report=report, claims=claims)
+    )["published_finding"]
+    assert isinstance(published, PublishedFinding)
+    assert published.claims == claims

@@ -1,115 +1,95 @@
-import { test } from "@playwright/test";
+import { test, expect } from "@playwright/test";
 import path from "node:path";
-import { SUCCESS_INVESTIGATION, sseBody } from "./fixtures";
+import { SUCCESS_INVESTIGATION, mockRun, mockStart, watchConsole } from "./fixtures";
 
-// Captures the screenshots docs/how-it-works/the-investigation.md embeds.
-// Reuses the exact same network mocks as investigation.spec.ts so a
-// screenshot can never silently drift from what the smoke test actually
-// proves the UI does (`make docs-screenshots`).
+// Captures every page and state in light and dark for the docs
+// (`make docs-screenshots`). Reuses the same network mocks as
+// investigation.spec.ts so a screenshot cannot drift from what the smoke test
+// proves, and fails on any console error. Light files keep their original
+// names; dark ones end in `-dark`.
 const SCREENSHOTS_DIR = path.join(__dirname, "..", "..", "docs", "assets");
+const RUN_LIVE = { name: "Run it live" };
 
-test("capture: success — trace, grounding status, and evidence panel", async ({ page }) => {
-  await page.route("**/investigations", async (route) => {
-    if (route.request().method() !== "POST") return route.fallback();
-    await route.fulfill({
-      status: 202,
-      contentType: "application/json",
-      body: JSON.stringify({ id: "run-success", status: "running" }),
+for (const scheme of ["light", "dark"] as const) {
+  const suffix = scheme === "dark" ? "-dark" : "";
+  const shot = (name: string) => path.join(SCREENSHOTS_DIR, `screenshot-${name}${suffix}.png`);
+
+  test.describe(scheme, () => {
+    test.use({ colorScheme: scheme, viewport: { width: 1100, height: 800 } });
+
+    test("home: recorded example on first paint", async ({ page }) => {
+      const problems = watchConsole(page);
+      await page.goto("/");
+      await page.getByLabel("Process audit", { exact: true }).waitFor();
+      await page.screenshot({ path: shot("home"), fullPage: true });
+      expect(problems).toEqual([]);
     });
-  });
-  await page.route("**/investigations/run-success/events", async (route) => {
-    await route.fulfill({
-      status: 200,
-      contentType: "text/event-stream",
-      body: sseBody({ status: "completed", finding: SUCCESS_INVESTIGATION.finding }),
+
+    test("loading: before the run begins", async ({ page }) => {
+      await mockStart(page, "run-loading", 5000);
+      await page.goto("/");
+      await page.getByRole("button", RUN_LIVE).click();
+      await page.getByText("Starting the investigation").waitFor();
+      await page.screenshot({ path: shot("loading"), fullPage: true });
     });
-  });
-  await page.route("**/investigations/run-success", async (route) => {
-    if (route.request().method() !== "GET") return route.fallback();
-    await route.fulfill({
-      status: 200,
-      contentType: "application/json",
-      body: JSON.stringify(SUCCESS_INVESTIGATION),
+
+    test("running: waiting for the first step", async ({ page }) => {
+      await mockStart(page, "run-running");
+      await mockRun(page, "run-running", SUCCESS_INVESTIGATION, 5000);
+      await page.goto("/");
+      await page.getByRole("button", RUN_LIVE).click();
+      await page.getByText("Waiting for the first step").waitFor();
+      await page.screenshot({ path: shot("running"), fullPage: true });
     });
-  });
 
-  await page.goto("/");
-  await page.getByLabel("Finding").waitFor();
-  await page.screenshot({
-    path: path.join(SCREENSHOTS_DIR, "screenshot-success.png"),
-    fullPage: true,
-  });
-});
-
-test("capture: loading — before the run begins", async ({ page }) => {
-  await page.route("**/investigations", async (route) => {
-    if (route.request().method() !== "POST") return route.fallback();
-    await new Promise((resolve) => setTimeout(resolve, 5000));
-    await route.fulfill({
-      status: 202,
-      contentType: "application/json",
-      body: JSON.stringify({ id: "run-loading", status: "running" }),
+    test("success: full investigation with the process audit", async ({ page }) => {
+      const problems = watchConsole(page);
+      await mockStart(page, "run-success");
+      await mockRun(page, "run-success", SUCCESS_INVESTIGATION);
+      await page.goto("/");
+      await page.getByRole("button", RUN_LIVE).click();
+      await page.getByLabel("Cost", { exact: true }).waitFor();
+      await page.screenshot({ path: shot("success"), fullPage: true });
+      expect(problems).toEqual([]);
     });
-  });
 
-  await page.goto("/");
-  await page.getByText("Starting the investigation").waitFor();
-  await page.screenshot({
-    path: path.join(SCREENSHOTS_DIR, "screenshot-loading.png"),
-    fullPage: true,
-  });
-});
-
-test("capture: error — the investigation could not be started", async ({ page }) => {
-  await page.route("**/investigations", async (route) => {
-    if (route.request().method() !== "POST") return route.fallback();
-    await route.fulfill({ status: 500, contentType: "application/json", body: "{}" });
-  });
-
-  await page.goto("/");
-  await page.getByText("Could not start the investigation").waitFor();
-  await page.screenshot({
-    path: path.join(SCREENSHOTS_DIR, "screenshot-error.png"),
-    fullPage: true,
-  });
-});
-
-test("capture: empty — a completed run with no finding", async ({ page }) => {
-  await page.route("**/investigations", async (route) => {
-    if (route.request().method() !== "POST") return route.fallback();
-    await route.fulfill({
-      status: 202,
-      contentType: "application/json",
-      body: JSON.stringify({ id: "run-empty", status: "running" }),
+    test("error: the investigation could not be started", async ({ page }) => {
+      await page.route("**/investigations", async (route) => {
+        if (route.request().method() !== "POST") return route.fallback();
+        await route.fulfill({
+          status: 404,
+          contentType: "application/json",
+          body: JSON.stringify({ detail: "Accession 'X' is not in the facts database." }),
+        });
+      });
+      await page.goto("/");
+      await page.getByRole("button", RUN_LIVE).click();
+      await page.getByRole("alert").filter({ hasText: "facts database" }).waitFor();
+      await page.screenshot({ path: shot("error"), fullPage: true });
     });
-  });
-  await page.route("**/investigations/run-empty/events", async (route) => {
-    await route.fulfill({
-      status: 200,
-      contentType: "text/event-stream",
-      body: sseBody({ status: "completed", finding: null }),
-    });
-  });
-  await page.route("**/investigations/run-empty", async (route) => {
-    if (route.request().method() !== "GET") return route.fallback();
-    await route.fulfill({
-      status: 200,
-      contentType: "application/json",
-      body: JSON.stringify({
+
+    test("empty: a completed run with no finding", async ({ page }) => {
+      await mockStart(page, "run-empty");
+      await mockRun(page, "run-empty", {
         ...SUCCESS_INVESTIGATION,
         id: "run-empty",
         finding_kind: null,
         finding: null,
         costs: [],
         total_cost_usd: 0,
-      }),
+      });
+      await page.goto("/");
+      await page.getByRole("button", RUN_LIVE).click();
+      await page.getByText("produced no finding").waitFor();
+      await page.screenshot({ path: shot("empty"), fullPage: true });
+    });
+
+    test("evaluation: how we know it works", async ({ page }) => {
+      const problems = watchConsole(page);
+      await page.goto("/evaluation");
+      await page.getByText("Key finding").waitFor();
+      await page.screenshot({ path: shot("evaluation"), fullPage: true });
+      expect(problems).toEqual([]);
     });
   });
-
-  await page.goto("/");
-  await page.getByText("produced no finding").waitFor();
-  await page.screenshot({
-    path: path.join(SCREENSHOTS_DIR, "screenshot-empty.png"),
-    fullPage: true,
-  });
-});
+}

@@ -23,5 +23,7 @@ def publish_node(state: SurveillanceState) -> dict[str, object]:
     audit = audit_trajectory(
         extract_tool_call_records(state["messages"]), claims, extract_claimed_exemptions(claims)
     )
-    published = PublishedFinding(**draft.model_dump(), grounding_report=report, process_audit=audit)
+    published = PublishedFinding(
+        **draft.model_dump(), grounding_report=report, claims=claims, process_audit=audit
+    )
     return {"published_finding": published}

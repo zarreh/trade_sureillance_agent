@@ -60,6 +60,12 @@ export const ProcessAuditSchema = z.object({
   trajectory_score: z.number(),
 });
 
+export const ClaimSchema = z.object({
+  id: z.string(),
+  text: z.string(),
+  cited_tool_call_ids: z.array(z.string()).default([]),
+});
+
 export const ComplianceFindingSchema = z.object({
   disposition: z.enum(["clear", "flag", "escalate"]),
   severity: z.enum(["Low", "Medium", "High", "Critical"]).nullable().optional(),
@@ -72,10 +78,12 @@ export const ComplianceFindingSchema = z.object({
   incomplete_reason: z.string().nullable().optional(),
   // Present only once grounding has run (finding_kind === "published").
   grounding_report: GroundingReportSchema.optional(),
+  claims: z.array(ClaimSchema).default([]),
   process_audit: ProcessAuditSchema.nullable().optional(),
 });
 
 export type ComplianceFinding = z.infer<typeof ComplianceFindingSchema>;
+export type Claim = z.infer<typeof ClaimSchema>;
 export type ProcessAudit = z.infer<typeof ProcessAuditSchema>;
 export type ExculpatoryFactor = z.infer<typeof ExculpatoryFactorSchema>;
 export type GroundingReport = z.infer<typeof GroundingReportSchema>;
@@ -92,3 +100,33 @@ export const TraceEndOutputSchema = z.object({
   status: z.string(),
   finding: z.record(z.string(), z.unknown()).nullable(),
 });
+
+/** frontend/src/generated/example-run.json, written by evals/export_example.py. */
+export const ExampleRunSchema = z.object({
+  accession_number: z.string(),
+  scorer: z.string(),
+  events: z.array(z.object({ node: z.string() })),
+  finding: ComplianceFindingSchema,
+});
+
+/** frontend/src/generated/rl-policies.json, written by evals/run_rl.py. */
+export const RlPoliciesSchema = z.object({
+  n: z.number(),
+  scorer: z.string(),
+  label_source: z.string(),
+  model_version: z.string(),
+  run_date: z.string(),
+  uncertainty: z.string(),
+  gate_margin: z.number(),
+  policies: z.array(
+    z.object({
+      policy: z.string(),
+      description: z.string(),
+      reward_mean: z.number(),
+      outcome_only_mean: z.number().nullable(),
+      flag_recall: z.number().nullable(),
+      false_positive_rate_on_clear: z.number().nullable(),
+    })
+  ),
+});
+export type RlPolicies = z.infer<typeof RlPoliciesSchema>;

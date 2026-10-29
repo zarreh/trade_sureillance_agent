@@ -1,26 +1,43 @@
+import { ArrowRight, Search } from "lucide-react";
+import Link from "next/link";
+import { Suspense } from "react";
+
+import { HowItWorks } from "@/components/HowItWorks";
 import { RunConsole } from "@/components/RunConsole";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { docsLink } from "@/lib/docs";
 
 export default function Home() {
   return (
-    <main className="mx-auto max-w-2xl p-8 font-sans">
-      <h1 className="text-2xl font-bold">Trade Surveillance Agent</h1>
-      <p className="mt-2 text-sm text-neutral-500">
-        A grounded insider-trading investigation, streamed node-by-node. Every
-        published finding is judged against the evidence before you see it —
-        see{" "}
-        <a
-          className="underline"
-          href="https://github.com/zarreh/trade_sureillance_agent/blob/main/docs/how-it-works/grounding.md"
-        >
-          docs/how-it-works/grounding.md
-        </a>{" "}
-        for how.
-      </p>
+    <div className="space-y-10">
+      <PageHeader
+        icon={Search}
+        eyebrow="Insider-trading surveillance"
+        title="Does this insider trade need a second look?"
+        docsHref={docsLink("plainLanguage")}
+        docsLabel="Read how it works in plain language"
+      >
+        <p>
+          Give it a Form 4 filing. It gathers evidence, drafts a conclusion, checks every claim
+          against that evidence, and only then publishes: clear, flag or escalate. Its own process
+          is audited in code, so a shortcut shows up.
+        </p>
+        <p>
+          <Link
+            className="inline-flex items-center gap-1 font-medium text-sky-700 hover:text-sky-900 dark:text-sky-400 dark:hover:text-sky-300"
+            href="/evaluation"
+          >
+            How we know it isn&apos;t cutting corners
+            <ArrowRight className="h-4 w-4" aria-hidden />
+          </Link>
+        </p>
+      </PageHeader>
 
-      <div className="mt-6">
+      <HowItWorks />
+
+      <Suspense fallback={null}>
         <RunConsole />
-      </div>
-    </main>
+      </Suspense>
+    </div>
   );
 }
-

@@ -203,7 +203,7 @@ def results_to_json(results: RLResults) -> str:
         "scorer": "scripted stand-in (evals/oracle.py); no live model",
         "label_source": "canonical scenarios in data/scenarios.py, designed with their labels",
         "model_version": "n/a, stand-in",
-        "run_date": "deterministic: regenerated from the code at each commit",
+        "run_date": "n/a (deterministic; regenerated from the code at each commit)",
         "uncertainty": "none computed; n=10 supports no precision claim",
         "gate_margin": MARGIN,
         "policies": policies,
