@@ -8,28 +8,19 @@ Postgres for this phase, docs/PLAN.md §5.2).
 
 from __future__ import annotations
 
-import json
+from typing import Any
 
-import structlog
-from pydantic import BaseModel
 from zarreh_agentkit.observability import build_tracing_callbacks
+from zarreh_agentkit.runs import execute_run
 
 from surveillance.graph.builder import SurveillanceGraph
-from surveillance.graph.cost_tracking import CostTrackingHandler
 from surveillance.graph.state import create_initial_state
-from surveillance.observability import get_logger
 from surveillance.schemas.finding import ComplianceFinding, PublishedFinding
 from surveillance.settings import Settings
-from surveillance.store.models import CostEntry
 from surveillance.store.run_store import RunStore
 
-logger = get_logger(__name__)
-
-# Only these are genuine node boundaries: astream_events also emits
-# on_chain_end for internal LCEL sub-steps (prompt templates, parsers, the
-# routing predicates themselves) which happen to share event names with
-# real nodes' `langgraph_node` tag in some LangGraph versions, so filtering
-# on name alone is not enough — see the name == langgraph_node check below.
+# Only these are genuine node boundaries (execute_run also requires
+# name == langgraph_node, which drops routing predicates and LCEL sub-steps).
 _GRAPH_NODE_NAMES = frozenset(
     {
         "plan",
@@ -46,12 +37,6 @@ _GRAPH_NODE_NAMES = frozenset(
 )
 
 
-def _json_default(value: object) -> object:
-    if isinstance(value, BaseModel):
-        return value.model_dump(mode="json")
-    return str(value)
-
-
 async def execute_investigation(
     run_id: str,
     accession_number: str,
@@ -59,52 +44,18 @@ async def execute_investigation(
     run_store: RunStore,
     settings: Settings,
 ) -> None:
-    structlog.contextvars.bind_contextvars(correlation_id=run_id)
-    try:
-        cost_handler = CostTrackingHandler()
-        callbacks = [
-            cost_handler,
-            *build_tracing_callbacks(settings.langsmith_api_key, settings.langsmith_project),
-        ]
-        final_state: dict[str, object] = {}
-        sequence = 0
-
-        async for event in graph.astream_events(
-            create_initial_state(accession_number),
-            version="v2",
-            config={"callbacks": callbacks, "metadata": {"correlation_id": run_id}},
-        ):
-            if event["event"] != "on_chain_end":
-                continue
-            metadata = event.get("metadata") or {}
-            node_name = metadata.get("langgraph_node")
-            if node_name not in _GRAPH_NODE_NAMES or event.get("name") != node_name:
-                continue
-
-            output = event.get("data", {}).get("output")
-            if isinstance(output, dict):
-                final_state.update(output)
-            run_store.append_event(
-                run_id, sequence, node_name, json.dumps(output, default=_json_default)
-            )
-            sequence += 1
-
-        run_store.record_costs(
-            run_id,
-            [
-                CostEntry(e.node, e.model, e.prompt_tokens, e.completion_tokens, e.cost_usd)
-                for e in cost_handler.entries
-            ],
-        )
-        _finalize(run_store, run_id, final_state)
-    except Exception as exc:
-        logger.error("investigation_failed", run_id=run_id, error=str(exc))
-        run_store.fail_run(run_id, str(exc))
-    finally:
-        structlog.contextvars.unbind_contextvars("correlation_id")
+    await execute_run(
+        run_id=run_id,
+        graph=graph,
+        graph_input=create_initial_state(accession_number),
+        store=run_store,
+        finalize=lambda final_state: _finalize(run_store, run_id, final_state),
+        callbacks=build_tracing_callbacks(settings.langsmith_api_key, settings.langsmith_project),
+        node_names=_GRAPH_NODE_NAMES,
+    )
 
 
-def _finalize(run_store: RunStore, run_id: str, final_state: dict[str, object]) -> None:
+def _finalize(run_store: RunStore, run_id: str, final_state: dict[str, Any]) -> None:
     published = final_state.get("published_finding")
     if isinstance(published, PublishedFinding):
         run_store.complete_run(
