@@ -37,6 +37,24 @@ _GRAPH_NODE_NAMES = frozenset(
 )
 
 
+# A real run takes about two steps per tool call (up to 15) plus two evidence passes; LangGraph's
+# default limit of 25 aborted every real investigation (found by the live run).
+RECURSION_LIMIT = 100
+
+
+class WithRecursionLimit:
+    """`astream_events` ignores a limit bound with `with_config`, and the shared run
+    executor offers no way to pass one, so the limit is injected per call here."""
+
+    def __init__(self, graph: Any, limit: int = RECURSION_LIMIT) -> None:
+        self._graph = graph
+        self._limit = limit
+
+    def astream_events(self, graph_input: Any, config: Any = None, **kwargs: Any) -> Any:
+        merged = {**(config or {}), "recursion_limit": self._limit}
+        return self._graph.astream_events(graph_input, config=merged, **kwargs)
+
+
 async def execute_investigation(
     run_id: str,
     accession_number: str,
@@ -46,7 +64,7 @@ async def execute_investigation(
 ) -> None:
     await execute_run(
         run_id=run_id,
-        graph=graph,
+        graph=WithRecursionLimit(graph),
         graph_input=create_initial_state(accession_number),
         store=run_store,
         finalize=lambda final_state: _finalize(run_store, run_id, final_state),
