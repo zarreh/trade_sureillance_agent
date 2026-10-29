@@ -19,12 +19,14 @@ from __future__ import annotations
 
 import json
 from collections.abc import Sequence
+from dataclasses import dataclass
 from typing import Literal
 
 from langchain_core.messages import AIMessage, BaseMessage
 
 from surveillance.graph.evidence import derive_exculpatory_factors, extract_tool_call_records
 from surveillance.graph.nodes.check_plan import MANDATORY_TOOLS
+from surveillance.graph.trajectory_audit import TRUE_EXEMPTIONS
 from surveillance.schemas.finding import ComplianceFindingDraft, ToolCallRecord
 from surveillance.schemas.grounding import Claim, ClaimJudgment, ClaimJudgments, ExtractedClaims
 from surveillance.schemas.plan import InvestigationPlan, PlanStep
@@ -33,7 +35,6 @@ Disposition = Literal["clear", "flag", "escalate"]
 
 _VOLUME_SPIKE_SHARE_THRESHOLD = 150_000
 _SEVERITY_RANK: dict[Disposition, int] = {"clear": 0, "flag": 1, "escalate": 2}
-_TRUE_EXEMPTIONS = {"reported_under_10b5_1", "tax_withholding", "option_exercise"}
 
 
 def _latest_json(records: list[ToolCallRecord], tool_name: str) -> dict[str, object] | None:
@@ -67,6 +68,45 @@ class OraclePlannerChain:
         return InvestigationPlan(steps=steps)
 
 
+def next_tool_call(
+    accession_number: str, records: list[ToolCallRecord]
+) -> tuple[str, dict[str, object]] | None:
+    """The next mandatory tool call, with arguments derived from the real
+    result of `get_transaction_details`. None once every mandatory tool has
+    been called, or when the details needed to build arguments are missing."""
+    called = {r.tool_name for r in records}
+    remaining = [name for name in MANDATORY_TOOLS if name not in called]
+    if not remaining:
+        return None
+
+    next_tool = remaining[0]
+    if next_tool == "get_transaction_details":
+        return next_tool, {"accession_number": accession_number}
+
+    details = _latest_json(records, "get_transaction_details")
+    if details is None:
+        return None
+    args: dict[str, object]
+    if next_tool == "get_applicable_role_limits":
+        args = {
+            "relationship": details["rptowner_relationship"],
+            "title": details["rptowner_title"] or None,
+        }
+    elif next_tool == "get_compliance_rules":
+        args = {}
+    elif next_tool in ("rolling_90d_trading_volume", "insider_trading_baseline"):
+        args = {
+            "rptowner_cik": details["rptowner_cik"],
+            "as_of_date": _focal_trans_date(details),
+        }
+    else:  # get_material_events
+        args = {
+            "issuer_cik": details["issuer_cik"],
+            "on_date": _focal_trans_date(details),
+        }
+    return next_tool, args
+
+
 class OracleInvestigator:
     """Deterministically gathers all six mandatory tools, deriving each
     call's arguments from the real result of `get_transaction_details` —
@@ -76,39 +116,12 @@ class OracleInvestigator:
         self._accession_number = accession_number
 
     def invoke(self, conversation: Sequence[BaseMessage]) -> AIMessage:
-        records = extract_tool_call_records(conversation)
-        called = {r.tool_name for r in records}
-        remaining = [name for name in MANDATORY_TOOLS if name not in called]
-        if not remaining:
+        call = next_tool_call(self._accession_number, extract_tool_call_records(conversation))
+        if call is None:
             return AIMessage(content="Investigation complete.")
-
-        next_tool = remaining[0]
-        if next_tool == "get_transaction_details":
-            args: dict[str, object] = {"accession_number": self._accession_number}
-        else:
-            details = _latest_json(records, "get_transaction_details")
-            if details is None:
-                return AIMessage(content="Investigation complete.")
-            if next_tool == "get_applicable_role_limits":
-                args = {
-                    "relationship": details["rptowner_relationship"],
-                    "title": details["rptowner_title"] or None,
-                }
-            elif next_tool == "get_compliance_rules":
-                args = {}
-            elif next_tool in ("rolling_90d_trading_volume", "insider_trading_baseline"):
-                args = {
-                    "rptowner_cik": details["rptowner_cik"],
-                    "as_of_date": _focal_trans_date(details),
-                }
-            else:  # get_material_events
-                args = {
-                    "issuer_cik": details["issuer_cik"],
-                    "on_date": _focal_trans_date(details),
-                }
-
+        name, args = call
         return AIMessage(
-            content="", tool_calls=[{"name": next_tool, "args": args, "id": f"call_{next_tool}"}]
+            content="", tool_calls=[{"name": name, "args": args, "id": f"call_{name}"}]
         )
 
 
@@ -152,50 +165,62 @@ def _line_verdict(
     return "clear", "within all applicable limits"
 
 
+@dataclass(frozen=True)
+class Decision:
+    disposition: Disposition
+    severity: Literal["Low", "Medium", "High", "Critical"] | None
+    reason: str
+    accession_number: str
+
+
+def decide(records: list[ToolCallRecord]) -> Decision | None:
+    """The oracle's disposition for an investigation, from its tool-call records
+    alone. None when `get_transaction_details` was never retrieved."""
+    details = _latest_json(records, "get_transaction_details")
+    if details is None:
+        return None
+    role_limits = _latest_json(records, "get_applicable_role_limits")
+    rolling_90d = _latest_json(records, "rolling_90d_trading_volume")
+    baseline = _latest_json(records, "insider_trading_baseline")
+    material_event = _latest_json(records, "get_material_events")
+    exempt_sks = {
+        f.applies_to_transaction_sk
+        for f in derive_exculpatory_factors(records)
+        if f.kind in TRUE_EXEMPTIONS
+    }
+
+    lines = details.get("transactions", [])
+    assert isinstance(lines, list)
+    verdicts = [
+        _line_verdict(line, details, role_limits, rolling_90d, baseline, material_event, exempt_sks)
+        for line in lines
+    ]
+    disposition, reason = max(verdicts, key=lambda v: _SEVERITY_RANK[v[0]])
+    severity: Literal["Low", "Medium", "High", "Critical"] | None = {
+        "clear": None,
+        "flag": "Medium",
+        "escalate": "High",
+    }[disposition]
+    return Decision(disposition, severity, reason, str(details.get("accession_number", "unknown")))
+
+
 class OracleFindingWriterChain:
     def invoke(self, input_: dict[str, object]) -> ComplianceFindingDraft:
         messages = input_["messages"]
         assert isinstance(messages, Sequence)
-        records = extract_tool_call_records(messages)
-        details = _latest_json(records, "get_transaction_details")
-        role_limits = _latest_json(records, "get_applicable_role_limits")
-        rolling_90d = _latest_json(records, "rolling_90d_trading_volume")
-        baseline = _latest_json(records, "insider_trading_baseline")
-        material_event = _latest_json(records, "get_material_events")
-        exempt_sks = {
-            f.applies_to_transaction_sk
-            for f in derive_exculpatory_factors(records)
-            if f.kind in _TRUE_EXEMPTIONS
-        }
-
-        if details is None:
+        decision = decide(extract_tool_call_records(messages))
+        if decision is None:
             return ComplianceFindingDraft(
                 disposition="escalate",
                 severity="High",
                 confidence="low",
                 finding_text="No transaction details could be retrieved for this filing.",
             )
-
-        lines = details.get("transactions", [])
-        assert isinstance(lines, list)
-        verdicts = [
-            _line_verdict(
-                line, details, role_limits, rolling_90d, baseline, material_event, exempt_sks
-            )
-            for line in lines
-        ]
-        disposition, reason = max(verdicts, key=lambda v: _SEVERITY_RANK[v[0]])
-        severity: Literal["Low", "Medium", "High", "Critical"] | None = {
-            "clear": None,
-            "flag": "Medium",
-            "escalate": "High",
-        }[disposition]
-        accession = details.get("accession_number", "unknown")
         return ComplianceFindingDraft(
-            disposition=disposition,
-            severity=severity,
+            disposition=decision.disposition,
+            severity=decision.severity,
             confidence="high",
-            finding_text=f"{reason} (accession {accession}).",
+            finding_text=f"{decision.reason} (accession {decision.accession_number}).",
         )
 
 

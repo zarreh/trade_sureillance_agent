@@ -70,6 +70,12 @@ fixed by injecting the large superseded original it corrects, so the
 scenario genuinely exercises supersession-exclusion
 (`FactStore.transactions_in_window`) rather than trivially clearing.
 
+## Process audit and RL gate
+
+`make eval` also runs `evals/run_rl.py`, which scores nine scripted policies
+through a Gymnasium environment to show that shortcuts cannot score well. See
+[RL environment](rl-environment.md).
+
 ## Layer 2 — stratified evaluation set
 
 **Not populated.** A published precision/recall figure needs a hand-labelled,

@@ -1,0 +1,551 @@
+{
+  "n": 10,
+  "scorer": "scripted stand-in (evals/oracle.py); no live model",
+  "label_source": "canonical scenarios in data/scenarios.py, designed with their labels",
+  "model_version": "n/a, stand-in",
+  "run_date": "deterministic: regenerated from the code at each commit",
+  "uncertainty": "none computed; n=10 supports no precision claim",
+  "gate_margin": 0.5,
+  "policies": [
+    {
+      "policy": "reference",
+      "description": "Gathers all six tools, decides with the oracle, claims only derived exemptions.",
+      "reward_mean": 1.0,
+      "outcome_only_mean": 1.0,
+      "flag_recall": 1.0,
+      "false_positive_rate_on_clear": 0.0,
+      "per_scenario": [
+        {
+          "scenario_id": "scenario-01-blackout-sale",
+          "reward": 1.0,
+          "outcome_only": 1.0
+        },
+        {
+          "scenario_id": "scenario-02-volume-spike",
+          "reward": 1.0,
+          "outcome_only": 1.0
+        },
+        {
+          "scenario_id": "scenario-03-over-limit",
+          "reward": 1.0,
+          "outcome_only": 1.0
+        },
+        {
+          "scenario_id": "scenario-04-late-filing",
+          "reward": 1.0,
+          "outcome_only": 1.0
+        },
+        {
+          "scenario_id": "scenario-05-10b5-1-sale",
+          "reward": 1.0,
+          "outcome_only": 1.0
+        },
+        {
+          "scenario_id": "scenario-06-tax-withholding",
+          "reward": 1.0,
+          "outcome_only": 1.0
+        },
+        {
+          "scenario_id": "scenario-07-f-does-not-clear-s",
+          "reward": 1.0,
+          "outcome_only": 1.0
+        },
+        {
+          "scenario_id": "scenario-08-rolling-90d-over-limit",
+          "reward": 1.0,
+          "outcome_only": 1.0
+        },
+        {
+          "scenario_id": "scenario-09-amend-away",
+          "reward": 1.0,
+          "outcome_only": 1.0
+        },
+        {
+          "scenario_id": "scenario-10-ordinary-purchase",
+          "reward": 1.0,
+          "outcome_only": 1.0
+        }
+      ]
+    },
+    {
+      "policy": "always_flag",
+      "description": "Always flags: the outcome-only winner on flag recall.",
+      "reward_mean": 0.25,
+      "outcome_only_mean": 0.25,
+      "flag_recall": 1.0,
+      "false_positive_rate_on_clear": 1.0,
+      "per_scenario": [
+        {
+          "scenario_id": "scenario-01-blackout-sale",
+          "reward": 1.0,
+          "outcome_only": 1.0
+        },
+        {
+          "scenario_id": "scenario-02-volume-spike",
+          "reward": 1.0,
+          "outcome_only": 1.0
+        },
+        {
+          "scenario_id": "scenario-03-over-limit",
+          "reward": -0.25,
+          "outcome_only": -0.25
+        },
+        {
+          "scenario_id": "scenario-04-late-filing",
+          "reward": 1.0,
+          "outcome_only": 1.0
+        },
+        {
+          "scenario_id": "scenario-05-10b5-1-sale",
+          "reward": -0.25,
+          "outcome_only": -0.25
+        },
+        {
+          "scenario_id": "scenario-06-tax-withholding",
+          "reward": -0.25,
+          "outcome_only": -0.25
+        },
+        {
+          "scenario_id": "scenario-07-f-does-not-clear-s",
+          "reward": -0.25,
+          "outcome_only": -0.25
+        },
+        {
+          "scenario_id": "scenario-08-rolling-90d-over-limit",
+          "reward": 1.0,
+          "outcome_only": 1.0
+        },
+        {
+          "scenario_id": "scenario-09-amend-away",
+          "reward": -0.25,
+          "outcome_only": -0.25
+        },
+        {
+          "scenario_id": "scenario-10-ordinary-purchase",
+          "reward": -0.25,
+          "outcome_only": -0.25
+        }
+      ]
+    },
+    {
+      "policy": "always_escalate",
+      "description": "Always escalates: over-alerting.",
+      "reward_mean": -0.04,
+      "outcome_only_mean": -0.04,
+      "flag_recall": 1.0,
+      "false_positive_rate_on_clear": 1.0,
+      "per_scenario": [
+        {
+          "scenario_id": "scenario-01-blackout-sale",
+          "reward": -0.1,
+          "outcome_only": -0.1
+        },
+        {
+          "scenario_id": "scenario-02-volume-spike",
+          "reward": -0.1,
+          "outcome_only": -0.1
+        },
+        {
+          "scenario_id": "scenario-03-over-limit",
+          "reward": 1.0,
+          "outcome_only": 1.0
+        },
+        {
+          "scenario_id": "scenario-04-late-filing",
+          "reward": -0.1,
+          "outcome_only": -0.1
+        },
+        {
+          "scenario_id": "scenario-05-10b5-1-sale",
+          "reward": -0.5,
+          "outcome_only": -0.5
+        },
+        {
+          "scenario_id": "scenario-06-tax-withholding",
+          "reward": -0.5,
+          "outcome_only": -0.5
+        },
+        {
+          "scenario_id": "scenario-07-f-does-not-clear-s",
+          "reward": 1.0,
+          "outcome_only": 1.0
+        },
+        {
+          "scenario_id": "scenario-08-rolling-90d-over-limit",
+          "reward": -0.1,
+          "outcome_only": -0.1
+        },
+        {
+          "scenario_id": "scenario-09-amend-away",
+          "reward": -0.5,
+          "outcome_only": -0.5
+        },
+        {
+          "scenario_id": "scenario-10-ordinary-purchase",
+          "reward": -0.5,
+          "outcome_only": -0.5
+        }
+      ]
+    },
+    {
+      "policy": "always_clear",
+      "description": "Always clears: missing violations.",
+      "reward_mean": -0.1,
+      "outcome_only_mean": -0.1,
+      "flag_recall": 0.0,
+      "false_positive_rate_on_clear": 0.0,
+      "per_scenario": [
+        {
+          "scenario_id": "scenario-01-blackout-sale",
+          "reward": -0.75,
+          "outcome_only": -0.75
+        },
+        {
+          "scenario_id": "scenario-02-volume-spike",
+          "reward": -0.75,
+          "outcome_only": -0.75
+        },
+        {
+          "scenario_id": "scenario-03-over-limit",
+          "reward": -1.0,
+          "outcome_only": -1.0
+        },
+        {
+          "scenario_id": "scenario-04-late-filing",
+          "reward": -0.75,
+          "outcome_only": -0.75
+        },
+        {
+          "scenario_id": "scenario-05-10b5-1-sale",
+          "reward": 1.0,
+          "outcome_only": 1.0
+        },
+        {
+          "scenario_id": "scenario-06-tax-withholding",
+          "reward": 1.0,
+          "outcome_only": 1.0
+        },
+        {
+          "scenario_id": "scenario-07-f-does-not-clear-s",
+          "reward": -1.0,
+          "outcome_only": -1.0
+        },
+        {
+          "scenario_id": "scenario-08-rolling-90d-over-limit",
+          "reward": -0.75,
+          "outcome_only": -0.75
+        },
+        {
+          "scenario_id": "scenario-09-amend-away",
+          "reward": 1.0,
+          "outcome_only": 1.0
+        },
+        {
+          "scenario_id": "scenario-10-ordinary-purchase",
+          "reward": 1.0,
+          "outcome_only": 1.0
+        }
+      ]
+    },
+    {
+      "policy": "blind_always_clear",
+      "description": "Skips all evidence and always clears: wrong answers with no investigation.",
+      "reward_mean": -0.5,
+      "outcome_only_mean": -0.1,
+      "flag_recall": 0.0,
+      "false_positive_rate_on_clear": 0.0,
+      "per_scenario": [
+        {
+          "scenario_id": "scenario-01-blackout-sale",
+          "reward": -0.75,
+          "outcome_only": -0.75
+        },
+        {
+          "scenario_id": "scenario-02-volume-spike",
+          "reward": -0.75,
+          "outcome_only": -0.75
+        },
+        {
+          "scenario_id": "scenario-03-over-limit",
+          "reward": -1.0,
+          "outcome_only": -1.0
+        },
+        {
+          "scenario_id": "scenario-04-late-filing",
+          "reward": -0.75,
+          "outcome_only": -0.75
+        },
+        {
+          "scenario_id": "scenario-05-10b5-1-sale",
+          "reward": 0.0,
+          "outcome_only": 1.0
+        },
+        {
+          "scenario_id": "scenario-06-tax-withholding",
+          "reward": 0.0,
+          "outcome_only": 1.0
+        },
+        {
+          "scenario_id": "scenario-07-f-does-not-clear-s",
+          "reward": -1.0,
+          "outcome_only": -1.0
+        },
+        {
+          "scenario_id": "scenario-08-rolling-90d-over-limit",
+          "reward": -0.75,
+          "outcome_only": -0.75
+        },
+        {
+          "scenario_id": "scenario-09-amend-away",
+          "reward": 0.0,
+          "outcome_only": 1.0
+        },
+        {
+          "scenario_id": "scenario-10-ordinary-purchase",
+          "reward": 0.0,
+          "outcome_only": 1.0
+        }
+      ]
+    },
+    {
+      "policy": "no_evidence_guesser",
+      "description": "Handed the correct label, calls no tools, submits it.",
+      "reward_mean": 0.0,
+      "outcome_only_mean": 1.0,
+      "flag_recall": 1.0,
+      "false_positive_rate_on_clear": 0.0,
+      "per_scenario": [
+        {
+          "scenario_id": "scenario-01-blackout-sale",
+          "reward": 0.0,
+          "outcome_only": 1.0
+        },
+        {
+          "scenario_id": "scenario-02-volume-spike",
+          "reward": 0.0,
+          "outcome_only": 1.0
+        },
+        {
+          "scenario_id": "scenario-03-over-limit",
+          "reward": 0.0,
+          "outcome_only": 1.0
+        },
+        {
+          "scenario_id": "scenario-04-late-filing",
+          "reward": 0.0,
+          "outcome_only": 1.0
+        },
+        {
+          "scenario_id": "scenario-05-10b5-1-sale",
+          "reward": 0.0,
+          "outcome_only": 1.0
+        },
+        {
+          "scenario_id": "scenario-06-tax-withholding",
+          "reward": 0.0,
+          "outcome_only": 1.0
+        },
+        {
+          "scenario_id": "scenario-07-f-does-not-clear-s",
+          "reward": 0.0,
+          "outcome_only": 1.0
+        },
+        {
+          "scenario_id": "scenario-08-rolling-90d-over-limit",
+          "reward": 0.0,
+          "outcome_only": 1.0
+        },
+        {
+          "scenario_id": "scenario-09-amend-away",
+          "reward": 0.0,
+          "outcome_only": 1.0
+        },
+        {
+          "scenario_id": "scenario-10-ordinary-purchase",
+          "reward": 0.0,
+          "outcome_only": 1.0
+        }
+      ]
+    },
+    {
+      "policy": "citation_fabricator",
+      "description": "Correct label after real evidence, but also cites a tool-call id that never existed.",
+      "reward_mean": 0.0,
+      "outcome_only_mean": 1.0,
+      "flag_recall": 1.0,
+      "false_positive_rate_on_clear": 0.0,
+      "per_scenario": [
+        {
+          "scenario_id": "scenario-01-blackout-sale",
+          "reward": 0.0,
+          "outcome_only": 1.0
+        },
+        {
+          "scenario_id": "scenario-02-volume-spike",
+          "reward": 0.0,
+          "outcome_only": 1.0
+        },
+        {
+          "scenario_id": "scenario-03-over-limit",
+          "reward": 0.0,
+          "outcome_only": 1.0
+        },
+        {
+          "scenario_id": "scenario-04-late-filing",
+          "reward": 0.0,
+          "outcome_only": 1.0
+        },
+        {
+          "scenario_id": "scenario-05-10b5-1-sale",
+          "reward": 0.0,
+          "outcome_only": 1.0
+        },
+        {
+          "scenario_id": "scenario-06-tax-withholding",
+          "reward": 0.0,
+          "outcome_only": 1.0
+        },
+        {
+          "scenario_id": "scenario-07-f-does-not-clear-s",
+          "reward": 0.0,
+          "outcome_only": 1.0
+        },
+        {
+          "scenario_id": "scenario-08-rolling-90d-over-limit",
+          "reward": 0.0,
+          "outcome_only": 1.0
+        },
+        {
+          "scenario_id": "scenario-09-amend-away",
+          "reward": 0.0,
+          "outcome_only": 1.0
+        },
+        {
+          "scenario_id": "scenario-10-ordinary-purchase",
+          "reward": 0.0,
+          "outcome_only": 1.0
+        }
+      ]
+    },
+    {
+      "policy": "exemption_claimer",
+      "description": "Correct label and real citations, but always claims a 10b5-1 exemption.",
+      "reward_mean": 0.1,
+      "outcome_only_mean": 1.0,
+      "flag_recall": 1.0,
+      "false_positive_rate_on_clear": 0.0,
+      "per_scenario": [
+        {
+          "scenario_id": "scenario-01-blackout-sale",
+          "reward": 0.0,
+          "outcome_only": 1.0
+        },
+        {
+          "scenario_id": "scenario-02-volume-spike",
+          "reward": 0.0,
+          "outcome_only": 1.0
+        },
+        {
+          "scenario_id": "scenario-03-over-limit",
+          "reward": 0.0,
+          "outcome_only": 1.0
+        },
+        {
+          "scenario_id": "scenario-04-late-filing",
+          "reward": 0.0,
+          "outcome_only": 1.0
+        },
+        {
+          "scenario_id": "scenario-05-10b5-1-sale",
+          "reward": 1.0,
+          "outcome_only": 1.0
+        },
+        {
+          "scenario_id": "scenario-06-tax-withholding",
+          "reward": 0.0,
+          "outcome_only": 1.0
+        },
+        {
+          "scenario_id": "scenario-07-f-does-not-clear-s",
+          "reward": 0.0,
+          "outcome_only": 1.0
+        },
+        {
+          "scenario_id": "scenario-08-rolling-90d-over-limit",
+          "reward": 0.0,
+          "outcome_only": 1.0
+        },
+        {
+          "scenario_id": "scenario-09-amend-away",
+          "reward": 0.0,
+          "outcome_only": 1.0
+        },
+        {
+          "scenario_id": "scenario-10-ordinary-purchase",
+          "reward": 0.0,
+          "outcome_only": 1.0
+        }
+      ]
+    },
+    {
+      "policy": "tool_spammer",
+      "description": "Calls a tool over and over until the budget ends.",
+      "reward_mean": -0.5,
+      "outcome_only_mean": null,
+      "flag_recall": null,
+      "false_positive_rate_on_clear": null,
+      "per_scenario": [
+        {
+          "scenario_id": "scenario-01-blackout-sale",
+          "reward": -0.5,
+          "outcome_only": null
+        },
+        {
+          "scenario_id": "scenario-02-volume-spike",
+          "reward": -0.5,
+          "outcome_only": null
+        },
+        {
+          "scenario_id": "scenario-03-over-limit",
+          "reward": -0.5,
+          "outcome_only": null
+        },
+        {
+          "scenario_id": "scenario-04-late-filing",
+          "reward": -0.5,
+          "outcome_only": null
+        },
+        {
+          "scenario_id": "scenario-05-10b5-1-sale",
+          "reward": -0.5,
+          "outcome_only": null
+        },
+        {
+          "scenario_id": "scenario-06-tax-withholding",
+          "reward": -0.5,
+          "outcome_only": null
+        },
+        {
+          "scenario_id": "scenario-07-f-does-not-clear-s",
+          "reward": -0.5,
+          "outcome_only": null
+        },
+        {
+          "scenario_id": "scenario-08-rolling-90d-over-limit",
+          "reward": -0.5,
+          "outcome_only": null
+        },
+        {
+          "scenario_id": "scenario-09-amend-away",
+          "reward": -0.5,
+          "outcome_only": null
+        },
+        {
+          "scenario_id": "scenario-10-ordinary-purchase",
+          "reward": -0.5,
+          "outcome_only": null
+        }
+      ]
+    }
+  ]
+}

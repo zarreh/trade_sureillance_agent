@@ -18,6 +18,13 @@ publication, not after, and a failed check returns the investigation to
 gather more evidence rather than silently rewriting the answer. See
 [docs/how-it-works/grounding.md](docs/how-it-works/grounding.md).
 
+What is deterministic and what is model-judged: whether each claim is
+*supported* is judged by an LLM; the plan check, the exculpatory factors, the
+**process audit** (evidence gathered, ordering, real citations, supported
+exemptions) and the RL reward are plain code. An extra Gymnasium environment
+and a CI gate show that shortcut strategies score far below a proper
+investigation — see [docs/evidence/rl-environment.md](docs/evidence/rl-environment.md).
+
 ## Status
 
 **The `base` build (docs/PLAN.md phases 0–8) is complete.** Full pipeline —

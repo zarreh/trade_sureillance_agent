@@ -18,6 +18,7 @@ vs alert volume) needs the larger stratified Layer 2 set, not yet populated
 
 from __future__ import annotations
 
+import json
 import sqlite3
 from pathlib import Path
 
@@ -26,6 +27,9 @@ import pandas as pd
 
 ASSETS_DIR = Path(__file__).parent / "assets"
 STYLE_PATH = ASSETS_DIR / "plot_style.mplstyle"
+RL_RESULTS_PATH = (
+    Path(__file__).parent.parent / "frontend" / "src" / "generated" / "rl-policies.json"
+)
 
 
 def _save(fig: plt.Figure, name: str) -> None:
@@ -230,6 +234,39 @@ def cost_and_latency_per_investigation() -> None:
     _save(fig, "cost-and-latency-per-investigation")
 
 
+def rl_policy_scores() -> None:
+    """Outcome-only score against the trajectory-aware reward per scripted policy,
+    from the committed RL gate output (evals/run_rl.py, n=10, scripted stand-in)."""
+    policies = json.loads(RL_RESULTS_PATH.read_text())["policies"]
+    names = [p["policy"] for p in policies][::-1]
+    reward = [p["reward_mean"] for p in policies][::-1]
+    outcome_only = [p["outcome_only_mean"] for p in policies][::-1]
+
+    fig, ax = plt.subplots(figsize=(8, 5))
+    positions = range(len(names))
+    height = 0.38
+    ax.barh(
+        [i + height / 2 for i in positions],
+        [0.0 if v is None else v for v in outcome_only],
+        height,
+        label="Outcome only",
+        color="#9ca3af",
+    )
+    ax.barh(
+        [i - height / 2 for i in positions],
+        reward,
+        height,
+        label="Trajectory-aware",
+        color="#2563eb",
+    )
+    ax.set_yticks(list(positions), labels=names)
+    ax.axvline(0, color="#6b7280", linewidth=0.8)
+    ax.set_xlabel("Mean score over the ten canonical scenarios (n=10)")
+    ax.set_title("Outcome-only versus trajectory-aware score")
+    ax.legend()
+    _save(fig, "rl-policy-scores")
+
+
 def main() -> None:
     from surveillance.settings import get_settings
 
@@ -238,6 +275,7 @@ def main() -> None:
     grounding_loop_unsupported_claims()
     disposition_confusion_matrix()
     cost_and_latency_per_investigation()
+    rl_policy_scores()
     settings = get_settings()
     facts_db_path = Path(settings.facts_db_path)
     if not facts_db_path.exists():

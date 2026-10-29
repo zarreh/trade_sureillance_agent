@@ -87,8 +87,11 @@ nav:
           - D-A2-5 Vocabulary discipline: architecture/decisions/D-A2-5-vocabulary-discipline.md
           - D-A2-6 Two evaluation layers: architecture/decisions/D-A2-6-two-evaluation-layers.md
           - D-A2-7 Process audit: architecture/decisions/D-A2-7-process-audit.md
+          - D-A2-8 Reward design: architecture/decisions/D-A2-8-reward-design.md
+          - D-A2-9 Gymnasium dev-only: architecture/decisions/D-A2-9-gymnasium-dev-only.md
   - Evidence:
       - Evaluation: evidence/evaluation.md
+      - RL environment: evidence/rl-environment.md
       - False positives: evidence/false-positives.md
       - Cost and latency: evidence/cost-and-latency.md
       - Data profile: evidence/data-profile.md

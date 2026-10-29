@@ -16,6 +16,7 @@ on 2026-10-29, ranked by severity, with what was done about each.
 | Medium | No authentication, and every investigation spends model credits. | Not fixed in the app by design; the deploy guide puts basic auth at the proxy. The rate limit is a backstop. |
 | Low | Two POSTs for the same accession start two independent runs. | Accepted. Runs are replayable records, the rate limit bounds the cost, and the run id (not the accession) is the key. An atomic claim would only matter if a run mutated shared state. |
 | Low | `docs/PLAN.md` refers to `docs/regulatory_basis.md`; the file is `docs/regulatory-basis.md`. | Noted. |
+| Low | `docs/PLAN.md` §11 says every chart regenerates byte-identically, but CI has no such check and the SVGs embed run-specific data (latency, metadata), so regenerating them changes the files. | Open. Only the RL results JSON, which is deterministic, has a CI drift check. |
 | Low | The API's `finding` field is opaque JSON in the OpenAPI document, so generated types do not describe it. | Accepted. `frontend/src/lib/schemas.ts` validates it at runtime and is the frontend's source of truth. |
 
 ## Failure visibility
