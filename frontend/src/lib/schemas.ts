@@ -42,6 +42,24 @@ export const GroundingReportSchema = z.object({
 
 export const ReportedUnder10b51Schema = z.enum(["true", "false", "unknown"]);
 
+export const ClaimedExemptionSchema = z.object({
+  kind: ExculpatoryKindSchema,
+  transaction_sk: z.number().nullable().optional(),
+});
+
+export const ProcessAuditSchema = z.object({
+  mandatory_tools_called: z.array(z.string()),
+  mandatory_tools_missing: z.array(z.string()),
+  coverage: z.number(),
+  details_first: z.boolean(),
+  fabricated_citation_ids: z.array(z.string()),
+  citation_validity: z.number(),
+  claimed_exemptions: z.array(ClaimedExemptionSchema),
+  unsupported_exemptions: z.array(ClaimedExemptionSchema),
+  exemption_validity: z.number(),
+  trajectory_score: z.number(),
+});
+
 export const ComplianceFindingSchema = z.object({
   disposition: z.enum(["clear", "flag", "escalate"]),
   severity: z.enum(["Low", "Medium", "High", "Critical"]).nullable().optional(),
@@ -54,9 +72,11 @@ export const ComplianceFindingSchema = z.object({
   incomplete_reason: z.string().nullable().optional(),
   // Present only once grounding has run (finding_kind === "published").
   grounding_report: GroundingReportSchema.optional(),
+  process_audit: ProcessAuditSchema.nullable().optional(),
 });
 
 export type ComplianceFinding = z.infer<typeof ComplianceFindingSchema>;
+export type ProcessAudit = z.infer<typeof ProcessAuditSchema>;
 export type ExculpatoryFactor = z.infer<typeof ExculpatoryFactorSchema>;
 export type GroundingReport = z.infer<typeof GroundingReportSchema>;
 

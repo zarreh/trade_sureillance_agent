@@ -53,10 +53,33 @@ class ComplianceFinding(ComplianceFindingDraft):
     incomplete_reason: str | None = None
 
 
+class ClaimedExemption(BaseModel):
+    kind: ExculpatoryKind
+    transaction_sk: int | None = None
+
+
+class ProcessAudit(BaseModel):
+    """Deterministic audit of how the investigation reached its finding
+    (graph/trajectory_audit.py). Record-only: it never changes a disposition."""
+
+    mandatory_tools_called: list[str]
+    mandatory_tools_missing: list[str]
+    coverage: float
+    details_first: bool
+    fabricated_citation_ids: list[str]
+    citation_validity: float
+    claimed_exemptions: list[ClaimedExemption]
+    unsupported_exemptions: list[ClaimedExemption]
+    exemption_validity: float
+    trajectory_score: float
+
+
 class PublishedFinding(ComplianceFinding):
     """The terminal artifact. `publish` (nodes/publish.py) builds this from
     the judged draft's own `model_dump()` plus the grounding report — no
     model call, so `finding_text` is always byte-identical to the judged
-    draft (docs/PLAN.md D-A2-1)."""
+    draft (docs/PLAN.md D-A2-1). `process_audit` sits beside the draft, not
+    inside it."""
 
     grounding_report: GroundingReport
+    process_audit: ProcessAudit | None = None

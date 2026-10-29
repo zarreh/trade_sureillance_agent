@@ -17,3 +17,15 @@ def test_publish_is_byte_identical_to_the_judged_draft() -> None:
     assert published.finding_text == draft.finding_text
     assert published.disposition == draft.disposition
     assert published.grounding_report == report
+
+
+def test_publish_attaches_a_record_only_process_audit() -> None:
+    draft = ComplianceFinding(disposition="escalate", confidence="low", finding_text="text")
+    report = GroundingReport(claims=[], unsupported=0, confidence="high")
+    published = publish_node(make_state(draft_finding=draft, grounding_report=report))[
+        "published_finding"
+    ]
+    assert isinstance(published, PublishedFinding)
+    assert published.process_audit is not None
+    assert published.process_audit.coverage == 0.0
+    assert published.disposition == "escalate"

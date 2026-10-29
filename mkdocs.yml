@@ -86,6 +86,7 @@ nav:
           - D-A2-4 Fallback for availability: architecture/decisions/D-A2-4-fallback-for-availability.md
           - D-A2-5 Vocabulary discipline: architecture/decisions/D-A2-5-vocabulary-discipline.md
           - D-A2-6 Two evaluation layers: architecture/decisions/D-A2-6-two-evaluation-layers.md
+          - D-A2-7 Process audit: architecture/decisions/D-A2-7-process-audit.md
   - Evidence:
       - Evaluation: evidence/evaluation.md
       - False positives: evidence/false-positives.md

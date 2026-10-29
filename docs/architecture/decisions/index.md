@@ -13,3 +13,4 @@ what was built.
 | [D-A2-4](D-A2-4-fallback-for-availability.md) | Fallback is for availability, not validation |
 | [D-A2-5](D-A2-5-vocabulary-discipline.md) | The vocabulary does not overclaim |
 | [D-A2-6](D-A2-6-two-evaluation-layers.md) | Two evaluation layers |
+| [D-A2-7](D-A2-7-process-audit.md) | The process audit is the reward's trajectory component |
