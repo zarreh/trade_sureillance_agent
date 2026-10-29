@@ -1,4 +1,10 @@
-.PHONY: dev test lint typecheck imports eval eval-live up down data docs docs-assets docs-screenshots frontend-dev frontend-build frontend-types frontend-e2e
+# `run` needs data/facts.db (make data) and SURVEILLANCE_OPENAI_API_KEY in .env.
+.PHONY: run check dev test lint typecheck imports eval eval-live up down data docs docs-assets docs-screenshots frontend-dev frontend-build frontend-types frontend-e2e
+
+run:
+	$(MAKE) -j2 dev frontend-dev
+
+check: lint typecheck imports test eval
 
 dev:
 	uv run uvicorn surveillance.api.main:app --reload --port 8000
