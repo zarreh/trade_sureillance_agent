@@ -18,6 +18,8 @@ class Settings(AgentSettings):
     facts_db_path: str = "data/facts.db"
     policy_db_path: str = "data/policy.db"
 
+    frontend_origins: list[str] = ["http://localhost:3000"]
+
 
 @lru_cache
 def get_settings() -> Settings:

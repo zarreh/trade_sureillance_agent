@@ -6,7 +6,7 @@ from fastapi.testclient import TestClient
 
 from data.build_store import build_facts_db
 from data.generate_compliance_db import build_policy_db
-from surveillance.api.deps import get_run_store, get_surveillance_graph
+from surveillance.api.deps import get_fact_store, get_run_store, get_surveillance_graph
 from surveillance.api.main import app
 from surveillance.store.fact_store import FactStore
 from surveillance.store.policy_store import PolicyStore
@@ -46,6 +46,7 @@ def client(tmp_path: Path) -> Iterator[TestClient]:
 
     app.dependency_overrides[get_surveillance_graph] = lambda: fake_graph
     app.dependency_overrides[get_run_store] = lambda: fake_run_store
+    app.dependency_overrides[get_fact_store] = lambda: FactStore(facts_path)
     try:
         yield TestClient(app)
     finally:
@@ -100,3 +101,17 @@ def test_rate_limit_is_enforced_on_healthz() -> None:
     limit = get_settings().rate_limit_per_minute
     responses = [client.get("/healthz") for _ in range(limit + 1)]
     assert responses[-1].status_code == 429
+
+
+def test_unknown_accession_is_404_and_creates_no_run(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    created: list[str] = []
+    run_store = app.dependency_overrides[get_run_store]()
+    monkeypatch.setattr(run_store, "create_run", lambda run_id, _: created.append(run_id))
+
+    response = client.post("/investigations", json={"accession_number": "NOT-A-FILING"})
+
+    assert response.status_code == 404
+    assert "NOT-A-FILING" in response.json()["detail"]
+    assert created == []

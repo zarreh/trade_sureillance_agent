@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import {
+  ApiError,
   createInvestigation,
   getInvestigation,
   streamInvestigationEvents,
@@ -75,10 +76,12 @@ export function RunConsole({ accessionNumber = DEFAULT_ACCESSION }: { accessionN
             setErrorMessage("Lost connection to the investigation stream.");
           },
         });
-      } catch {
+      } catch (error) {
         if (!cancelled) {
           setPhase("error");
-          setErrorMessage("Could not start the investigation.");
+          setErrorMessage(
+            error instanceof ApiError ? error.message : "Could not start the investigation."
+          );
         }
       }
     }

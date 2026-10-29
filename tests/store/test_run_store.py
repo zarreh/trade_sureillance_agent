@@ -80,3 +80,20 @@ def test_record_and_get_costs(tmp_path: Path) -> None:
     costs = store.get_costs("run-1")
     assert len(costs) == 2
     assert {c.node for c in costs} == {"plan", "draft_finding"}
+
+
+def test_fail_interrupted_runs_only_touches_running_runs(tmp_path: Path) -> None:
+    store = RunStore(tmp_path / "runs.db")
+    store.create_run("running", "A")
+    store.create_run("done", "B")
+    store.complete_run("done", finding_kind="published", finding_json="{}")
+
+    assert store.fail_interrupted_runs("interrupted by a server restart") == 1
+
+    interrupted = store.get_run("running")
+    assert interrupted is not None
+    assert interrupted.status == "failed"
+    assert interrupted.error == "interrupted by a server restart"
+    finished = store.get_run("done")
+    assert finished is not None
+    assert finished.status == "completed"

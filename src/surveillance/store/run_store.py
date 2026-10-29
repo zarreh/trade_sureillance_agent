@@ -83,3 +83,13 @@ class RunStore(RunEventLog):
             (utc_now(), error, run_id),
         )
         self._conn.commit()
+
+    def fail_interrupted_runs(self, reason: str) -> int:
+        """Runs execute in-process, so any run still `running` at startup was
+        cut off by a restart and can never finish."""
+        cursor = self._conn.execute(
+            "UPDATE runs SET status = 'failed', updated_at = ?, error = ? WHERE status = 'running'",
+            (utc_now(), reason),
+        )
+        self._conn.commit()
+        return cursor.rowcount

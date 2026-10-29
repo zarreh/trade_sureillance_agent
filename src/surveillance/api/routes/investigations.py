@@ -5,7 +5,12 @@ from uuid import uuid4
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request
 from sse_starlette.sse import EventSourceResponse
 
-from surveillance.api.deps import get_compiled_graph, get_run_store, get_surveillance_graph
+from surveillance.api.deps import (
+    get_compiled_graph,
+    get_fact_store,
+    get_run_store,
+    get_surveillance_graph,
+)
 from surveillance.api.rate_limit import DEFAULT_RATE_LIMIT, limiter
 from surveillance.api.run_executor import execute_investigation
 from surveillance.api.schemas import (
@@ -18,6 +23,7 @@ from surveillance.api.streaming import stream_graph_events, stream_investigation
 from surveillance.graph.builder import SkeletonGraph, SurveillanceGraph
 from surveillance.graph.state import SkeletonState
 from surveillance.settings import Settings, get_settings
+from surveillance.store.fact_store import FactStore
 from surveillance.store.run_store import RunStore
 
 router = APIRouter(prefix="/investigations", tags=["investigations"])
@@ -25,6 +31,7 @@ router = APIRouter(prefix="/investigations", tags=["investigations"])
 GraphDep = Annotated[SkeletonGraph, Depends(get_compiled_graph)]
 SurveillanceGraphDep = Annotated[SurveillanceGraph, Depends(get_surveillance_graph)]
 RunStoreDep = Annotated[RunStore, Depends(get_run_store)]
+FactStoreDep = Annotated[FactStore, Depends(get_fact_store)]
 SettingsDep = Annotated[Settings, Depends(get_settings)]
 
 
@@ -46,10 +53,20 @@ async def create_investigation(
     background_tasks: BackgroundTasks,
     graph: SurveillanceGraphDep,
     run_store: RunStoreDep,
+    fact_store: FactStoreDep,
     settings: SettingsDep,
 ) -> CreateInvestigationResponse:
     """Starts one investigation as a background task and returns immediately
-    — poll `GET /{id}` or stream `GET /{id}/events` for progress."""
+    — poll `GET /{id}` or stream `GET /{id}/events` for progress. Two POSTs
+    for the same accession start two independent runs (see docs/HARVEST.md)."""
+    if fact_store.get_transaction(body.accession_number) is None:
+        raise HTTPException(
+            status_code=404,
+            detail=(
+                f"Accession {body.accession_number!r} is not in the facts database. "
+                "Use an accession number from the loaded Form 4 filings."
+            ),
+        )
     run_id = str(uuid4())
     run_store.create_run(run_id, body.accession_number)
     background_tasks.add_task(

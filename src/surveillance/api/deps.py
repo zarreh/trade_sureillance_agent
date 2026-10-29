@@ -4,6 +4,7 @@ from pathlib import Path
 from surveillance.graph.builder import SkeletonGraph, SurveillanceGraph, build_skeleton_graph
 from surveillance.graph.builder import build_surveillance_graph as _build_surveillance_graph
 from surveillance.settings import Settings, get_settings
+from surveillance.store.fact_store import FactStore
 from surveillance.store.run_store import RunStore
 
 
@@ -23,6 +24,11 @@ def get_surveillance_graph() -> SurveillanceGraph:
     Overridden in tests via `app.dependency_overrides` so a request can be
     served without a live LLM or a real facts.db."""
     return _build_surveillance_graph(get_settings())
+
+
+@lru_cache
+def get_fact_store() -> FactStore:
+    return FactStore(Path(get_settings().facts_db_path))
 
 
 @lru_cache

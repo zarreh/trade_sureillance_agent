@@ -16,6 +16,20 @@ export class ApiError extends Error {
   }
 }
 
+/** The API's actionable `detail` message, when the error body has one. */
+async function errorDetail(response: Response): Promise<string | null> {
+  try {
+    const body: unknown = await response.json();
+    if (typeof body === "object" && body !== null && "detail" in body) {
+      const { detail } = body as { detail: unknown };
+      return typeof detail === "string" ? detail : null;
+    }
+  } catch {
+    // Non-JSON error body (proxy error page): fall back to the status text.
+  }
+  return null;
+}
+
 export async function createInvestigation(
   accessionNumber: string
 ): Promise<CreateInvestigationResponse> {
@@ -25,7 +39,8 @@ export async function createInvestigation(
     body: JSON.stringify({ accession_number: accessionNumber }),
   });
   if (!response.ok) {
-    throw new ApiError(`Failed to start investigation (${response.status})`, response.status);
+    const detail = await errorDetail(response);
+    throw new ApiError(detail ?? "Could not start the investigation.", response.status);
   }
   return response.json() as Promise<CreateInvestigationResponse>;
 }

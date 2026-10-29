@@ -105,3 +105,17 @@ test("error: renders an alert when the investigation cannot be started", async (
   await page.goto("/");
   await expect(page.getByText("Could not start the investigation")).toBeVisible();
 });
+
+test("error: shows the API's actionable detail for an unknown accession", async ({ page }) => {
+  await page.route("**/investigations", async (route) => {
+    if (route.request().method() !== "POST") return route.fallback();
+    await route.fulfill({
+      status: 404,
+      contentType: "application/json",
+      body: JSON.stringify({ detail: "Accession 'X' is not in the facts database." }),
+    });
+  });
+
+  await page.goto("/");
+  await expect(page.getByText("is not in the facts database")).toBeVisible();
+});

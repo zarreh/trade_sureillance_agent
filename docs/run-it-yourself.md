@@ -73,9 +73,8 @@ states (loading, success, empty, error) against a fully mocked backend — no
 live LLM, network, or Python process required.
 
 
-`GET /investigations/{id}/events` replays every persisted node event from the
-start and then tails new ones until the run finishes — reconnecting later
-just replays from `RunStore` (`data/runs.db`), no run is lost. Requests are
-rate-limited (`SURVEILLANCE_RATE_LIMIT_PER_MINUTE`, default 20/minute) and
-request bodies are capped (`SURVEILLANCE_MAX_REQUEST_BODY_BYTES`, default 16KB).
-
+An accession that is not in `facts.db` is rejected up front with `404` and an
+actionable `detail`; no run is created. Browser calls are allowed from
+`SURVEILLANCE_FRONTEND_ORIGINS` (default `http://localhost:3000`; in
+`development` any localhost port is also allowed). To put it on a server, see
+[Deploy to a server](deploy.md).
