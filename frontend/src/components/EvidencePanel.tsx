@@ -12,7 +12,7 @@ const TONE: Record<ComplianceFinding["disposition"], CardTone> = {
 
 // Never rendered as an absence of a plan: unknown means the filing never
 // established it either way (docs/PLAN.md §3.4).
-const REPORTED_10B5_1: Record<ComplianceFinding["reported_under_10b5_1"], string> = {
+export const REPORTED_10B5_1: Record<ComplianceFinding["reported_under_10b5_1"], string> = {
   true: "Reported under a 10b5-1 plan",
   false: "Reported as not under a 10b5-1 plan",
   unknown: "10b5-1 status: not established",

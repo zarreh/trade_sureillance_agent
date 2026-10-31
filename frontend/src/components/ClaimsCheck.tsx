@@ -1,5 +1,6 @@
 import { Check, X } from "lucide-react";
 
+import { Badge } from "@/components/ui/Badge";
 import { Card, CardTitle } from "@/components/ui/Card";
 import { InfoTip } from "@/components/ui/InfoTip";
 import { GLOSSARY } from "@/lib/glossary";
@@ -33,16 +34,21 @@ export function ClaimsCheck({ finding }: { finding: ComplianceFinding }) {
               <div className="min-w-0 space-y-1">
                 <p className="text-slate-800 dark:text-slate-100">{claim.text}</p>
                 {verdict && <p className="text-xs text-slate-500 dark:text-slate-400">{verdict.reason}</p>}
-                {claim.cited_tool_call_ids.length > 0 && (
+                {claim.cited_tool_call_ids.length > 0 ? (
                   <p className="flex flex-wrap gap-1">
                     {claim.cited_tool_call_ids.map((id) => (
-                      <span
+                      <a
                         key={id}
-                        className="rounded bg-slate-100 px-1.5 py-0.5 font-mono text-[11px] text-slate-600 dark:bg-slate-800 dark:text-slate-300"
+                        href={`#evidence-${id}`}
+                        className="rounded bg-slate-100 px-1.5 py-0.5 font-mono text-[11px] text-sky-700 hover:bg-sky-50 hover:underline dark:bg-slate-800 dark:text-sky-300 dark:hover:bg-sky-950"
                       >
                         {id}
-                      </span>
+                      </a>
                     ))}
+                  </p>
+                ) : (
+                  <p>
+                    <Badge variant="amber">Cites no evidence</Badge>
                   </p>
                 )}
               </div>
