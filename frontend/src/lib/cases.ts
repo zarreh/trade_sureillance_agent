@@ -173,3 +173,54 @@ export function caseCopyBySlug(slug: string): CaseCopy | undefined {
 export function caseCopyForScenario(scenarioId: string): CaseCopy | undefined {
   return CASE_COPY.find((c) => c.scenarioId === scenarioId);
 }
+
+export const FAILURE_MODES: Record<
+  FailureMode,
+  { title: string; problem: string; safeguard: string; caseSlug: string }
+> = {
+  "crying-wolf": {
+    title: "Crying wolf",
+    problem:
+      "Flag every sale made before earnings and analysts drown in alerts, including sales reported under a plan set up in advance.",
+    safeguard:
+      "The filing's reported 10b5-1 status is read from the data and shown as a signal. It is never guessed from its absence.",
+    caseSlug: "planned-sale",
+  },
+  "one-excuse": {
+    title: "One excuse covering everything",
+    problem:
+      "Tax withholding is routine. If one exempt line clears the whole filing, a very large sale in the same filing goes unnoticed.",
+    safeguard: "Exemptions are tied to the specific transaction line they belong to.",
+    caseSlug: "mixed-filing",
+  },
+  unsupported: {
+    title: "Confident but unsupported",
+    problem: "An AI can write a convincing conclusion that its evidence does not back up.",
+    safeguard:
+      "The draft is split into claims, each checked against the evidence gathered, and a process audit records whether claims cite real tool calls.",
+    caseSlug: "blackout-sale",
+  },
+};
+
+/** The facts a reader sees first, in plain words. Deliberately leaves out the trading plan. */
+export function tradeRows(facts: Fact[]): { label: string; value: string }[] {
+  const details = latest(facts, "details")?.data;
+  const material = latest(facts, "material")?.data;
+  if (!details) return [];
+  const line = largestLine(details);
+  const rows = [
+    { label: "Insider", value: roleOf(details) },
+    { label: "Trade", value: `${describeCode(line.trans_code)} of ${formatMoney(line.trans_value)}` },
+    { label: "Date", value: formatDate(line.trans_date) },
+  ];
+  if (material?.event_date) {
+    const days = daysBetween(line.trans_date, material.event_date);
+    const eventType = material.event_type ?? "announcement";
+    rows.push({
+      label: "Company news",
+      value: `${eventType[0].toUpperCase()}${eventType.slice(1)} on ${formatDate(material.event_date)} (${plural(days, "day")} later)`,
+    });
+  }
+  if (material) rows.push({ label: "Blackout window", value: material.in_blackout ? "Trade falls inside it" : "Trade is outside it" });
+  return rows;
+}

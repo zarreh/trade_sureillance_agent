@@ -13,25 +13,18 @@ import {
   streamInvestigationEvents,
   type InvestigationResponse,
 } from "@/lib/api";
-import casesJson from "@/generated/cases.json";
-import { CasesSchema, ComplianceFindingSchema, type TraceEvent } from "@/lib/schemas";
+import { ComplianceFindingSchema, type TraceEvent } from "@/lib/schemas";
 
 type Phase = "idle" | "loading" | "streaming" | "success" | "empty" | "error";
 
-// Scenario 1 is flagged, not trivially clear, so there is something to look at.
-const FIRST_CASE = CasesSchema.parse(casesJson).cases[0];
-const EXAMPLE = { events: FIRST_CASE.reference.events, finding: FIRST_CASE.reference.finding };
-const DEFAULT_ACCESSION = FIRST_CASE.accession_number;
-
 /**
- * First paint shows a recorded example for free. "Run it live" starts a real
- * investigation and puts its id in the URL (`?run=`), so a reload replays the
- * stored run from the API instead of starting another.
+ * Starts a real investigation and puts its id in the URL (`?run=`), so a
+ * reload replays the stored run from the API instead of starting another.
  */
-export function RunConsole() {
+export function RunConsole({ samples }: { samples: { label: string; accession: string }[] }) {
   const router = useRouter();
   const runId = useSearchParams().get("run");
-  const [accession, setAccession] = useState(DEFAULT_ACCESSION);
+  const [accession, setAccession] = useState(samples[0]?.accession ?? "");
   const [phase, setPhase] = useState<Phase>("idle");
   const [events, setEvents] = useState<TraceEvent[]>([]);
   const [investigation, setInvestigation] = useState<InvestigationResponse | null>(null);
@@ -96,7 +89,7 @@ export function RunConsole() {
     setErrorMessage(null);
     try {
       const created = await createInvestigation(accession.trim());
-      router.replace(`/?run=${created.id}`);
+      router.replace(`/investigate?run=${created.id}`);
     } catch (error) {
       setPhase("error");
       setErrorMessage(
@@ -131,28 +124,32 @@ export function RunConsole() {
         {runId && (
           <button
             type="button"
-            onClick={() => router.replace("/")}
+            onClick={() => router.replace("/investigate")}
             className="inline-flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-medium text-sky-700 hover:bg-sky-50 dark:text-sky-300 dark:hover:bg-sky-950"
           >
             <ArrowLeft className="h-4 w-4" aria-hidden />
-            Back to the example
+            Start another
           </button>
         )}
       </form>
 
-      {phase === "idle" && (
-        <>
-          <Callout variant="info" title="Recorded example">
-            Canonical scenario 1, replayed from a stored run. It used the scripted stand-in for the
-            AI model, so it cost nothing and is not a measure of model quality. Running it live uses
-            the server&apos;s model credits.
-          </Callout>
-          <InvestigationView
-            events={EXAMPLE.events}
-            finding={EXAMPLE.finding}
-            investigation={null}
-          />
-        </>
+      {phase === "idle" && samples.length > 0 && (
+        <section aria-label="Sample filings" className="space-y-2">
+          <h2 className="text-sm font-semibold text-slate-700 dark:text-slate-200">Or pick a sample filing</h2>
+          <ul className="flex flex-wrap gap-2">
+            {samples.map((sample) => (
+              <li key={sample.accession}>
+                <button
+                  type="button"
+                  onClick={() => setAccession(sample.accession)}
+                  className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-left text-xs text-slate-700 hover:border-sky-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
+                >
+                  {sample.label}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </section>
       )}
 
       {phase === "loading" && (

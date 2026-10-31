@@ -17,17 +17,25 @@ for (const scheme of ["light", "dark"] as const) {
   test.describe(scheme, () => {
     test.use({ colorScheme: scheme, viewport: { width: 1100, height: 800 } });
 
-    test("home: recorded example on first paint", async ({ page }) => {
+    test("home: the problem, the quiz and the sample cases", async ({ page }) => {
       const problems = watchConsole(page);
       await page.goto("/");
-      await page.getByLabel("Process audit", { exact: true }).waitFor();
+      await page.getByRole("heading", { name: "Explore sample cases" }).waitFor();
       await page.screenshot({ path: shot("home"), fullPage: true });
+      expect(problems).toEqual([]);
+    });
+
+    test("case: evidence, both investigations and the safeguards", async ({ page }) => {
+      const problems = watchConsole(page);
+      await page.goto("/cases/blackout-sale");
+      await page.getByLabel("Claims check", { exact: true }).waitFor();
+      await page.screenshot({ path: shot("case"), fullPage: true });
       expect(problems).toEqual([]);
     });
 
     test("loading: before the run begins", async ({ page }) => {
       await mockStart(page, "run-loading", 5000);
-      await page.goto("/");
+      await page.goto("/investigate");
       await page.getByRole("button", RUN_LIVE).click();
       await page.getByText("Starting the investigation").waitFor();
       await page.screenshot({ path: shot("loading"), fullPage: true });
@@ -36,7 +44,7 @@ for (const scheme of ["light", "dark"] as const) {
     test("running: waiting for the first step", async ({ page }) => {
       await mockStart(page, "run-running");
       await mockRun(page, "run-running", SUCCESS_INVESTIGATION, 5000);
-      await page.goto("/");
+      await page.goto("/investigate");
       await page.getByRole("button", RUN_LIVE).click();
       await page.getByText("Waiting for the first step").waitFor();
       await page.screenshot({ path: shot("running"), fullPage: true });
@@ -46,7 +54,7 @@ for (const scheme of ["light", "dark"] as const) {
       const problems = watchConsole(page);
       await mockStart(page, "run-success");
       await mockRun(page, "run-success", SUCCESS_INVESTIGATION);
-      await page.goto("/");
+      await page.goto("/investigate");
       await page.getByRole("button", RUN_LIVE).click();
       await page.getByLabel("Cost", { exact: true }).waitFor();
       await page.screenshot({ path: shot("success"), fullPage: true });
@@ -62,7 +70,7 @@ for (const scheme of ["light", "dark"] as const) {
           body: JSON.stringify({ detail: "Accession 'X' is not in the facts database." }),
         });
       });
-      await page.goto("/");
+      await page.goto("/investigate");
       await page.getByRole("button", RUN_LIVE).click();
       await page.getByRole("alert").filter({ hasText: "facts database" }).waitFor();
       await page.screenshot({ path: shot("error"), fullPage: true });
@@ -78,7 +86,7 @@ for (const scheme of ["light", "dark"] as const) {
         costs: [],
         total_cost_usd: 0,
       });
-      await page.goto("/");
+      await page.goto("/investigate");
       await page.getByRole("button", RUN_LIVE).click();
       await page.getByText("produced no finding").waitFor();
       await page.screenshot({ path: shot("empty"), fullPage: true });

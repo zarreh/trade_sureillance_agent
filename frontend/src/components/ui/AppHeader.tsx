@@ -7,12 +7,14 @@ import { usePathname } from "next/navigation";
 import { DOCS_URL } from "@/lib/docs";
 
 const NAV = [
-  { href: "/", label: "Investigation" },
+  { href: "/", label: "Sample cases" },
+  { href: "/investigate", label: "Investigate a filing" },
   { href: "/evaluation", label: "How we know it works" },
 ];
 
 function isActive(pathname: string, href: string): boolean {
-  return href === "/" ? pathname === "/" : pathname.startsWith(href);
+  if (href === "/") return pathname === "/" || pathname.startsWith("/cases");
+  return pathname.startsWith(href);
 }
 
 export function AppHeader() {
