@@ -72,6 +72,12 @@ export function CaseOutcome({ data }: { data: Case }) {
               <Row label="Required checks">{`${summary.checksRun} of ${summary.checksRequired} run`}</Row>
             )}
             {review && <Badge variant="amber">Human review required</Badge>}
+            {live?.correct === false && !review && (
+              <p className="text-xs leading-relaxed text-slate-600 dark:text-slate-300">
+                These checks cover evidence and process, not whether the verdict is right. This run passed them and
+                still differs from the answer key.
+              </p>
+            )}
           </dl>
         ) : (
           <p className="text-sm text-slate-600 dark:text-slate-300">Nothing to report without a live run.</p>

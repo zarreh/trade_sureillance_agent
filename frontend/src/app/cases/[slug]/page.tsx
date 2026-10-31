@@ -1,4 +1,4 @@
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -40,6 +40,10 @@ export default async function CasePage({ params }: { params: Promise<Params> }) 
   if (!item) notFound();
   const { copy, data, facts, number } = item;
   const pair = copy.pairWith ? caseCopyBySlug(copy.pairWith) : undefined;
+  const all = sampleCases();
+  const index = all.findIndex((c) => c.copy.slug === copy.slug);
+  const previous = all[index - 1];
+  const next = all[index + 1];
 
   const reference = (
     <CaseRunPanel
@@ -116,6 +120,29 @@ export default async function CasePage({ params }: { params: Promise<Params> }) 
           .
         </p>
       )}
+
+      <nav aria-label="Other cases" className="flex flex-wrap justify-between gap-3 border-t border-slate-200 pt-6 text-sm dark:border-slate-800">
+        {previous ? (
+          <Link
+            href={`/cases/${previous.copy.slug}`}
+            className="inline-flex items-center gap-1 font-medium text-sky-700 hover:underline dark:text-sky-300"
+          >
+            <ArrowLeft className="h-4 w-4" aria-hidden />
+            Case {previous.number}: {previous.copy.title}
+          </Link>
+        ) : (
+          <span />
+        )}
+        {next && (
+          <Link
+            href={`/cases/${next.copy.slug}`}
+            className="inline-flex items-center gap-1 font-medium text-sky-700 hover:underline dark:text-sky-300"
+          >
+            Case {next.number}: {next.copy.title}
+            <ArrowRight className="h-4 w-4" aria-hidden />
+          </Link>
+        )}
+      </nav>
     </div>
   );
 }

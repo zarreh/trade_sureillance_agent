@@ -5,18 +5,19 @@ import { Badge, type BadgeVariant } from "@/components/ui/Badge";
 import {
   dayNumber,
   describeCode,
+  FILING_DEADLINE_TRADING_DAYS,
   formatCount,
   formatDate,
   formatMoney,
+  humanize,
   largestLine,
   latest,
   parseEvidence,
+  roleOf,
   type Fact,
   type ToolName,
 } from "@/lib/evidence";
 import type { ToolCallRecord } from "@/lib/schemas";
-
-const FILING_DEADLINE_TRADING_DAYS = 2;
 
 type Status = { label: string; variant: BadgeVariant };
 type CardContent = { title: string; status?: Status; body: ReactNode };
@@ -120,12 +121,12 @@ function content(fact: Fact, facts: Fact[]): CardContent {
           lag === null
             ? undefined
             : late
-              ? { label: `Filed ${lag} trading days late`, variant: "amber" }
+              ? { label: `Filed ${lag - FILING_DEADLINE_TRADING_DAYS} trading day${lag - FILING_DEADLINE_TRADING_DAYS === 1 ? "" : "s"} late`, variant: "amber" }
               : { label: "Filed on time", variant: "green" },
         body: (
           <div className="space-y-3">
             <p className="text-sm text-slate-700 dark:text-slate-200">
-              {d.rptowner_name}, {d.rptowner_title?.trim() || d.rptowner_relationship} of {d.issuer_name}
+              {d.rptowner_name}, {roleOf(d)} of {d.issuer_name}
               {d.issuer_ticker ? ` (${d.issuer_ticker})` : ""}
             </p>
             <ul className="space-y-1.5">
@@ -181,7 +182,7 @@ function content(fact: Fact, facts: Fact[]): CardContent {
             )}
             <dl className="space-y-1">
               <Row label="Role">
-                {l.relationship} ({l.authorization_level})
+                {humanize(l.relationship)} ({humanize(l.authorization_level)})
               </Row>
               <Row label="Single-trade limit">{formatMoney(l.single_trade_limit)}</Row>
               <Row label="Rolling 90-day limit">{formatMoney(l.rolling_90d_limit)}</Row>

@@ -44,7 +44,12 @@ test("home: states the problem, lets you try it, and links every sample case", a
   ]);
   await expect(failures).toContainText("claims were judged unsupported");
 
-  await expect(page.getByLabel("Sample cases", { exact: true }).getByRole("link")).toHaveCount(3);
+  const samples = page.getByLabel("Sample cases", { exact: true });
+  await expect(samples.getByRole("heading", { name: /^(Worth an analyst's time|Should not be alarms)$/ })).toHaveText([
+    "Worth an analyst's time",
+    "Should not be alarms",
+  ]);
+  await expect(samples.getByRole("link")).toHaveCount(10);
   await expect(page.getByRole("region", { name: "How it works" })).toBeVisible();
   expect(apiCalls).toEqual([]);
   expect(problems).toEqual([]);
@@ -136,10 +141,83 @@ test("case: an unknown case is a 404", async ({ page }) => {
   expect(response?.status()).toBe(404);
 });
 
+const ALL_SLUGS = [
+  "blackout-sale",
+  "first-large-sale",
+  "over-limit-sale",
+  "late-filing",
+  "planned-sale",
+  "tax-withholding",
+  "mixed-filing",
+  "rolling-volume",
+  "amended-filing",
+  "ordinary-purchase",
+];
+
+for (const slug of ALL_SLUGS) {
+  test(`case ${slug}: renders its evidence, both investigations and no console errors`, async ({ page }) => {
+    const problems = watchConsole(page);
+    await page.goto(`/cases/${slug}`);
+    await expect(page.getByRole("heading", { level: 1 })).not.toBeEmpty();
+    await expect(page.getByText("A synthetic trade checked against synthetic firm policy")).toBeVisible();
+    await expect(page.getByLabel("Outcome", { exact: true })).toContainText("Answer key");
+    await expect(page.getByRole("article").first()).toBeVisible();
+    await page.getByRole("tab", { name: "Reference investigation" }).click();
+    await expect(page.getByLabel("Finding", { exact: true })).toBeVisible();
+    expect(problems).toEqual([]);
+  });
+}
+
+// The wording below is derived from each case's evidence, so these pin the numbers to the data.
+const DERIVED_WORDING: [string, string, string][] = [
+  ["first-large-sale", "sells 200,000 shares for $1,000,000, with no trading history to compare", "above the 150,000-share level"],
+  ["over-limit-sale", "sells $25,000,000 of stock in one trade", "2.5 times the $10,000,000 single-trade limit"],
+  ["late-filing", "was reported 10 trading days after the trade", "The Section 16(a) deadline is 2"],
+  ["tax-withholding", "$5,000,000 of shares withheld to pay tax", "Code F means shares were withheld"],
+  ["rolling-volume", "bringing the last 90 days to $16,000,000", "includes an earlier $14,000,000 trade"],
+  ["amended-filing", "files an amendment (Form 4/A) for a $3,000 sale", "Replaced filings are kept on record"],
+  ["ordinary-purchase", "Ten Percent Owner buys $10,000 of stock", "The evidence raised no specific concern"],
+];
+for (const [slug, headline, detail] of DERIVED_WORDING) {
+  test(`case ${slug}: wording matches the evidence`, async ({ page }) => {
+    await page.goto(`/cases/${slug}`);
+    await expect(page.getByRole("heading", { level: 1 })).toContainText(headline);
+    await expect(page.getByText(detail).first()).toBeVisible();
+  });
+}
+
+test("case: a late filing says how far past the deadline it was, not just how long it took", async ({ page }) => {
+  await page.goto("/cases/late-filing");
+  await page.getByRole("tab", { name: "Reference investigation" }).click();
+  await expect(page.getByText("Filed 8 trading days late")).toBeVisible();
+});
+
+test("case: with no history, it says so instead of inventing a comparison", async ({ page }) => {
+  await page.goto("/cases/first-large-sale");
+  // The AI answered wrongly here, but every safeguard passed. The page must not imply they vouch for the verdict.
+  await expect(page.getByLabel("Outcome", { exact: true })).toContainText(
+    "not whether the verdict is right"
+  );
+  await page.getByRole("tab", { name: "Reference investigation" }).click();
+  const history = page.getByLabel("Their own trading history", { exact: true });
+  await expect(history).toContainText("No history to compare");
+  await expect(history).not.toContainText("×");
+});
+
+test("case: previous and next links walk the cases in order", async ({ page }) => {
+  await page.goto("/cases/blackout-sale");
+  const other = page.getByLabel("Other cases", { exact: true });
+  await expect(other.getByRole("link")).toHaveCount(1);
+  await other.getByRole("link", { name: /Case 2: Large sale, no history/ }).click();
+  await expect(page).toHaveURL(/\/cases\/first-large-sale$/);
+  await expect(other.getByRole("link")).toHaveCount(2);
+  await expect(other.getByRole("link", { name: /Case 1: Sale just before earnings/ })).toBeVisible();
+});
+
 test.describe("on a phone", () => {
   test.use({ viewport: { width: 375, height: 800 } });
 
-  for (const path of ["/", "/cases/blackout-sale", "/cases/mixed-filing"]) {
+  for (const path of ["/", ...ALL_SLUGS.map((s) => `/cases/${s}`)]) {
     test(`${path} does not scroll sideways`, async ({ page }) => {
       await page.goto(path);
       await page.getByRole("heading", { level: 1 }).waitFor();

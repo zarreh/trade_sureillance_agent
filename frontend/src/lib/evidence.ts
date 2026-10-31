@@ -197,3 +197,15 @@ export const TRANSACTION_CODES: Record<string, string> = {
 export function describeCode(code: string): string {
   return TRANSACTION_CODES[code] ?? `Code ${code}`;
 }
+
+/** Section 16(a): a Form 4 is due within two trading days of the transaction. */
+export const FILING_DEADLINE_TRADING_DAYS = 2;
+
+/** "TenPercentOwner" -> "Ten Percent Owner". */
+export function humanize(value: string): string {
+  return value.replace(/([a-z])([A-Z])/g, "$1 $2");
+}
+
+export function roleOf(details: Details): string {
+  return details.rptowner_title?.trim() || humanize(details.rptowner_relationship);
+}

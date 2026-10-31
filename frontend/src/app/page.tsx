@@ -23,6 +23,20 @@ function toFiling(label: "A" | "B", item: SampleCase): QuizFiling {
 
 const FAILURE_ORDER: FailureMode[] = ["crying-wolf", "one-excuse", "unsupported"];
 
+// Grouped by what a wrong answer costs: a missed alert, or a false alarm.
+const CASE_GROUPS = [
+  {
+    title: "Worth an analyst's time",
+    blurb: "Missing any of these is how a real violation slips through.",
+    matches: (d: string) => d !== "clear",
+  },
+  {
+    title: "Should not be alarms",
+    blurb: "Flagging any of these is a false alarm, and false alarms are what bury analysts.",
+    matches: (d: string) => d === "clear",
+  },
+];
+
 export default function Home() {
   const cases = sampleCases();
   const planned = cases.find((c) => c.copy.slug === "planned-sale");
@@ -86,7 +100,7 @@ export default function Home() {
         </ul>
       </section>
 
-      <section aria-label="Sample cases" className="space-y-4">
+      <section aria-label="Sample cases" className="space-y-6">
         <div className="space-y-1">
           <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Explore sample cases</h2>
           <p className="max-w-3xl text-sm text-slate-600 dark:text-slate-300">
@@ -94,13 +108,24 @@ export default function Home() {
             investigator&apos;s conclusion, and what the safeguards said about it.
           </p>
         </div>
-        <ul className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-          {cases.map((item) => (
-            <li key={item.copy.slug}>
-              <CaseCard item={item} />
-            </li>
-          ))}
-        </ul>
+        {CASE_GROUPS.map((group) => {
+          const items = cases.filter((c) => group.matches(c.data.expected_disposition));
+          return (
+            <div key={group.title} className="space-y-3">
+              <div>
+                <h3 className="font-semibold text-slate-900 dark:text-white">{group.title}</h3>
+                <p className="text-sm text-slate-600 dark:text-slate-300">{group.blurb}</p>
+              </div>
+              <ul className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+                {items.map((item) => (
+                  <li key={item.copy.slug}>
+                    <CaseCard item={item} />
+                  </li>
+                ))}
+              </ul>
+            </div>
+          );
+        })}
       </section>
 
       <section aria-label="Under the hood" className="space-y-4">
