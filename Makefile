@@ -25,7 +25,7 @@ imports:
 eval:
 	uv run python -m evals.run
 	uv run python -m evals.run_rl
-	uv run python -m evals.export_example
+	uv run python -m evals.export_cases
 
 eval-live:
 	uv run python -m evals.live_run

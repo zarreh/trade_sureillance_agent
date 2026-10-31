@@ -13,15 +13,15 @@ import {
   streamInvestigationEvents,
   type InvestigationResponse,
 } from "@/lib/api";
-import example from "@/generated/example-run.json";
-import { ComplianceFindingSchema, ExampleRunSchema, type TraceEvent } from "@/lib/schemas";
+import casesJson from "@/generated/cases.json";
+import { CasesSchema, ComplianceFindingSchema, type TraceEvent } from "@/lib/schemas";
 
 type Phase = "idle" | "loading" | "streaming" | "success" | "empty" | "error";
 
-const EXAMPLE = ExampleRunSchema.parse(example);
-
 // Scenario 1 is flagged, not trivially clear, so there is something to look at.
-const DEFAULT_ACCESSION = EXAMPLE.accession_number;
+const FIRST_CASE = CasesSchema.parse(casesJson).cases[0];
+const EXAMPLE = { events: FIRST_CASE.reference.events, finding: FIRST_CASE.reference.finding };
+const DEFAULT_ACCESSION = FIRST_CASE.accession_number;
 
 /**
  * First paint shows a recorded example for free. "Run it live" starts a real
