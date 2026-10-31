@@ -62,9 +62,11 @@ def _reference_run(scenario: Scenario, tools: list[StructuredTool]) -> dict[str,
     published = final_state["published_finding"]
     assert isinstance(published, PublishedFinding)
     evidence = extract_tool_call_records(final_state["messages"])
+    # `evidence` is exported once, beside the finding, rather than twice.
+    finding = published.model_dump(mode="json", exclude={"evidence"})
     return {
         "events": [{"node": node} for node in nodes],
-        "finding": published.model_dump(mode="json"),
+        "finding": finding,
         "evidence": [r.model_dump(mode="json") for r in evidence],
     }
 

@@ -66,6 +66,14 @@ export const ClaimSchema = z.object({
   cited_tool_call_ids: z.array(z.string()).default([]),
 });
 
+export const ToolCallRecordSchema = z.object({
+  tool_call_id: z.string(),
+  tool_name: z.string(),
+  args: z.record(z.string(), z.unknown()),
+  result: z.string(),
+});
+export type ToolCallRecord = z.infer<typeof ToolCallRecordSchema>;
+
 export const ComplianceFindingSchema = z.object({
   disposition: z.enum(["clear", "flag", "escalate"]),
   severity: z.enum(["Low", "Medium", "High", "Critical"]).nullable().optional(),
@@ -80,6 +88,8 @@ export const ComplianceFindingSchema = z.object({
   grounding_report: GroundingReportSchema.optional(),
   claims: z.array(ClaimSchema).default([]),
   process_audit: ProcessAuditSchema.nullable().optional(),
+  // Absent on findings recorded before evidence was attached; the case data carries it separately.
+  evidence: z.array(ToolCallRecordSchema).default([]),
 });
 
 export type ComplianceFinding = z.infer<typeof ComplianceFindingSchema>;
@@ -100,14 +110,6 @@ export const TraceEndOutputSchema = z.object({
   status: z.string(),
   finding: z.record(z.string(), z.unknown()).nullable(),
 });
-
-export const ToolCallRecordSchema = z.object({
-  tool_call_id: z.string(),
-  tool_name: z.string(),
-  args: z.record(z.string(), z.unknown()),
-  result: z.string(),
-});
-export type ToolCallRecord = z.infer<typeof ToolCallRecordSchema>;
 
 const DispositionSchema = z.enum(["clear", "flag", "escalate"]);
 

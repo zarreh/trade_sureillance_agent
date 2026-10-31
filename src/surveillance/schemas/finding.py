@@ -84,3 +84,5 @@ class PublishedFinding(ComplianceFinding):
     grounding_report: GroundingReport
     claims: list[Claim] = Field(default_factory=list)
     process_audit: ProcessAudit | None = None
+    # The tool results the claims cite, so a reader can follow a citation to its source.
+    evidence: list[ToolCallRecord] = Field(default_factory=list)
