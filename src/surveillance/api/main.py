@@ -9,7 +9,7 @@ from slowapi.errors import RateLimitExceeded
 from surveillance.api.deps import get_run_store
 from surveillance.api.middleware import MaxBodySizeMiddleware
 from surveillance.api.rate_limit import limiter
-from surveillance.api.routes import health, investigations
+from surveillance.api.routes import cases, health, investigations
 from surveillance.observability import configure_logging
 from surveillance.settings import Settings, get_settings
 
@@ -21,7 +21,7 @@ def cors_options(config: Settings) -> dict[str, object]:
     because `next dev` moves to :3001 when :3000 is taken."""
     options: dict[str, object] = {
         "allow_origins": config.frontend_origins,
-        "allow_methods": ["GET", "POST"],
+        "allow_methods": ["GET", "POST", "PUT"],
         "allow_headers": ["Content-Type"],
     }
     if config.environment == "development":
@@ -48,3 +48,4 @@ app.add_middleware(CORSMiddleware, **cors_options(settings))  # type: ignore[arg
 
 app.include_router(health.router)
 app.include_router(investigations.router)
+app.include_router(cases.router)

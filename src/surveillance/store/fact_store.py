@@ -63,6 +63,17 @@ class FactStore:
         ).fetchone()
         return _row_to_transaction(row) if row else None
 
+    def scenario_accessions(self) -> list[str]:
+        """The labelled canonical scenarios, found by their `SCENARIO-` prefix.
+        Superseded originals and the `-PRIOR` history row are supporting data for
+        a scenario, not cases. Labels live in data/scenarios.py and are never read here."""
+        rows = self._conn.execute(
+            "SELECT DISTINCT accession_number FROM transactions "
+            "WHERE accession_number LIKE 'SCENARIO-%' AND accession_number NOT LIKE '%-PRIOR' "
+            "AND superseded = 0 ORDER BY accession_number"
+        ).fetchall()
+        return [r[0] for r in rows]
+
     def transactions_for_accession(self, accession_number: str) -> list[Transaction]:
         """Every transaction line reported in one filing.
 

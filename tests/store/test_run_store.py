@@ -97,3 +97,28 @@ def test_fail_interrupted_runs_only_touches_running_runs(tmp_path: Path) -> None
     finished = store.get_run("done")
     assert finished is not None
     assert finished.status == "completed"
+
+
+def test_list_runs_newest_first_and_investigated_accessions(tmp_path: Path) -> None:
+    store = RunStore(tmp_path / "runs.db")
+    store.create_run("a-1", "ACC-A")
+    store.create_run("b-1", "ACC-B")
+    store.create_run("a-2", "ACC-A")
+
+    assert [r.id for r in store.list_runs("ACC-A")] == ["a-2", "a-1"]
+    assert store.list_runs("ACC-NONE") == []
+    assert store.investigated_accessions() == ["ACC-A", "ACC-B"]
+
+
+def test_set_decision_replaces_the_previous_one(tmp_path: Path) -> None:
+    store = RunStore(tmp_path / "runs.db")
+    store.create_run("run-1", "ACC-A")
+    assert store.get_decision("ACC-A") is None
+
+    store.set_decision("ACC-A", "run-1", "accept", None, "")
+    replaced = store.set_decision("ACC-A", "run-1", "override", "escalate", "rolling 90d")
+
+    assert replaced.decision == "override"
+    assert replaced.override_disposition == "escalate"
+    assert replaced.note == "rolling 90d"
+    assert store.get_decision("ACC-A") == replaced

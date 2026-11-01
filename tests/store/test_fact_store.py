@@ -59,3 +59,15 @@ def test_history_for_insider_filters_by_code_and_lookback(store: FactStore) -> N
 
     all_history = store.history_for_insider("0001234571", None, "2025-07-31", lookback_days=90)
     assert len(all_history) == 2
+
+
+def test_scenario_accessions_lists_only_scenarios(tmp_path: Path) -> None:
+    from data.scenarios import SCENARIOS, inject_scenarios_into
+
+    db_path = tmp_path / "facts.db"
+    build_facts_db(FIXTURE_DIR, db_path)
+    assert FactStore(db_path).scenario_accessions() == []
+
+    inject_scenarios_into(db_path)
+    accessions = FactStore(db_path).scenario_accessions()
+    assert accessions == sorted({s.accession_number for s in SCENARIOS})

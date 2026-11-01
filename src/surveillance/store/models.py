@@ -80,7 +80,21 @@ class RunRecord:
     error: str | None
 
 
+@dataclass(frozen=True)
+class AnalystDecision:
+    """An analyst's call on one accession, tied to the run it was made on.
+    Record-only: it never changes the AI finding (D-A2-12)."""
+
+    accession_number: str
+    run_id: str
+    decision: str  # "accept" | "override"
+    override_disposition: str | None
+    note: str
+    updated_at: str
+
+
 __all__ = [
+    "AnalystDecision",
     "ComplianceRule",
     "CostEntry",
     "MaterialEvent",
