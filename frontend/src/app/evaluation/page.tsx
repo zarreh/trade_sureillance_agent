@@ -62,8 +62,8 @@ export default function EvaluationPage() {
             performance claim.
           </li>
           <li>
-            The trades are real SEC filings; the limits, rules and calendar they are checked
-            against are synthetic.
+            The scenarios are synthetic trades, and the limits, rules and calendar they are
+            checked against are synthetic too.
             <InfoTip text={GLOSSARY.syntheticPolicy} label="Synthetic firm policy." />
           </li>
           <li>Run date: {data.run_date}.</li>

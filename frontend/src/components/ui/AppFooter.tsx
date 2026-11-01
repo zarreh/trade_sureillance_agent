@@ -10,8 +10,9 @@ export function AppFooter() {
     <footer className="mt-16 border-t border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-950">
       <div className="mx-auto flex max-w-5xl flex-col gap-3 px-4 py-6 text-sm text-slate-500 sm:flex-row sm:items-center sm:justify-between sm:px-6 dark:text-slate-400">
         <p>
-          Trades are real SEC filings; firm policy and the corporate calendar are synthetic. A
-          research prototype, not a supervisory system of record.
+          The sample cases are synthetic trades; firm policy and the corporate calendar are synthetic
+          too. Other filings come from public SEC data. A research prototype, not a supervisory system
+          of record.
         </p>
         <div className="flex flex-wrap gap-4">
           <a className={LINK} href={DOCS_URL} target="_blank" rel="noreferrer">
