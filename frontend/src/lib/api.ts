@@ -88,3 +88,41 @@ export function streamInvestigationEvents(id: string, handlers: TraceEventHandle
   };
   return () => source.close();
 }
+
+export type CaseRow = components["schemas"]["CaseRow"];
+export type CaseListResponse = components["schemas"]["CaseListResponse"];
+export type AnalystDecisionRequest = components["schemas"]["AnalystDecisionRequest"];
+
+export async function listCases(): Promise<CaseListResponse> {
+  const response = await fetch(`${API_BASE}/cases`, { cache: "no-store" });
+  if (!response.ok) {
+    throw new ApiError(`Failed to load the case queue (${response.status})`, response.status);
+  }
+  return response.json() as Promise<CaseListResponse>;
+}
+
+export async function getCase(accessionNumber: string): Promise<CaseRow> {
+  const response = await fetch(`${API_BASE}/cases/${encodeURIComponent(accessionNumber)}`, {
+    cache: "no-store",
+  });
+  if (!response.ok) {
+    throw new ApiError(`Failed to load the case (${response.status})`, response.status);
+  }
+  return response.json() as Promise<CaseRow>;
+}
+
+export async function putDecision(
+  accessionNumber: string,
+  body: AnalystDecisionRequest
+): Promise<CaseRow> {
+  const response = await fetch(`${API_BASE}/cases/${encodeURIComponent(accessionNumber)}/decision`, {
+    method: "PUT",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  if (!response.ok) {
+    const detail = await errorDetail(response);
+    throw new ApiError(detail ?? "Could not save the decision.", response.status);
+  }
+  return response.json() as Promise<CaseRow>;
+}

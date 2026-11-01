@@ -1,25 +1,74 @@
 @import "tailwindcss";
 
+/* Class-based dark mode: `<html class="dark">` is the default and a stored
+   "light" preference removes it before first paint (app/layout.tsx). */
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
-  --background: #f5f7fa;
-  --foreground: #0f172a;
+  --bg: #f4f5f7;
+  --surface: #ffffff;
+  --surface-2: #f1f3f6;
+  --line: #dde1e8;
+  --fg: #0e1420;
+  --muted: #546072;
+  --accent-fg: #1a1206;
+  --focus: #9a5b10;
+}
+
+.dark {
+  --bg: #070b14;
+  --surface: #0c1322;
+  --surface-2: #121b2d;
+  --line: #1f2a3f;
+  --fg: #e6e9ef;
+  --muted: #94a0b4;
+  --focus: #f0b72f;
+  color-scheme: dark;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-background: var(--bg);
+  --color-foreground: var(--fg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-line: var(--line);
+  --color-fg: var(--fg);
+  --color-muted: var(--muted);
+  --color-accent-fg: var(--accent-fg);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0b1120;
-    --foreground: #e2e8f0;
-  }
+/* Gold accent. 700 on white is 5.6:1 and 300 on --bg (dark) is 12:1; filled
+   buttons use accent-400 with --accent-fg text (10:1) instead of white (fails AA). */
+@theme {
+  --color-accent-50: #fefaec;
+  --color-accent-100: #fcf1c9;
+  --color-accent-200: #f9e18e;
+  --color-accent-300: #f5cc55;
+  --color-accent-400: #f0b72f;
+  --color-accent-500: #e09a16;
+  --color-accent-600: #c27a0e;
+  --color-accent-700: #9a5b10;
+  --color-accent-800: #7d4914;
+  --color-accent-900: #683d16;
+  --color-accent-950: #3c1f07;
+
+  /* Deeper, bluer darks for the ops-console look; lighter steps are unchanged. */
+  --color-slate-800: #1a2335;
+  --color-slate-900: #0c1322;
+  --color-slate-950: #070b14;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: var(--bg);
+  color: var(--fg);
+}
+
+:focus-visible {
+  outline-color: var(--focus);
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
 }

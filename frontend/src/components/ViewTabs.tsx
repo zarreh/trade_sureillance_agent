@@ -44,7 +44,7 @@ export function ViewTabs({ tabs, label }: { tabs: TabSpec[]; label: string }) {
               onKeyDown={(e) => onKeyDown(e, i)}
               className={`-mb-px rounded-t-lg border-b-2 px-4 py-2 text-sm font-medium transition-colors ${
                 selected
-                  ? "border-sky-600 text-sky-800 dark:border-sky-400 dark:text-sky-200"
+                  ? "border-accent-600 text-accent-800 dark:border-accent-400 dark:text-accent-200"
                   : "border-transparent text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white"
               }`}
             >

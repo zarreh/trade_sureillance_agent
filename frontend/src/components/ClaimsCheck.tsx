@@ -40,7 +40,7 @@ export function ClaimsCheck({ finding }: { finding: ComplianceFinding }) {
                       <a
                         key={id}
                         href={`#evidence-${id}`}
-                        className="rounded bg-slate-100 px-1.5 py-0.5 font-mono text-[11px] text-sky-700 hover:bg-sky-50 hover:underline dark:bg-slate-800 dark:text-sky-300 dark:hover:bg-sky-950"
+                        className="rounded bg-slate-100 px-1.5 py-0.5 font-mono text-[11px] text-accent-700 hover:bg-accent-50 hover:underline dark:bg-slate-800 dark:text-accent-300 dark:hover:bg-accent-950"
                       >
                         {id}
                       </a>

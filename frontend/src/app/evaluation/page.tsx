@@ -1,18 +1,40 @@
 import { FlaskConical } from "lucide-react";
 
+import { LiveRuns } from "@/components/LiveRuns";
 import { PolicyScores } from "@/components/PolicyScores";
 import { Callout } from "@/components/ui/Callout";
 import { Card, CardTitle } from "@/components/ui/Card";
 import { InfoTip } from "@/components/ui/InfoTip";
 import { PageHeader } from "@/components/ui/PageHeader";
+import liveRuns from "@/generated/live-runs.json";
 import rlPolicies from "@/generated/rl-policies.json";
 import { docsLink } from "@/lib/docs";
 import { GLOSSARY } from "@/lib/glossary";
-import { RlPoliciesSchema } from "@/lib/schemas";
+import { LiveRunsSchema, RlPoliciesSchema } from "@/lib/schemas";
 
 export const metadata = { title: "How we know it works · Trade Surveillance Agent" };
 
 const data = RlPoliciesSchema.parse(rlPolicies);
+const live = LiveRunsSchema.parse(liveRuns);
+
+const RL_PURPOSE = [
+  {
+    title: "A process audit on every real run",
+    body: "Plain code checks that all six evidence sources were consulted, transaction details came first, every citation points at a real tool call, and any exemption is backed by the filing. It is shown on every run.",
+  },
+  {
+    title: "A score that shortcuts can't win",
+    body: "Scoring only the final answer rewards always flagging. The reward multiplies a correct answer by the audit score and has no AI judge in it, so each tested shortcut scores far below a proper investigation.",
+  },
+  {
+    title: "A regression guard",
+    body: "CI fails if any shortcut gets within 0.5 of the reference, so weakening a check is caught before it ships.",
+  },
+  {
+    title: "A ready environment, not a trained model",
+    body: "The same loop is a Gymnasium environment that could drive prompt optimisation or fine-tuning later. Nothing is trained on it today.",
+  },
+];
 
 export default function EvaluationPage() {
   const reference = data.policies.find((p) => p.policy === "reference");
@@ -34,7 +56,22 @@ export default function EvaluationPage() {
         </p>
       </PageHeader>
 
-      <Card tone="sky" className="space-y-2">
+      <Card className="space-y-4" aria-label="What the RL part is for">
+        <CardTitle>What the RL part is for</CardTitle>
+        <ol className="grid gap-4 sm:grid-cols-2">
+          {RL_PURPOSE.map((item, i) => (
+            <li key={item.title} className="flex gap-3">
+              <span className="font-mono text-sm text-accent-700 dark:text-accent-300">{String(i + 1).padStart(2, "0")}</span>
+              <div>
+                <p className="text-sm font-semibold text-fg">{item.title}</p>
+                <p className="mt-1 text-sm leading-relaxed text-muted">{item.body}</p>
+              </div>
+            </li>
+          ))}
+        </ol>
+      </Card>
+
+      <Card tone="accent" className="space-y-2">
         <CardTitle>Key finding</CardTitle>
         <p className="text-[15px] leading-relaxed text-slate-800 dark:text-slate-100">
           Every shortcut scores at least {data.gate_margin} below a proper investigation, and a
@@ -75,7 +112,19 @@ export default function EvaluationPage() {
         <PolicyScores data={data} />
       </Card>
 
-      <p className="text-sm text-slate-600 dark:text-slate-300">
+      <Card className="space-y-4" aria-label="Live model">
+        <CardTitle>The real model, on the same ruler</CardTitle>
+        <p className="text-sm leading-relaxed text-muted">
+          The same ten scenarios run through the real graph with real models, scored with the same reward. The
+          audit caught a real defect: the claim extractor saw only opaque tool-call ids, so on most runs it cited
+          nothing and every claim failed the citation check. Giving it the tool name and a result excerpt per id
+          (extractor v2) took audit failures from 8 of 10 runs to 0. It did not fix the answers: the model still
+          clears cases it should flag.
+        </p>
+        <LiveRuns data={live} />
+      </Card>
+
+      <p className="text-sm text-muted">
         Read more:{" "}
         <a className="underline" href={docsLink("rlEnvironment")} target="_blank" rel="noreferrer">
           the environment and its gate

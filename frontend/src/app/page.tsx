@@ -88,7 +88,7 @@ export default function Home() {
                   </p>
                   <Link
                     href={`/cases/${item.caseSlug}`}
-                    className="mt-auto inline-flex items-center gap-1 text-sm font-medium text-sky-700 hover:underline dark:text-sky-300"
+                    className="mt-auto inline-flex items-center gap-1 text-sm font-medium text-accent-700 hover:underline dark:text-accent-300"
                   >
                     See it in a case
                     <ArrowRight className="h-4 w-4" aria-hidden />
@@ -133,14 +133,14 @@ export default function Home() {
         <HowItWorks />
         <p className="flex flex-wrap gap-x-6 gap-y-2 text-sm">
           <Link
-            className="inline-flex items-center gap-1 font-medium text-sky-700 hover:underline dark:text-sky-300"
+            className="inline-flex items-center gap-1 font-medium text-accent-700 hover:underline dark:text-accent-300"
             href="/evaluation"
           >
             How we know it isn&apos;t cutting corners
             <ArrowRight className="h-4 w-4" aria-hidden />
           </Link>
           <Link
-            className="inline-flex items-center gap-1 font-medium text-sky-700 hover:underline dark:text-sky-300"
+            className="inline-flex items-center gap-1 font-medium text-accent-700 hover:underline dark:text-accent-300"
             href="/investigate"
           >
             Investigate a filing yourself

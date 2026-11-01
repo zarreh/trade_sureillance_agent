@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { PrototypeBanner } from "@/components/PrototypeBanner";
 import { AppFooter } from "@/components/ui/AppFooter";
 import { AppHeader } from "@/components/ui/AppHeader";
+import { THEME_INIT_SCRIPT } from "@/lib/theme";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -25,8 +26,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      suppressHydrationWarning
+      className={`dark ${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+      </head>
       <body suppressHydrationWarning className="flex min-h-full flex-col font-sans">
         <AppHeader />
         <PrototypeBanner />

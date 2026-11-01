@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 
 const STYLES = {
   info: {
-    box: "border-sky-200 bg-sky-50 text-sky-900 dark:border-sky-900 dark:bg-sky-950/60 dark:text-sky-100",
+    box: "border-line bg-surface-2 text-fg",
     icon: Info,
   },
   success: {

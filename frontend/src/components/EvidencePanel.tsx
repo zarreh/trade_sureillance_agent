@@ -29,7 +29,7 @@ export function EvidencePanel({ finding }: { finding: ComplianceFinding }) {
         <DispositionBadge disposition={finding.disposition} />
         {finding.severity && <Badge variant="slate">Severity: {finding.severity}</Badge>}
         <Badge variant="slate">Confidence: {finding.confidence}</Badge>
-        <Badge variant="sky">
+        <Badge variant="accent">
           {REPORTED_10B5_1[finding.reported_under_10b5_1]}
           <InfoTip text={GLOSSARY.reportedUnder10b5_1} label="10b5-1 status." />
         </Badge>

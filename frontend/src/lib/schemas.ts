@@ -189,3 +189,37 @@ export const RlPoliciesSchema = z.object({
   ),
 });
 export type RlPolicies = z.infer<typeof RlPoliciesSchema>;
+
+export const LiveRunsSchema = z.object({
+  scorer: z.string(),
+  label_source: z.string(),
+  runs: z.array(
+    z.object({
+      run_date: z.string(),
+      n: z.number(),
+      models: z.array(z.string()),
+      claim_extractor: z.string(),
+      disposition_accuracy: z.number(),
+      reward_mean: z.number(),
+      outcome_only_mean: z.number(),
+      audit_zero_runs: z.number(),
+      unsupported_claims_mean: z.number(),
+      total_cost_usd: z.number(),
+      mean_latency_seconds: z.number(),
+      uncertainty: z.string(),
+      scenarios: z.array(
+        z.object({
+          scenario_id: z.string(),
+          expected: z.string(),
+          submitted: z.string().nullable(),
+          correct: z.boolean(),
+          reward: z.number(),
+          outcome_only: z.number(),
+          trajectory_score: z.number(),
+          unsupported_claims: z.number(),
+        })
+      ),
+    })
+  ),
+});
+export type LiveRuns = z.infer<typeof LiveRunsSchema>;

@@ -12,9 +12,9 @@ export function CaseCard({ item }: { item: SampleCase }) {
   return (
     <Link
       href={`/cases/${copy.slug}`}
-      className="block h-full rounded-xl focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-500"
+      className="block h-full rounded-xl focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-500"
     >
-      <Card className="h-full space-y-3 transition-colors hover:border-sky-400 dark:hover:border-sky-600">
+      <Card className="h-full space-y-3 transition-colors hover:border-accent-400 dark:hover:border-accent-600">
         <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
           Case {number}
         </p>

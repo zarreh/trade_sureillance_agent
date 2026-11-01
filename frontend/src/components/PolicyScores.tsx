@@ -29,7 +29,7 @@ export function PolicyScores({ data }: { data: RlPolicies }) {
               <span className="text-xs text-slate-500 dark:text-slate-400">{p.description}</span>
             </div>
             <Bar value={p.outcome_only_mean} tone="bg-slate-400" />
-            <Bar value={p.reward_mean} tone="bg-sky-600" />
+            <Bar value={p.reward_mean} tone="bg-accent-600" />
           </li>
         ))}
       </ul>
@@ -38,7 +38,7 @@ export function PolicyScores({ data }: { data: RlPolicies }) {
           <span className="h-2 w-4 rounded bg-slate-400" aria-hidden /> Outcome only
         </span>
         <span className="flex items-center gap-1">
-          <span className="h-2 w-4 rounded bg-sky-600" aria-hidden /> Trajectory-aware
+          <span className="h-2 w-4 rounded bg-accent-600" aria-hidden /> Trajectory-aware
         </span>
       </p>
 

@@ -7,7 +7,7 @@ export function InfoTip({ text, label = "What does this mean?" }: { text: string
       <button
         type="button"
         aria-label={`${label} ${text}`}
-        className="ml-1 inline-flex rounded-full text-slate-400 hover:text-sky-600 focus:text-sky-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
+        className="ml-1 inline-flex rounded-full text-slate-400 hover:text-accent-700 focus:text-accent-700 dark:hover:text-accent-300 dark:focus:text-accent-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-500"
       >
         <Info className="h-3.5 w-3.5" aria-hidden />
       </button>

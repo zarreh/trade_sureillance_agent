@@ -4,6 +4,7 @@ import { ArrowLeft, Play } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
+import { AnalystDecisionCard } from "./AnalystDecisionCard";
 import { InvestigationView } from "./InvestigationView";
 import { Callout } from "@/components/ui/Callout";
 import {
@@ -118,7 +119,7 @@ export function RunConsole({ samples }: { samples: { label: string; accession: s
         <button
           type="submit"
           disabled={busy || accession.trim() === ""}
-          className="inline-flex items-center gap-2 rounded-lg bg-sky-600 px-4 py-2 text-sm font-medium text-white hover:bg-sky-700 disabled:opacity-50"
+          className="inline-flex items-center gap-2 rounded-lg bg-accent-400 px-4 py-2 text-sm font-medium text-accent-fg hover:bg-accent-300 disabled:opacity-50"
         >
           <Play className="h-4 w-4" aria-hidden />
           Run it live
@@ -127,7 +128,7 @@ export function RunConsole({ samples }: { samples: { label: string; accession: s
           <button
             type="button"
             onClick={() => router.replace("/investigate")}
-            className="inline-flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-medium text-sky-700 hover:bg-sky-50 dark:text-sky-300 dark:hover:bg-sky-950"
+            className="inline-flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-medium text-accent-700 hover:bg-accent-50 dark:text-accent-300 dark:hover:bg-accent-950"
           >
             <ArrowLeft className="h-4 w-4" aria-hidden />
             Start another
@@ -144,7 +145,7 @@ export function RunConsole({ samples }: { samples: { label: string; accession: s
                 <button
                   type="button"
                   onClick={() => setAccession(sample.accession)}
-                  className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-left text-xs text-slate-700 hover:border-sky-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
+                  className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-left text-xs text-slate-700 hover:border-accent-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
                 >
                   {sample.label}
                 </button>
@@ -177,6 +178,14 @@ export function RunConsole({ samples }: { samples: { label: string; accession: s
           events={events}
           finding={phase === "success" && parsedFinding?.success ? parsedFinding.data : null}
           investigation={investigation && (phase === "success" || phase === "empty") ? investigation : null}
+        />
+      )}
+
+      {phase === "success" && investigation?.status === "completed" && parsedFinding?.success && (
+        <AnalystDecisionCard
+          accessionNumber={investigation.accession_number}
+          runId={investigation.id}
+          aiDisposition={parsedFinding.data.disposition}
         />
       )}
     </div>

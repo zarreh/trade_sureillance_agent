@@ -33,7 +33,7 @@ export function SpotTheDifference({ filings }: { filings: [QuizFiling, QuizFilin
   const correct: Choice = flagged.length === 2 ? "both" : flagged.length === 1 ? flagged[0] : "neither";
 
   return (
-    <Card aria-label="Spot the difference" tone="sky" className="space-y-5">
+    <Card aria-label="Spot the difference" tone="accent" className="space-y-5">
       <div className="space-y-1">
         <CardTitle>Try it yourself</CardTitle>
         <h2 className="text-xl font-semibold text-slate-900 dark:text-white">
@@ -71,10 +71,10 @@ export function SpotTheDifference({ filings }: { filings: [QuizFiling, QuizFilin
           {OPTIONS.map((option) => (
             <label
               key={option.value}
-              className={`cursor-pointer rounded-lg border px-3 py-2 text-sm font-medium has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-sky-500 ${
+              className={`cursor-pointer rounded-lg border px-3 py-2 text-sm font-medium has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-accent-500 ${
                 choice === option.value
-                  ? "border-sky-600 bg-sky-600 text-white"
-                  : "border-slate-300 bg-white text-slate-800 hover:border-sky-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
+                  ? "border-accent-400 bg-accent-400 text-accent-fg"
+                  : "border-slate-300 bg-white text-slate-800 hover:border-accent-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
               }`}
             >
               <input
@@ -108,7 +108,7 @@ export function SpotTheDifference({ filings }: { filings: [QuizFiling, QuizFilin
                   <p className="text-slate-700 dark:text-slate-200">{filing.decisive}</p>
                   <Link
                     href={`/cases/${filing.slug}`}
-                    className="font-medium text-sky-700 hover:underline dark:text-sky-300"
+                    className="font-medium text-accent-700 hover:underline dark:text-accent-300"
                   >
                     See the full investigation: {filing.title}
                   </Link>
@@ -118,7 +118,7 @@ export function SpotTheDifference({ filings }: { filings: [QuizFiling, QuizFilin
             <button
               type="button"
               onClick={() => setChoice(null)}
-              className="text-sm font-medium text-sky-700 hover:underline dark:text-sky-300"
+              className="text-sm font-medium text-accent-700 hover:underline dark:text-accent-300"
             >
               Try again
             </button>

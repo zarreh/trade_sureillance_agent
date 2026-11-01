@@ -34,7 +34,7 @@ export function HowItWorks() {
             <Card className="h-full space-y-2">
               <div className="flex items-center justify-between gap-2">
                 <span className="flex items-center gap-2 text-sm font-semibold text-slate-900 dark:text-white">
-                  <span className="flex h-6 w-6 items-center justify-center rounded-full bg-sky-600 text-xs text-white">
+                  <span className="flex h-6 w-6 items-center justify-center rounded-full bg-accent-400 text-xs text-accent-fg">
                     {i + 1}
                   </span>
                   {step.title}

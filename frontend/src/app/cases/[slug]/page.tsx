@@ -76,7 +76,7 @@ export default async function CasePage({ params }: { params: Promise<Params> }) 
     <div className="space-y-8">
       <Link
         href="/"
-        className="inline-flex items-center gap-1 text-sm font-medium text-sky-700 hover:underline dark:text-sky-300"
+        className="inline-flex items-center gap-1 text-sm font-medium text-accent-700 hover:underline dark:text-accent-300"
       >
         <ArrowLeft className="h-4 w-4" aria-hidden />
         All sample cases
@@ -87,7 +87,7 @@ export default async function CasePage({ params }: { params: Promise<Params> }) 
       </Callout>
 
       <header className="space-y-3">
-        <p className="text-xs font-semibold uppercase tracking-wider text-sky-700 dark:text-sky-400">
+        <p className="text-xs font-semibold uppercase tracking-wider text-accent-700 dark:text-accent-400">
           Case {number}: {copy.title}
         </p>
         <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl dark:text-white">
@@ -121,7 +121,7 @@ export default async function CasePage({ params }: { params: Promise<Params> }) 
         </div>
         <Link
           href={`/investigate?accession=${encodeURIComponent(data.accession_number)}`}
-          className="inline-flex items-center gap-2 rounded-lg bg-sky-600 px-4 py-2 text-sm font-medium text-white hover:bg-sky-700"
+          className="inline-flex items-center gap-2 rounded-lg bg-accent-400 px-4 py-2 text-sm font-medium text-accent-fg hover:bg-accent-300"
         >
           <Play className="h-4 w-4" aria-hidden />
           Re-run this case live
@@ -131,7 +131,7 @@ export default async function CasePage({ params }: { params: Promise<Params> }) 
       {pair && (
         <p className="text-sm text-slate-600 dark:text-slate-300">
           Compare with{" "}
-          <Link className="font-medium text-sky-700 underline dark:text-sky-300" href={`/cases/${pair.slug}`}>
+          <Link className="font-medium text-accent-700 underline dark:text-accent-300" href={`/cases/${pair.slug}`}>
             {pair.title}
           </Link>
           .
@@ -142,7 +142,7 @@ export default async function CasePage({ params }: { params: Promise<Params> }) 
         {previous ? (
           <Link
             href={`/cases/${previous.copy.slug}`}
-            className="inline-flex items-center gap-1 font-medium text-sky-700 hover:underline dark:text-sky-300"
+            className="inline-flex items-center gap-1 font-medium text-accent-700 hover:underline dark:text-accent-300"
           >
             <ArrowLeft className="h-4 w-4" aria-hidden />
             Case {previous.number}: {previous.copy.title}
@@ -153,7 +153,7 @@ export default async function CasePage({ params }: { params: Promise<Params> }) 
         {next && (
           <Link
             href={`/cases/${next.copy.slug}`}
-            className="inline-flex items-center gap-1 font-medium text-sky-700 hover:underline dark:text-sky-300"
+            className="inline-flex items-center gap-1 font-medium text-accent-700 hover:underline dark:text-accent-300"
           >
             Case {next.number}: {next.copy.title}
             <ArrowRight className="h-4 w-4" aria-hidden />

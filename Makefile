@@ -26,6 +26,7 @@ eval:
 	uv run python -m evals.run
 	uv run python -m evals.run_rl
 	uv run python -m evals.export_cases
+	uv run python -m evals.export_live_runs
 
 eval-live:
 	uv run python -m evals.live_run
@@ -62,4 +63,4 @@ frontend-types:
 	cd frontend && npm run gen:types
 
 frontend-e2e:
-	cd frontend && npx playwright test investigation.spec.ts
+	cd frontend && npx playwright test investigation.spec.ts queue.spec.ts

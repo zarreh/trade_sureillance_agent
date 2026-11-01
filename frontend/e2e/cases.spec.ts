@@ -194,10 +194,8 @@ test("case: a late filing says how far past the deadline it was, not just how lo
 
 test("case: with no history, it says so instead of inventing a comparison", async ({ page }) => {
   await page.goto("/cases/first-large-sale");
-  // The AI answered wrongly here, but every safeguard passed. The page must not imply they vouch for the verdict.
-  await expect(page.getByLabel("Outcome", { exact: true })).toContainText(
-    "not whether the verdict is right"
-  );
+  // The recorded live run answered wrongly and left a claim unsupported, so it must be sent to a human.
+  await expect(page.getByLabel("Outcome", { exact: true })).toContainText("Human review required");
   await page.getByRole("tab", { name: "Reference investigation" }).click();
   const history = page.getByLabel("Their own trading history", { exact: true });
   await expect(history).toContainText("No history to compare");

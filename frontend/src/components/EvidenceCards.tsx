@@ -44,7 +44,7 @@ function LimitBar({
         className="relative h-3 rounded-full bg-slate-100 dark:bg-slate-800"
       >
         <div
-          className={`h-full rounded-full ${over ? "bg-red-500" : "bg-sky-500"}`}
+          className={`h-full rounded-full ${over ? "bg-red-500" : "bg-accent-500"}`}
           style={{ width: `${(value / max) * 100}%` }}
         />
         <div
@@ -328,7 +328,7 @@ function EvidenceCard({ fact, facts }: { fact: Fact; facts: Fact[] }) {
     <article
       id={`evidence-${record.tool_call_id}`}
       aria-label={title}
-      className="scroll-mt-20 space-y-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm target:ring-2 target:ring-sky-500 dark:border-slate-800 dark:bg-slate-900"
+      className="scroll-mt-20 space-y-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm target:ring-2 target:ring-accent-500 dark:border-slate-800 dark:bg-slate-900"
     >
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h3 className="text-sm font-semibold text-slate-900 dark:text-white">{title}</h3>
