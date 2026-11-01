@@ -6,6 +6,8 @@
 
 ::: surveillance.api.routes.investigations
 
+::: surveillance.api.routes.cases
+
 ::: surveillance.api.schemas
 
 ::: surveillance.api.run_executor

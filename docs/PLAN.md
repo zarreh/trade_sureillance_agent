@@ -678,6 +678,8 @@ Explicitly **not** in the primary timeline. Each item is close to a second
 application and none of them is required for the argument in §0.
 
 - **Alert triage queue** — batch-score a filing day, rank by severity, queue UI.
+  *(A narrow case-review queue over the scenarios and investigated filings shipped
+  early in v5; batch triage stays gated. See §14 and D-A2-12.)*
 - **False-positive analysis view** — the layer-2 numbers rendered as an
   alert-fatigue story. *(The numbers themselves ship in Phase 7; this is only the
   presentation of them.)*
@@ -1088,6 +1090,56 @@ Where the build differs from the text above:
 - **Duplicate starts** are allowed (recorded in `docs/HARVEST.md`).
 - **Extra fixes found by the readiness review and the live run** (all in `docs/HARVEST.md`): no CORS policy; runs cut off by a restart stayed `running`; the API image did not trust proxy headers; and every real investigation through the API failed on LangGraph's default recursion limit of 25.
 - **Live result (not gated):** 4 of 10 dispositions correct, mean reward -0.03, $0.43 in total, and the process audit scored 0 on five runs because the claim extractor cited no tool-call ids. See `docs/evidence/rl-environment.md`.
+
+---
+
+## 14. v5 — citation fix, case-review queue, amber theme, live results on /evaluation (2026-11-01)
+
+`docs/PLAN_V5.md` was the first proposal. After review it was cut to the parts
+below; follow-up chat and the reward on real runs (G3) move to v6.
+
+**Why the scope changed.** The process audit scored 0 on 5/10 and then 8/10 live
+runs because the claim extractor cited nothing. Chat would reuse that extractor,
+so the fix came first. Chat is a second agent workflow and deserves its own
+release. G3 would bring reward code and a labels table into the product for a
+demo label on ten synthetic cases.
+
+**Shipped.**
+
+- **Claim extractor v2.** Structured output was already strict, so the empty
+  citation lists were the model's choice: it saw only opaque ids. The extractor
+  now gets one line per tool call (id, tool, args, truncated result,
+  `graph/evidence.py:format_evidence_index`) and a v2 prompt. Invented ids are
+  not filtered, so the audit still reports them. Live re-run 2026-11-01: audit
+  zero on 0/10 (was 8/10), unsupported claims 1.5 per run (was 3.2), mean reward
+  +0.15 (was −0.24). Accuracy unchanged at 5/10; the model still clears most
+  `flag` cases. That is open.
+- **Case-review queue** (D-A2-12): `GET /cases`, `GET /cases/{accession}`,
+  `/queue`. Scenarios plus investigated accessions; no labels in the API.
+- **Analyst decision** (D-A2-13): `PUT /cases/{accession}/decision` requires a
+  completed `run_id` of that accession; stale only after a newer *completed* run;
+  record-only.
+- **Theme.** Semantic tokens (`bg-surface`, `text-muted`, `border-line`, …), a
+  gold `accent-*` scale replacing `sky-*`, class-based dark by default with a
+  no-flash inline script and a persisted header toggle. `flag` moved from amber
+  to orange so it no longer reads as the accent. Filled accent buttons use dark
+  text on gold (white on amber fails AA). Primitives are on tokens; other
+  components still use `slate-*`/`dark:` pairs, which keep working under the
+  class variant and can be migrated gradually.
+- **/evaluation.** A "What the RL part is for" card, and every recorded live run
+  (`evals/export_live_runs.py` → `frontend/src/generated/live-runs.json`, written
+  by `make eval` and drift-checked) with a per-scenario "why it lost" breakdown.
+  Wording says the *tested* shortcuts score far below the reference, not that the
+  reward cannot be gamed.
+
+**Deviations from the reviewed plan.** ADR numbers are D-A2-12/13 (D-A2-10 and
+D-A2-11 are already used in §13.1). `PUT` on an unfinished run returns 409, not
+422. `make frontend-e2e` now also runs `queue.spec.ts`.
+
+**v6 candidates.** Grounded follow-up chat, sending the answer only after the
+grounding check (stream progress, not unverified text), with the citation check
+per turn. The reward on scenario runs (G3) only with a test that no tool reads
+labels. The disposition miss on `flag` cases. Scripted episode replay (G1).
 
 ---
 

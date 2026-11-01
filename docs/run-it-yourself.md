@@ -46,6 +46,22 @@ just replays from `RunStore` (`data/runs.db`), no run is lost. Requests are
 rate-limited (`SURVEILLANCE_RATE_LIMIT_PER_MINUTE`, default 20/minute) and
 request bodies are capped (`SURVEILLANCE_MAX_REQUEST_BODY_BYTES`, default 16KB).
 
+## Case queue and analyst decisions
+
+```bash
+curl -s localhost:8000/cases                        # scenarios + investigated filings
+curl -s localhost:8000/cases/<accession>            # one row
+curl -sX PUT localhost:8000/cases/<accession>/decision \
+  -H 'content-type: application/json' \
+  -d '{"run_id": "<id>", "decision": "override", "override_disposition": "escalate", "note": "…"}'
+```
+
+A decision is tied to the completed run it was made on and becomes *stale* once a
+newer run completes. It is record-only: it never changes the finding or feeds the
+evaluations ([D-A2-12](architecture/decisions/D-A2-12-case-review-queue.md),
+[D-A2-13](architecture/decisions/D-A2-13-analyst-decision-record-only.md)).
+Decisions are stored in `data/runs.db` next to the runs.
+
 ## Frontend
 
 ```bash
@@ -62,12 +78,16 @@ a case page) starts a real run and streams it step by step; its id goes into the
 URL, so a reload replays the stored run. A real finding needs the backend running with a real
 `SURVEILLANCE_OPENAI_API_KEY`; against a placeholder key the run still streams
 but ultimately fails, exercising the error state honestly rather than faking one.
-The **How we know it works** page reads `frontend/src/generated/rl-policies.json`.
+The **Case queue** (`/queue`) lists the scenarios and every investigated filing from
+`GET /cases`; open a run to accept or override the AI suggestion. The UI is dark by
+default; the header toggle switches to light and is remembered in `localStorage`.
+The **How we know it works** page reads `frontend/src/generated/rl-policies.json`
+and `frontend/src/generated/live-runs.json`.
 
 `NEXT_PUBLIC_API_BASE` and `NEXT_PUBLIC_DOCS_URL` are baked in at build time.
 
-The generated files in `frontend/src/generated/` (`cases.json` and the RL
-results) are written by `make eval` and checked for drift in CI. `cases.json`
+The generated files in `frontend/src/generated/` (`cases.json`, the RL
+results and `live-runs.json`) are written by `make eval` and checked for drift in CI. `cases.json`
 holds each case's reference run plus the latest live recording under
 `evals/recordings/`; `make eval-live` (needs an API key) records a new one.
 

@@ -113,38 +113,43 @@ A further CI step fails if the generated results file differs from the
 committed one. The scorer is the scripted stand-in; **no live-model number is
 gated.**
 
-## Live-model run (not gated)
+## Live-model runs (not gated)
 
-The same ten scenarios were run once through the real graph with real models and
+The same ten scenarios were run through the real graph with real models and
 scored with the same `compute_reward` (`make eval-live`, `evals/live_run.py`).
-It is **not** part of `make eval` and no CI check depends on it.
+This is **not** part of `make eval` and no CI check depends on it. Models:
+`gpt-4o-mini-2024-07-18` (plan, investigate, claims) and `gpt-4o-2024-08-06`
+(finding, judge). Labels were designed with the scenarios, as above.
 
-| | |
-|---|---|
-| n | 10 canonical scenarios |
-| Models | `gpt-4o-mini-2024-07-18` (plan, investigate, claims), `gpt-4o-2024-08-06` (finding, judge) |
-| Run date | 2026-10-29 |
-| Labels | designed with the scenarios, as above |
-| Disposition accuracy | 4 of 10 |
-| Mean reward | -0.03 (outcome only: 0.09) |
-| Cost | $0.43 in total, about $0.04 per investigation |
-| Mean latency | 33.5 s per investigation |
-| Uncertainty | none computed; n=10 supports no precision claim, and one run varies from the next |
+| Run | Claim extractor | Correct | Audit = 0 | Unsupported claims per run | Mean reward (outcome only) | Cost |
+|---|---|---|---|---|---|---|
+| 2026-10-29 | v1 | 4/10 | 5/10 | 3.2 | -0.03 (0.09) | $0.43 |
+| 2026-10-31 | v1 | 5/10 | 8/10 | 3.2 | -0.24 (0.28) | $0.41 |
+| 2026-11-01 | **v2** | 5/10 | **0/10** | **1.5** | **+0.15** (0.22) | $0.40 |
 
-Per-scenario results and every transcript are in
-`evals/recordings/live-2026-10-29/`. Two things stand out.
+n=10 per run, one run each. No uncertainty is computed; n=10 supports no
+precision claim, and one run varies from the next. Per-scenario results and every
+transcript are in `evals/recordings/live-*/`, and the `/evaluation` page renders
+the same numbers from `frontend/src/generated/live-runs.json`.
 
-- **The model missed three of the four `flag` cases** by clearing them, which the
-  outcome table penalises hardest. The accuracy figure says nothing about model
-  quality in general: ten cases, one run, one prompt version.
-- **The process audit scored 0 on five of ten runs, and for a real reason.** In
-  those five the claim extractor cited no tool-call ids at all, so the audit's
-  citation check failed. The grounding judge also marked many claims unsupported
-  (between 1 and 5 per run), and those findings were still published once the
-  two evidence passes were spent, with the unsupported count visible. A
-  record-only audit and a judge that sees only the claims it is given are doing
-  different jobs; here the audit surfaced a weakness in the claim extractor that
-  the grounding report alone did not.
+What the runs show:
+
+- **The audit found a real defect, and it was fixed.** In the v1 runs the claim
+  extractor cited no tool-call ids on 5 and then 8 of 10 runs, so the audit's
+  citation check scored those runs 0 and the grounding judge rejected the claims
+  as uncited. Structured output was already strict, so the field wasn't missing:
+  the model chose an empty list because it saw only opaque ids like
+  `call_E40B…`. Extractor v2 (`prompts/claim_extractor_v2.md`) gets one line per
+  call: id, tool name, arguments and a truncated result. With that, no run scored
+  0 and unsupported claims halved. Invented ids are still left in place for the
+  audit to report, not filtered out.
+- **The fix did not change the answers.** Accuracy stayed at 5 of 10, and the
+  model still clears three of the four `flag` cases, which the outcome table
+  penalises hardest. That is a disposition-reasoning problem, not a citation one,
+  and it is still open.
+- **A record-only audit and the grounding judge do different jobs.** The judge
+  sees only the claims it is given; the audit surfaced the extractor weakness that
+  the grounding report alone did not explain.
 
 The recorded transcripts are what a later replay harness would use to replace the
 scripted stand-in (`evals/oracle.py`) with real responses. That replacement is not

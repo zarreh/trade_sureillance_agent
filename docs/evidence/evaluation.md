@@ -73,7 +73,7 @@ scenario genuinely exercises supersession-exclusion
 ## Process audit and RL gate
 
 `make eval` also runs `evals/run_rl.py`, which scores nine scripted policies
-through a Gymnasium environment to show that shortcuts cannot score well. See
+through a Gymnasium environment to show that the tested shortcut strategies score far below a proper investigation. See
 [RL environment](rl-environment.md).
 
 ## Layer 2 — stratified evaluation set

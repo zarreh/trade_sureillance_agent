@@ -16,3 +16,5 @@ what was built.
 | [D-A2-7](D-A2-7-process-audit.md) | The process audit is the reward's trajectory component |
 | [D-A2-8](D-A2-8-reward-design.md) | Reward design |
 | [D-A2-9](D-A2-9-gymnasium-dev-only.md) | Gymnasium is dev-only and confined to evals |
+| [D-A2-12](D-A2-12-case-review-queue.md) | A case-review queue ships before the `pro` gate |
+| [D-A2-13](D-A2-13-analyst-decision-record-only.md) | The analyst decision is record-only |
