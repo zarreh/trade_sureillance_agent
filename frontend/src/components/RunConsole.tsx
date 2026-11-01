@@ -108,12 +108,12 @@ export function RunConsole({ samples }: { samples: { label: string; accession: s
   return (
     <div className="space-y-6">
       <form onSubmit={runLive} className="flex flex-wrap items-end gap-3">
-        <label className="min-w-0 flex-1 text-sm font-medium text-slate-700 dark:text-slate-200">
+        <label className="min-w-0 flex-1 text-sm font-medium text-fg">
           Accession number
           <input
             value={accession}
             onChange={(e) => setAccession(e.target.value)}
-            className="mt-1 block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 font-mono text-sm text-slate-900 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
+            className="mt-1 block w-full rounded-lg border border-line bg-surface px-3 py-2 font-mono text-sm text-fg"
           />
         </label>
         <button
@@ -138,14 +138,14 @@ export function RunConsole({ samples }: { samples: { label: string; accession: s
 
       {phase === "idle" && samples.length > 0 && (
         <section aria-label="Sample filings" className="space-y-2">
-          <h2 className="text-sm font-semibold text-slate-700 dark:text-slate-200">Or pick a sample filing</h2>
+          <h2 className="text-sm font-semibold text-fg">Or pick a sample filing</h2>
           <ul className="flex flex-wrap gap-2">
             {samples.map((sample) => (
               <li key={sample.accession}>
                 <button
                   type="button"
                   onClick={() => setAccession(sample.accession)}
-                  className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-left text-xs text-slate-700 hover:border-accent-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
+                  className="rounded-lg border border-line bg-surface px-3 py-1.5 text-left text-xs text-fg hover:border-accent-500"
                 >
                   {sample.label}
                 </button>
@@ -156,7 +156,7 @@ export function RunConsole({ samples }: { samples: { label: string; accession: s
       )}
 
       {phase === "loading" && (
-        <p role="status" className="text-sm text-slate-500 dark:text-slate-400">
+        <p role="status" className="text-sm text-muted">
           Starting the investigation…
         </p>
       )}

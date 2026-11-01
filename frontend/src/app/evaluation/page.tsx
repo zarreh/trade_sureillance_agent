@@ -73,7 +73,7 @@ export default function EvaluationPage() {
 
       <Card tone="accent" className="space-y-2">
         <CardTitle>Key finding</CardTitle>
-        <p className="text-[15px] leading-relaxed text-slate-800 dark:text-slate-100">
+        <p className="text-[15px] leading-relaxed text-fg">
           Every shortcut scores at least {data.gate_margin} below a proper investigation, and a
           test in CI keeps it that way. Always flagging gets{" "}
           <strong>{Math.round((flagAll?.flag_recall ?? 0) * 100)}% flag recall</strong> on outcome

@@ -25,7 +25,7 @@ export function ViewTabs({ tabs, label }: { tabs: TabSpec[]; label: string }) {
   const current = tabs.find((t) => t.id === active) ?? tabs[0];
   return (
     <div className="space-y-5">
-      <div role="tablist" aria-label={label} className="flex flex-wrap gap-1 border-b border-slate-200 dark:border-slate-800">
+      <div role="tablist" aria-label={label} className="flex flex-wrap gap-1 border-b border-line">
         {tabs.map((tab, i) => {
           const selected = tab.id === current.id;
           return (
@@ -45,7 +45,7 @@ export function ViewTabs({ tabs, label }: { tabs: TabSpec[]; label: string }) {
               className={`-mb-px rounded-t-lg border-b-2 px-4 py-2 text-sm font-medium transition-colors ${
                 selected
                   ? "border-accent-600 text-accent-800 dark:border-accent-400 dark:text-accent-200"
-                  : "border-transparent text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white"
+                  : "border-transparent text-muted hover:text-fg"
               }`}
             >
               {tab.label}

@@ -35,8 +35,8 @@ export function CaseRunPanel({
       <ClaimsCheck finding={finding} />
       {finding.process_audit && <ProcessAuditPanel audit={finding.process_audit} />}
       {events && events.length > 0 && (
-        <details className="rounded-xl border border-slate-200 p-4 dark:border-slate-800">
-          <summary className="cursor-pointer text-sm font-medium text-slate-700 dark:text-slate-200">
+        <details className="rounded-xl border border-line p-4">
+          <summary className="cursor-pointer text-sm font-medium text-fg">
             Under the hood: the steps of this investigation
           </summary>
           <div className="mt-3">

@@ -41,13 +41,13 @@ export function EvidencePanel({ finding }: { finding: ComplianceFinding }) {
         </p>
       )}
 
-      <p className="text-[15px] leading-relaxed text-slate-800 dark:text-slate-100">
+      <p className="text-[15px] leading-relaxed text-fg">
         {finding.finding_text}
       </p>
 
       {finding.rules_cited.length > 0 && (
         <div>
-          <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+          <h3 className="text-xs font-semibold uppercase tracking-wide text-muted">
             Rules cited
           </h3>
           <ul className="mt-1 space-y-1 text-sm">
@@ -62,7 +62,7 @@ export function EvidencePanel({ finding }: { finding: ComplianceFinding }) {
 
       {finding.exculpatory_factors.length > 0 && (
         <div>
-          <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+          <h3 className="text-xs font-semibold uppercase tracking-wide text-muted">
             Exculpatory factors
             <InfoTip text={GLOSSARY.exculpatoryFactor} label="Exculpatory factors." />
           </h3>

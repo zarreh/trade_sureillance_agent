@@ -18,7 +18,7 @@ export function TraceTimeline({ events }: { events: TraceEvent[] | { node: strin
   // __end__ is a stream-termination marker, not an investigation step.
   const steps = events.filter((event) => event.node !== "__end__");
   if (steps.length === 0) {
-    return <p className="text-sm text-slate-500 dark:text-slate-400">Waiting for the first step…</p>;
+    return <p className="text-sm text-muted">Waiting for the first step…</p>;
   }
   return (
     <ol className="space-y-2" aria-label="Investigation trace">
@@ -27,14 +27,14 @@ export function TraceTimeline({ events }: { events: TraceEvent[] | { node: strin
         return (
           <li
             key={i}
-            className="flex items-center gap-3 rounded-lg border border-slate-200 bg-white p-3 text-sm dark:border-slate-800 dark:bg-slate-900"
+            className="flex items-center gap-3 rounded-lg border border-line bg-surface p-3 text-sm"
           >
-            <span className="w-6 text-right font-mono text-xs text-slate-400">{i + 1}</span>
+            <span className="w-6 text-right font-mono text-xs text-muted">{i + 1}</span>
             <div className="min-w-0 flex-1">
-              <div className="font-medium text-slate-900 dark:text-slate-100">
+              <div className="font-medium text-fg">
                 {step?.label ?? event.node}
               </div>
-              <div className="font-mono text-xs text-slate-500 dark:text-slate-400">{event.node}</div>
+              <div className="font-mono text-xs text-muted">{event.node}</div>
             </div>
             {step && <OwnerBadge owner={step.owner} />}
           </li>

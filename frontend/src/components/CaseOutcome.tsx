@@ -6,8 +6,8 @@ import type { Case } from "@/lib/schemas";
 function Row({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="space-y-0.5 text-sm">
-      <dt className="text-xs text-slate-500 dark:text-slate-400">{label}</dt>
-      <dd className="text-slate-900 dark:text-slate-100">{children}</dd>
+      <dt className="text-xs text-muted">{label}</dt>
+      <dd className="text-fg">{children}</dd>
     </div>
   );
 }
@@ -23,7 +23,7 @@ export function CaseOutcome({ data }: { data: Case }) {
       <Card className="space-y-3">
         <CardTitle>Answer key</CardTitle>
         <DispositionBadge disposition={data.expected_disposition} />
-        <p className="text-sm text-slate-600 dark:text-slate-300">
+        <p className="text-sm text-muted">
           Set when the scenario was designed. A rules-based reference investigation reaches it from the evidence.
         </p>
       </Card>
@@ -41,14 +41,14 @@ export function CaseOutcome({ data }: { data: Case }) {
               )}
               {live.incomplete && <Badge variant="amber">Incomplete</Badge>}
             </div>
-            <p className="text-sm text-slate-600 dark:text-slate-300">
+            <p className="text-sm text-muted">
               Recorded live run{LIVE_RUN ? ` on ${LIVE_RUN.run_date}` : ""}
               {live.models?.length ? ` using ${live.models.join(" and ")}` : ""}
               {live.cost_usd !== null ? `, costing $${live.cost_usd.toFixed(3)}` : ""}.
             </p>
           </>
         ) : (
-          <p className="text-sm text-slate-600 dark:text-slate-300">No live run is recorded for this case.</p>
+          <p className="text-sm text-muted">No live run is recorded for this case.</p>
         )}
       </Card>
 
@@ -73,14 +73,14 @@ export function CaseOutcome({ data }: { data: Case }) {
             )}
             {review && <Badge variant="amber">Human review required</Badge>}
             {live?.correct === false && !review && (
-              <p className="text-xs leading-relaxed text-slate-600 dark:text-slate-300">
+              <p className="text-xs leading-relaxed text-muted">
                 These checks cover evidence and process, not whether the verdict is right. This run passed them and
                 still differs from the answer key.
               </p>
             )}
           </dl>
         ) : (
-          <p className="text-sm text-slate-600 dark:text-slate-300">Nothing to report without a live run.</p>
+          <p className="text-sm text-muted">Nothing to report without a live run.</p>
         )}
       </Card>
     </section>

@@ -41,18 +41,18 @@ function LimitBar({
       <div
         role="img"
         aria-label={`${valueLabel}, compared with ${limitLabel}`}
-        className="relative h-3 rounded-full bg-slate-100 dark:bg-slate-800"
+        className="relative h-3 rounded-full bg-surface-2"
       >
         <div
           className={`h-full rounded-full ${over ? "bg-red-500" : "bg-accent-500"}`}
           style={{ width: `${(value / max) * 100}%` }}
         />
         <div
-          className="absolute -top-0.5 h-4 w-0.5 bg-slate-900 dark:bg-white"
+          className="absolute -top-0.5 h-4 w-0.5 bg-fg"
           style={{ left: `${(limit / max) * 100}%` }}
         />
       </div>
-      <div className="flex justify-between gap-3 text-xs text-slate-600 dark:text-slate-300">
+      <div className="flex justify-between gap-3 text-xs text-muted">
         <span>{valueLabel}</span>
         <span>{limitLabel}</span>
       </div>
@@ -77,24 +77,24 @@ function Timeline({
   const span = Math.max(...days) + 3 - min;
   const pct = (iso: string) => `${((dayNumber(iso) - min) / span) * 100}%`;
   return (
-    <div aria-hidden className="relative mx-3 mb-6 mt-7 h-2 rounded-full bg-slate-200 dark:bg-slate-700">
+    <div aria-hidden className="relative mx-3 mb-6 mt-7 h-2 rounded-full bg-surface-2">
       <div
         className="absolute h-2 rounded-full bg-amber-400/70"
         style={{ left: pct(start), width: `${((dayNumber(end) - dayNumber(start)) / span) * 100}%` }}
       />
       {eventDate && (
         <div className="absolute top-3 -translate-x-1/2 text-center" style={{ left: pct(eventDate) }}>
-          <div className="mx-auto h-2 w-2 rotate-45 bg-slate-700 dark:bg-slate-200" />
-          <div className="whitespace-nowrap text-[11px] text-slate-600 dark:text-slate-300">
+          <div className="mx-auto h-2 w-2 rotate-45 bg-fg" />
+          <div className="whitespace-nowrap text-[11px] text-muted">
             News {formatDate(eventDate)}
           </div>
         </div>
       )}
       <div className="absolute -top-6 -translate-x-1/2 text-center" style={{ left: pct(tradeDate) }}>
-        <div className="whitespace-nowrap text-[11px] font-medium text-slate-900 dark:text-white">
+        <div className="whitespace-nowrap text-[11px] font-medium text-fg">
           Trade {formatDate(tradeDate)}
         </div>
-        <div className="mx-auto h-3 w-3 translate-y-1 rounded-full bg-red-500 ring-2 ring-white dark:ring-slate-900" />
+        <div className="mx-auto h-3 w-3 translate-y-1 rounded-full bg-red-500 ring-2 ring-surface" />
       </div>
     </div>
   );
@@ -103,8 +103,8 @@ function Timeline({
 function Row({ label, children }: { label: string; children: ReactNode }) {
   return (
     <div className="flex flex-wrap justify-between gap-x-4 gap-y-0.5 text-sm">
-      <dt className="text-slate-500 dark:text-slate-400">{label}</dt>
-      <dd className="text-right text-slate-900 dark:text-slate-100">{children}</dd>
+      <dt className="text-muted">{label}</dt>
+      <dd className="text-right text-fg">{children}</dd>
     </div>
   );
 }
@@ -125,7 +125,7 @@ function content(fact: Fact, facts: Fact[]): CardContent {
               : { label: "Filed on time", variant: "green" },
         body: (
           <div className="space-y-3">
-            <p className="text-sm text-slate-700 dark:text-slate-200">
+            <p className="text-sm text-fg">
               {d.rptowner_name}, {roleOf(d)} of {d.issuer_name}
               {d.issuer_ticker ? ` (${d.issuer_ticker})` : ""}
             </p>
@@ -133,18 +133,18 @@ function content(fact: Fact, facts: Fact[]): CardContent {
               {d.transactions.map((t) => (
                 <li
                   key={t.nonderiv_trans_sk}
-                  className="flex flex-wrap items-baseline justify-between gap-x-3 rounded-lg bg-slate-50 px-3 py-2 text-sm dark:bg-slate-800/60"
+                  className="flex flex-wrap items-baseline justify-between gap-x-3 rounded-lg bg-surface-2 px-3 py-2 text-sm"
                 >
-                  <span className="font-medium text-slate-900 dark:text-slate-100">
-                    <span className="mr-2 rounded bg-slate-200 px-1.5 py-0.5 font-mono text-xs dark:bg-slate-700">
+                  <span className="font-medium text-fg">
+                    <span className="mr-2 rounded bg-line px-1.5 py-0.5 font-mono text-xs">
                       {t.trans_code}
                     </span>
                     {describeCode(t.trans_code)}
                   </span>
-                  <span className={t.superseded ? "text-slate-400 line-through" : "text-slate-700 dark:text-slate-200"}>
+                  <span className={t.superseded ? "text-muted line-through" : "text-fg"}>
                     {formatCount(t.trans_shares)} shares × ${t.trans_priceper_share} = {formatMoney(t.trans_value)}
                   </span>
-                  <span className="basis-full text-xs text-slate-500 dark:text-slate-400">
+                  <span className="basis-full text-xs text-muted">
                     {formatDate(t.trans_date)}
                     {t.superseded && " · replaced by an amended filing"}
                   </span>
@@ -230,7 +230,7 @@ function content(fact: Fact, facts: Fact[]): CardContent {
           title: "Their own trading history",
           status: { label: "No history to compare", variant: "slate" },
           body: (
-            <p className="text-sm text-slate-700 dark:text-slate-200">
+            <p className="text-sm text-fg">
               No earlier trades by this insider were found in the {b.lookback_days} days before this one, so there is
               nothing to compare it against.
             </p>
@@ -262,7 +262,7 @@ function content(fact: Fact, facts: Fact[]): CardContent {
           title: "Was news about to come out?",
           status: { label: "No blackout window", variant: "green" },
           body: (
-            <p className="text-sm text-slate-700 dark:text-slate-200">
+            <p className="text-sm text-fg">
               No scheduled blackout window covers {formatDate(m.on_date)}.
             </p>
           ),
@@ -274,7 +274,7 @@ function content(fact: Fact, facts: Fact[]): CardContent {
         body: (
           <div>
             <Timeline tradeDate={m.on_date} start={m.blackout_start} end={m.blackout_end} eventDate={m.event_date} />
-            <p className="text-sm text-slate-700 dark:text-slate-200">
+            <p className="text-sm text-fg">
               Trade on {formatDate(m.on_date)}. The blackout runs {formatDate(m.blackout_start)} to{" "}
               {formatDate(m.blackout_end)}
               {m.event_date ? `, around ${m.event_type ?? "company"} news on ${formatDate(m.event_date)}` : ""}.
@@ -294,7 +294,7 @@ function content(fact: Fact, facts: Fact[]): CardContent {
                   <span className="mr-2 font-mono text-xs">{rule.rule_id}</span>
                   {rule.rule_name}
                 </span>
-                <span className="text-xs text-slate-500 dark:text-slate-400">{rule.severity}</span>
+                <span className="text-xs text-muted">{rule.severity}</span>
               </li>
             ))}
           </ul>
@@ -305,7 +305,7 @@ function content(fact: Fact, facts: Fact[]): CardContent {
         title: fact.record.tool_name.replaceAll("_", " "),
         status: { label: "Not summarised", variant: "slate" },
         body: (
-          <p className="text-sm text-slate-700 dark:text-slate-200">
+          <p className="text-sm text-fg">
             This result could not be summarised. The source result below is what the investigator saw.
           </p>
         ),
@@ -328,21 +328,21 @@ function EvidenceCard({ fact, facts }: { fact: Fact; facts: Fact[] }) {
     <article
       id={`evidence-${record.tool_call_id}`}
       aria-label={title}
-      className="scroll-mt-20 space-y-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm target:ring-2 target:ring-accent-500 dark:border-slate-800 dark:bg-slate-900"
+      className="scroll-mt-20 space-y-3 rounded-xl border border-line bg-surface p-4 shadow-sm target:ring-2 target:ring-accent-500"
     >
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h3 className="text-sm font-semibold text-slate-900 dark:text-white">{title}</h3>
+        <h3 className="text-sm font-semibold text-fg">{title}</h3>
         {status && <Badge variant={status.variant}>{status.label}</Badge>}
       </div>
       {body}
-      <details className="text-xs text-slate-500 dark:text-slate-400">
+      <details className="text-xs text-muted">
         <summary className="cursor-pointer select-none">
           View source result <span className="ml-1 font-mono">{record.tool_call_id}</span>
         </summary>
         <p className="mt-2 font-mono">
           {record.tool_name}({JSON.stringify(record.args)})
         </p>
-        <pre className="mt-1 max-h-64 overflow-auto rounded-lg bg-slate-50 p-3 font-mono text-[11px] leading-relaxed dark:bg-slate-950">
+        <pre className="mt-1 max-h-64 overflow-auto rounded-lg bg-surface-2 p-3 font-mono text-[11px] leading-relaxed">
           {prettyJson(record.result)}
         </pre>
       </details>
@@ -354,7 +354,7 @@ function Group({ label, facts, all }: { label: string; facts: Fact[]; all: Fact[
   if (facts.length === 0) return null;
   return (
     <section aria-label={label} className="space-y-3">
-      <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">{label}</h2>
+      <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">{label}</h2>
       <div className="grid gap-3 md:grid-cols-2">
         {facts.map((fact) => (
           <EvidenceCard key={fact.record.tool_call_id} fact={fact} facts={all} />
@@ -374,7 +374,7 @@ export function EvidenceCards({ evidence, deciding = [] }: { evidence: ToolCallR
   const primary = facts.filter((f) => rank(f) >= 0).sort((a, b) => rank(a) - rank(b));
   const rest = facts.filter((f) => rank(f) < 0);
   if (facts.length === 0) {
-    return <p className="text-sm text-slate-500 dark:text-slate-400">No evidence was retrieved.</p>;
+    return <p className="text-sm text-muted">No evidence was retrieved.</p>;
   }
   return (
     <div className="space-y-6">

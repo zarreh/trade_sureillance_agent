@@ -32,15 +32,15 @@ export function ClaimsCheck({ finding }: { finding: ComplianceFinding }) {
                 {supported ? <Check className="h-3 w-3" aria-label="Supported" /> : <X className="h-3 w-3" aria-label="Not supported" />}
               </span>
               <div className="min-w-0 space-y-1">
-                <p className="text-slate-800 dark:text-slate-100">{claim.text}</p>
-                {verdict && <p className="text-xs text-slate-500 dark:text-slate-400">{verdict.reason}</p>}
+                <p className="text-fg">{claim.text}</p>
+                {verdict && <p className="text-xs text-muted">{verdict.reason}</p>}
                 {claim.cited_tool_call_ids.length > 0 ? (
                   <p className="flex flex-wrap gap-1">
                     {claim.cited_tool_call_ids.map((id) => (
                       <a
                         key={id}
                         href={`#evidence-${id}`}
-                        className="rounded bg-slate-100 px-1.5 py-0.5 font-mono text-[11px] text-accent-700 hover:bg-accent-50 hover:underline dark:bg-slate-800 dark:text-accent-300 dark:hover:bg-accent-950"
+                        className="rounded bg-surface-2 px-1.5 py-0.5 font-mono text-[11px] text-accent-700 hover:bg-accent-50 hover:underline dark:text-accent-300 dark:hover:bg-accent-950"
                       >
                         {id}
                       </a>

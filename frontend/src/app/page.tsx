@@ -70,19 +70,19 @@ export default function Home() {
       {planned && blackout && <SpotTheDifference filings={[toFiling("A", planned), toFiling("B", blackout)]} />}
 
       <section aria-label="Three ways surveillance goes wrong" className="space-y-4">
-        <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Three ways surveillance goes wrong</h2>
+        <h2 className="text-xl font-semibold text-fg">Three ways surveillance goes wrong</h2>
         <ul className="grid gap-3 md:grid-cols-3">
           {FAILURE_ORDER.map((mode) => {
             const item = FAILURE_MODES[mode];
             return (
               <li key={mode}>
                 <Card className="flex h-full flex-col gap-3">
-                  <h3 className="font-semibold text-slate-900 dark:text-white">{item.title}</h3>
-                  <p className="text-sm text-slate-600 dark:text-slate-300">
+                  <h3 className="font-semibold text-fg">{item.title}</h3>
+                  <p className="text-sm text-muted">
                     {item.problem}
                     {mode === "unsupported" && liveNote ? ` ${liveNote}` : ""}
                   </p>
-                  <p className="text-sm text-slate-800 dark:text-slate-100">
+                  <p className="text-sm text-fg">
                     <span className="font-semibold">The safeguard: </span>
                     {item.safeguard}
                   </p>
@@ -102,8 +102,8 @@ export default function Home() {
 
       <section aria-label="Sample cases" className="space-y-6">
         <div className="space-y-1">
-          <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Explore sample cases</h2>
-          <p className="max-w-3xl text-sm text-slate-600 dark:text-slate-300">
+          <h2 className="text-xl font-semibold text-fg">Explore sample cases</h2>
+          <p className="max-w-3xl text-sm text-muted">
             Each case is a synthetic filing with a known right answer. Open one to see the evidence, the
             investigator&apos;s conclusion, and what the safeguards said about it.
           </p>
@@ -113,8 +113,8 @@ export default function Home() {
           return (
             <div key={group.title} className="space-y-3">
               <div>
-                <h3 className="font-semibold text-slate-900 dark:text-white">{group.title}</h3>
-                <p className="text-sm text-slate-600 dark:text-slate-300">{group.blurb}</p>
+                <h3 className="font-semibold text-fg">{group.title}</h3>
+                <p className="text-sm text-muted">{group.blurb}</p>
               </div>
               <ul className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
                 {items.map((item) => (
@@ -129,7 +129,7 @@ export default function Home() {
       </section>
 
       <section aria-label="Under the hood" className="space-y-4">
-        <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Under the hood</h2>
+        <h2 className="text-xl font-semibold text-fg">Under the hood</h2>
         <HowItWorks />
         <p className="flex flex-wrap gap-x-6 gap-y-2 text-sm">
           <Link

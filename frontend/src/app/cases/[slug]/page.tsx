@@ -25,9 +25,9 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
 }
 
 function Bullets({ items, empty }: { items: string[]; empty: string }) {
-  if (items.length === 0) return <p className="text-sm text-slate-500 dark:text-slate-400">{empty}</p>;
+  if (items.length === 0) return <p className="text-sm text-muted">{empty}</p>;
   return (
-    <ul className="list-disc space-y-2 pl-5 text-sm leading-relaxed text-slate-800 dark:text-slate-100">
+    <ul className="list-disc space-y-2 pl-5 text-sm leading-relaxed text-fg">
       {items.map((item) => (
         <li key={item}>{item}</li>
       ))}
@@ -90,10 +90,10 @@ export default async function CasePage({ params }: { params: Promise<Params> }) 
         <p className="text-xs font-semibold uppercase tracking-wider text-accent-700 dark:text-accent-400">
           Case {number}: {copy.title}
         </p>
-        <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl dark:text-white">
+        <h1 className="text-2xl font-bold tracking-tight text-fg sm:text-3xl">
           {copy.headline(facts)}
         </h1>
-        <p className="max-w-3xl text-[15px] leading-relaxed text-slate-600 dark:text-slate-300">{copy.whyTricky}</p>
+        <p className="max-w-3xl text-[15px] leading-relaxed text-muted">{copy.whyTricky}</p>
       </header>
 
       <div className="grid gap-3 md:grid-cols-2">
@@ -113,8 +113,8 @@ export default async function CasePage({ params }: { params: Promise<Params> }) 
 
       <Card className="flex flex-wrap items-center justify-between gap-4">
         <div className="max-w-xl space-y-1">
-          <h2 className="font-semibold text-slate-900 dark:text-white">Run this case yourself</h2>
-          <p className="text-sm text-slate-600 dark:text-slate-300">
+          <h2 className="font-semibold text-fg">Run this case yourself</h2>
+          <p className="text-sm text-muted">
             Starts a new live investigation on this filing. It uses the server&apos;s model credits, and the result will
             differ a little from the recorded run.
           </p>
@@ -129,7 +129,7 @@ export default async function CasePage({ params }: { params: Promise<Params> }) 
       </Card>
 
       {pair && (
-        <p className="text-sm text-slate-600 dark:text-slate-300">
+        <p className="text-sm text-muted">
           Compare with{" "}
           <Link className="font-medium text-accent-700 underline dark:text-accent-300" href={`/cases/${pair.slug}`}>
             {pair.title}
@@ -138,7 +138,7 @@ export default async function CasePage({ params }: { params: Promise<Params> }) 
         </p>
       )}
 
-      <nav aria-label="Other cases" className="flex flex-wrap justify-between gap-3 border-t border-slate-200 pt-6 text-sm dark:border-slate-800">
+      <nav aria-label="Other cases" className="flex flex-wrap justify-between gap-3 border-t border-line pt-6 text-sm">
         {previous ? (
           <Link
             href={`/cases/${previous.copy.slug}`}

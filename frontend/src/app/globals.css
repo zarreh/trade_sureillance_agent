@@ -53,11 +53,6 @@
   --color-accent-800: #7d4914;
   --color-accent-900: #683d16;
   --color-accent-950: #3c1f07;
-
-  /* Deeper, bluer darks for the ops-console look; lighter steps are unchanged. */
-  --color-slate-800: #1a2335;
-  --color-slate-900: #0c1322;
-  --color-slate-950: #070b14;
 }
 
 body {

@@ -17,6 +17,12 @@ for (const scheme of ["light", "dark"] as const) {
   test.describe(scheme, () => {
     test.use({ colorScheme: scheme, viewport: { width: 1100, height: 800 } });
 
+    // The theme is class-based and dark by default, so the OS colour scheme alone
+    // does not pick it: store the preference the app reads before first paint.
+    test.beforeEach(async ({ page }) => {
+      await page.addInitScript((value) => localStorage.setItem("theme", value), scheme);
+    });
+
     test("home: the problem, the quiz and the sample cases", async ({ page }) => {
       const problems = watchConsole(page);
       await page.goto("/");

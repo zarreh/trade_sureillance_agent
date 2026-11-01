@@ -15,14 +15,14 @@ export function CaseCard({ item }: { item: SampleCase }) {
       className="block h-full rounded-xl focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-500"
     >
       <Card className="h-full space-y-3 transition-colors hover:border-accent-400 dark:hover:border-accent-600">
-        <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+        <p className="text-xs font-semibold uppercase tracking-wide text-muted">
           Case {number}
         </p>
-        <h3 className="text-base font-semibold text-slate-900 dark:text-white">{copy.title}</h3>
-        <p className="text-sm text-slate-600 dark:text-slate-300">
+        <h3 className="text-base font-semibold text-fg">{copy.title}</h3>
+        <p className="text-sm text-muted">
           {latest(facts, "details") ? copy.headline(facts) : data.name}
         </p>
-        <dl className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-slate-600 dark:text-slate-300">
+        <dl className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-muted">
           <div className="flex items-center gap-1.5">
             <dt>Answer key</dt>
             <dd>
