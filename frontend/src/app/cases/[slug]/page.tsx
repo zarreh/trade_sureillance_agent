@@ -1,4 +1,4 @@
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ArrowLeft, ArrowRight, Play } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -110,6 +110,23 @@ export default async function CasePage({ params }: { params: Promise<Params> }) 
       <CaseOutcome data={data} />
 
       {tabs.length > 0 ? <ViewTabs label="Which investigation to show" tabs={tabs} /> : reference}
+
+      <Card className="flex flex-wrap items-center justify-between gap-4">
+        <div className="max-w-xl space-y-1">
+          <h2 className="font-semibold text-slate-900 dark:text-white">Run this case yourself</h2>
+          <p className="text-sm text-slate-600 dark:text-slate-300">
+            Starts a new live investigation on this filing. It uses the server&apos;s model credits, and the result will
+            differ a little from the recorded run.
+          </p>
+        </div>
+        <Link
+          href={`/investigate?accession=${encodeURIComponent(data.accession_number)}`}
+          className="inline-flex items-center gap-2 rounded-lg bg-sky-600 px-4 py-2 text-sm font-medium text-white hover:bg-sky-700"
+        >
+          <Play className="h-4 w-4" aria-hidden />
+          Re-run this case live
+        </Link>
+      </Card>
 
       {pair && (
         <p className="text-sm text-slate-600 dark:text-slate-300">

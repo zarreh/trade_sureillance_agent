@@ -42,6 +42,57 @@ export const SUCCESS_FINDING = {
     exemption_validity: 1,
     trajectory_score: 1,
   },
+  // Real tool results, as the API stores them on a published finding.
+  evidence: [
+    {
+      tool_call_id: "t1",
+      tool_name: "get_transaction_details",
+      args: { accession_number: "SCENARIO-0000000001-25-000001" },
+      result: JSON.stringify({
+        accession_number: "SCENARIO-0000000001-25-000001",
+        issuer_cik: "0000320193",
+        issuer_name: "Acme Corp",
+        issuer_ticker: "ACME",
+        filing_date: "2025-07-19",
+        document_type: "4",
+        reported_under_10b5_1: "unknown",
+        filing_lag_trading_days: 1,
+        rptowner_cik: "9000000001",
+        rptowner_name: "SCENARIO OFFICER ONE",
+        rptowner_relationship: "Officer",
+        rptowner_title: "Chief Financial Officer",
+        transactions: [
+          {
+            nonderiv_trans_sk: 1,
+            trans_date: "2025-07-18",
+            trans_code: "S",
+            trans_shares: 4000,
+            trans_priceper_share: 100,
+            trans_value: 400000,
+            trans_acquired_disp_cd: "D",
+            shrs_ownd_folwng_trans: null,
+            superseded: false,
+            superseded_by: null,
+          },
+        ],
+        transaction_count: 1,
+      }),
+    },
+    {
+      tool_call_id: "t6",
+      tool_name: "get_material_events",
+      args: { issuer_cik: "0000320193", on_date: "2025-07-18" },
+      result: JSON.stringify({
+        issuer_cik: "0000320193",
+        on_date: "2025-07-18",
+        in_blackout: true,
+        event_type: "earnings",
+        event_date: "2025-07-20",
+        blackout_start: "2025-07-10",
+        blackout_end: "2025-07-22",
+      }),
+    },
+  ],
 };
 
 export const SUCCESS_INVESTIGATION = {

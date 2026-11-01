@@ -23,8 +23,10 @@ type Phase = "idle" | "loading" | "streaming" | "success" | "empty" | "error";
  */
 export function RunConsole({ samples }: { samples: { label: string; accession: string }[] }) {
   const router = useRouter();
-  const runId = useSearchParams().get("run");
-  const [accession, setAccession] = useState(samples[0]?.accession ?? "");
+  const params = useSearchParams();
+  const runId = params.get("run");
+  // A case page links here with its accession filled in; it never starts a run by itself.
+  const [accession, setAccession] = useState(params.get("accession") ?? samples[0]?.accession ?? "");
   const [phase, setPhase] = useState<Phase>("idle");
   const [events, setEvents] = useState<TraceEvent[]>([]);
   const [investigation, setInvestigation] = useState<InvestigationResponse | null>(null);

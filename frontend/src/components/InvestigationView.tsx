@@ -1,5 +1,6 @@
 import { ClaimsCheck } from "./ClaimsCheck";
 import { CostMeter } from "./CostMeter";
+import { EvidenceCards } from "./EvidenceCards";
 import { EvidencePanel } from "./EvidencePanel";
 import { ProcessAuditPanel } from "./ProcessAuditPanel";
 import { TraceTimeline } from "./TraceTimeline";
@@ -23,6 +24,7 @@ export function InvestigationView({
       {finding && (
         <>
           <ValidatorStrip finding={finding} />
+          {finding.evidence.length > 0 && <EvidenceCards evidence={finding.evidence} />}
           <EvidencePanel finding={finding} />
           <ClaimsCheck finding={finding} />
           {finding.process_audit && <ProcessAuditPanel audit={finding.process_audit} />}

@@ -49,7 +49,15 @@ test("success: renders the trace, the checks, the process audit and the cost", a
   await expect(page.getByLabel("Cost", { exact: true })).toBeVisible();
   await expect(page.getByText("$0.0021")).toBeVisible();
   // The 10b5-1 tri-state renders as "not established", never as "no plan".
-  await expect(page.getByText("10b5-1 status: not established")).toBeVisible();
+  await expect(page.getByText("10b5-1 status: not established").first()).toBeVisible();
+
+  // The evidence the claims cite is on the page, and a citation jumps to it.
+  await expect(page.getByLabel("Was news about to come out?", { exact: true })).toContainText(
+    "The blackout runs Jul 10, 2025 to Jul 22, 2025"
+  );
+  await page.getByLabel("Claims check", { exact: true }).getByRole("link", { name: "t6" }).click();
+  await expect(page).toHaveURL(/#evidence-t6$/);
+  await expect(page.locator("#evidence-t6")).toBeInViewport();
 
   const audit = page.getByLabel("Process audit", { exact: true });
   await expect(audit).toContainText("6 of 6 tools");
@@ -175,6 +183,29 @@ test("error: a failed run shows the stored error", async ({ page }) => {
   await expect(
     page.getByRole("alert").filter({ hasText: "interrupted by a server restart" })
   ).toBeVisible();
+});
+
+test("links: an old home-page run link lands on /investigate and replays the stored run", async ({
+  page,
+}) => {
+  await mockRun(page, "run-success", SUCCESS_INVESTIGATION);
+  await page.goto("/?run=run-success");
+  await expect(page).toHaveURL(/\/investigate\?run=run-success$/);
+  await expect(page.getByLabel("Finding", { exact: true })).toBeVisible();
+});
+
+test("links: a case page fills in its accession but does not start a run", async ({ page }) => {
+  const posts: string[] = [];
+  page.on("request", (request) => {
+    if (request.method() === "POST") posts.push(request.url());
+  });
+
+  await page.goto("/cases/blackout-sale");
+  await page.getByRole("link", { name: "Re-run this case live" }).click();
+
+  await expect(page).toHaveURL(/\/investigate\?accession=SCENARIO-0000000001-25-000001$/);
+  await expect(page.getByLabel("Accession number")).toHaveValue("SCENARIO-0000000001-25-000001");
+  expect(posts).toEqual([]);
 });
 
 test("evaluation: explains the result and discloses what the numbers are", async ({ page }) => {
