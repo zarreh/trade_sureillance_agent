@@ -1,13 +1,14 @@
 import { test, expect } from "@playwright/test";
 import { SUCCESS_INVESTIGATION, mockRun, mockStart, watchConsole } from "./fixtures";
 
-// The states an investigation can render, plus the recorded example and the
+// The states a live investigation can render (on /investigate), plus the
 // evaluation page. The backend is fully mocked at the network layer, so no live
-// model or Python process is needed.
+// model or Python process is needed. Home and case pages are in cases.spec.ts.
 
 const RUN_LIVE = { name: "Run it live" };
+const INVESTIGATE = "/investigate";
 
-test("home: shows a recorded example on first paint, with no request to the API", async ({
+test("investigate: starts empty, with sample filings to pick from and no request to the API", async ({
   page,
 }) => {
   const problems = watchConsole(page);
@@ -16,22 +17,19 @@ test("home: shows a recorded example on first paint, with no request to the API"
     if (request.url().includes("/investigations")) apiCalls.push(request.url());
   });
 
-  await page.goto("/");
+  await page.goto(INVESTIGATE);
 
-  await expect(page.getByRole("heading", { level: 1 })).toContainText("second look");
-  await expect(page.getByRole("region", { name: "How it works" })).toBeVisible();
-  await expect(page.getByText("Recorded example")).toBeVisible();
-  await expect(page.getByLabel("Investigation trace", { exact: true })).toBeVisible();
-  await expect(page.getByLabel("Finding", { exact: true })).toBeVisible();
-  await expect(page.getByLabel("Process audit", { exact: true })).toBeVisible();
-  await expect(page.getByText("10b5-1 status: not established")).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("Investigate a filing");
+  await expect(page.getByLabel("Sample filings", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: /Sale inside a blackout window/ }).click();
+  await expect(page.getByLabel("Accession number")).toHaveValue("SCENARIO-0000000001-25-000001");
   expect(apiCalls).toEqual([]);
   expect(problems).toEqual([]);
 });
 
 test("loading: shows a starting message before the run begins", async ({ page }) => {
   await mockStart(page, "run-loading", 1000);
-  await page.goto("/");
+  await page.goto(INVESTIGATE);
   await page.getByRole("button", RUN_LIVE).click();
   await expect(page.getByText("Starting the investigation")).toBeVisible();
 });
@@ -41,7 +39,7 @@ test("success: renders the trace, the checks, the process audit and the cost", a
   await mockStart(page, "run-success");
   await mockRun(page, "run-success", SUCCESS_INVESTIGATION);
 
-  await page.goto("/");
+  await page.goto(INVESTIGATE);
   await page.getByRole("button", RUN_LIVE).click();
 
   await expect(page.getByLabel("Investigation trace", { exact: true })).toBeVisible();
@@ -51,7 +49,15 @@ test("success: renders the trace, the checks, the process audit and the cost", a
   await expect(page.getByLabel("Cost", { exact: true })).toBeVisible();
   await expect(page.getByText("$0.0021")).toBeVisible();
   // The 10b5-1 tri-state renders as "not established", never as "no plan".
-  await expect(page.getByText("10b5-1 status: not established")).toBeVisible();
+  await expect(page.getByText("10b5-1 status: not established").first()).toBeVisible();
+
+  // The evidence the claims cite is on the page, and a citation jumps to it.
+  await expect(page.getByLabel("Was news about to come out?", { exact: true })).toContainText(
+    "The blackout runs Jul 10, 2025 to Jul 22, 2025"
+  );
+  await page.getByLabel("Claims check", { exact: true }).getByRole("link", { name: "t6" }).click();
+  await expect(page).toHaveURL(/#evidence-t6$/);
+  await expect(page.locator("#evidence-t6")).toBeInViewport();
 
   const audit = page.getByLabel("Process audit", { exact: true });
   await expect(audit).toContainText("6 of 6 tools");
@@ -67,10 +73,10 @@ test("reload: a finished run is replayed from the stored events, not started aga
   await mockStart(page, "run-success");
   await mockRun(page, "run-success", SUCCESS_INVESTIGATION);
 
-  await page.goto("/");
+  await page.goto(INVESTIGATE);
   await page.getByRole("button", RUN_LIVE).click();
   await expect(page.getByLabel("Cost", { exact: true })).toBeVisible();
-  await expect(page).toHaveURL(/\?run=run-success/);
+  await expect(page).toHaveURL(/\/investigate\?run=run-success/);
 
   let posts = 0;
   page.on("request", (request) => {
@@ -104,7 +110,7 @@ test("a failed audit is shown, not hidden", async ({ page }) => {
   await mockStart(page, "run-bad");
   await mockRun(page, "run-bad", failing);
 
-  await page.goto("/");
+  await page.goto(INVESTIGATE);
   await page.getByRole("button", RUN_LIVE).click();
 
   const audit = page.getByLabel("Process audit", { exact: true });
@@ -125,7 +131,7 @@ test("empty: renders a defensive message when a completed run has no finding", a
     total_cost_usd: 0,
   });
 
-  await page.goto("/");
+  await page.goto(INVESTIGATE);
   await page.getByRole("button", RUN_LIVE).click();
   await expect(page.getByText("produced no finding")).toBeVisible();
 });
@@ -136,7 +142,7 @@ test("error: renders an alert when the investigation cannot be started", async (
     await route.fulfill({ status: 500, contentType: "application/json", body: "{}" });
   });
 
-  await page.goto("/");
+  await page.goto(INVESTIGATE);
   await page.getByRole("button", RUN_LIVE).click();
   await expect(
     page.getByRole("alert").filter({ hasText: "Could not start the investigation" })
@@ -153,7 +159,7 @@ test("error: shows the API's actionable detail for an unknown accession", async 
     });
   });
 
-  await page.goto("/");
+  await page.goto(INVESTIGATE);
   await page.getByLabel("Accession number").fill("X");
   await page.getByRole("button", RUN_LIVE).click();
   await expect(
@@ -172,11 +178,34 @@ test("error: a failed run shows the stored error", async ({ page }) => {
     finding: null,
   });
 
-  await page.goto("/");
+  await page.goto(INVESTIGATE);
   await page.getByRole("button", RUN_LIVE).click();
   await expect(
     page.getByRole("alert").filter({ hasText: "interrupted by a server restart" })
   ).toBeVisible();
+});
+
+test("links: an old home-page run link lands on /investigate and replays the stored run", async ({
+  page,
+}) => {
+  await mockRun(page, "run-success", SUCCESS_INVESTIGATION);
+  await page.goto("/?run=run-success");
+  await expect(page).toHaveURL(/\/investigate\?run=run-success$/);
+  await expect(page.getByLabel("Finding", { exact: true })).toBeVisible();
+});
+
+test("links: a case page fills in its accession but does not start a run", async ({ page }) => {
+  const posts: string[] = [];
+  page.on("request", (request) => {
+    if (request.method() === "POST") posts.push(request.url());
+  });
+
+  await page.goto("/cases/blackout-sale");
+  await page.getByRole("link", { name: "Re-run this case live" }).click();
+
+  await expect(page).toHaveURL(/\/investigate\?accession=SCENARIO-0000000001-25-000001$/);
+  await expect(page.getByLabel("Accession number")).toHaveValue("SCENARIO-0000000001-25-000001");
+  expect(posts).toEqual([]);
 });
 
 test("evaluation: explains the result and discloses what the numbers are", async ({ page }) => {

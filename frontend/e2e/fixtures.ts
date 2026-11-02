@@ -42,6 +42,57 @@ export const SUCCESS_FINDING = {
     exemption_validity: 1,
     trajectory_score: 1,
   },
+  // Real tool results, as the API stores them on a published finding.
+  evidence: [
+    {
+      tool_call_id: "t1",
+      tool_name: "get_transaction_details",
+      args: { accession_number: "SCENARIO-0000000001-25-000001" },
+      result: JSON.stringify({
+        accession_number: "SCENARIO-0000000001-25-000001",
+        issuer_cik: "0000320193",
+        issuer_name: "Acme Corp",
+        issuer_ticker: "ACME",
+        filing_date: "2025-07-19",
+        document_type: "4",
+        reported_under_10b5_1: "unknown",
+        filing_lag_trading_days: 1,
+        rptowner_cik: "9000000001",
+        rptowner_name: "SCENARIO OFFICER ONE",
+        rptowner_relationship: "Officer",
+        rptowner_title: "Chief Financial Officer",
+        transactions: [
+          {
+            nonderiv_trans_sk: 1,
+            trans_date: "2025-07-18",
+            trans_code: "S",
+            trans_shares: 4000,
+            trans_priceper_share: 100,
+            trans_value: 400000,
+            trans_acquired_disp_cd: "D",
+            shrs_ownd_folwng_trans: null,
+            superseded: false,
+            superseded_by: null,
+          },
+        ],
+        transaction_count: 1,
+      }),
+    },
+    {
+      tool_call_id: "t6",
+      tool_name: "get_material_events",
+      args: { issuer_cik: "0000320193", on_date: "2025-07-18" },
+      result: JSON.stringify({
+        issuer_cik: "0000320193",
+        on_date: "2025-07-18",
+        in_blackout: true,
+        event_type: "earnings",
+        event_date: "2025-07-20",
+        blackout_start: "2025-07-10",
+        blackout_end: "2025-07-22",
+      }),
+    },
+  ],
 };
 
 export const SUCCESS_INVESTIGATION = {
@@ -115,6 +166,72 @@ export async function mockRun(
       body: JSON.stringify(investigation),
     });
   });
+  await mockCases(page, [caseRow(String(investigation.accession_number), id)]);
+}
+
+type Row = Record<string, unknown> & { accession_number: string; decision: unknown };
+
+/** A queue row: a filing summary plus, when `runId` is given, a completed run on it. */
+export function caseRow(accession: string, runId?: string, disposition = "flag"): Row {
+  return {
+    accession_number: accession,
+    is_scenario: accession.startsWith("SCENARIO-"),
+    filing: {
+      insider_name: "SCENARIO OFFICER ONE",
+      relationship: "Officer",
+      issuer_name: "Acme Corp",
+      issuer_ticker: "ACME",
+      trade_date: "2025-07-18",
+      transaction_codes: ["S"],
+      total_shares: 4000,
+      total_value: 400000,
+      lines: 1,
+    },
+    latest_run: runId
+      ? {
+          id: runId,
+          status: "completed",
+          created_at: "2026-08-19T00:00:00Z",
+          updated_at: "2026-08-19T00:00:05Z",
+          finding_kind: "published",
+          disposition,
+          severity: "Medium",
+          trajectory_score: 1,
+          unsupported_claims: 0,
+        }
+      : null,
+    run_count: runId ? 1 : 0,
+    decision: null,
+  };
+}
+
+/** GET /cases, GET /cases/{acc} and PUT /cases/{acc}/decision over an in-memory list.
+ * Returns the PUT bodies the page sent. */
+export async function mockCases(page: Page, rows: Row[]): Promise<Record<string, unknown>[]> {
+  const puts: Record<string, unknown>[] = [];
+  const json = (body: unknown) => ({ status: 200, contentType: "application/json", body: JSON.stringify(body) });
+  await page.route(/:8000\/cases(\/[^?]*)?(\?.*)?$/, async (route) => {
+    const request = route.request();
+    const path = new URL(request.url()).pathname;
+    if (path === "/cases") return route.fulfill(json({ cases: rows }));
+    const match = path.match(/^\/cases\/([^/]+)(\/decision)?$/);
+    const row = match && rows.find((r) => r.accession_number === decodeURIComponent(match[1]));
+    if (!row) return route.fulfill({ status: 404, contentType: "application/json", body: '{"detail":"Accession not found"}' });
+    if (request.method() === "PUT" && match?.[2]) {
+      const body = request.postDataJSON() as Record<string, unknown>;
+      puts.push(body);
+      row.decision = {
+        run_id: body.run_id,
+        decision: body.decision,
+        override_disposition: body.override_disposition ?? null,
+        note: String(body.note ?? "").trim(),
+        updated_at: "2026-08-19T00:01:00Z",
+        stale: false,
+      };
+    }
+    return route.fulfill(json(row));
+  });
+  return puts;
 }
 
 /** Collects console errors and uncaught exceptions so a test can assert there are none. */

@@ -8,18 +8,57 @@
 
 ## What a visitor sees, without typing anything
 
-The home page opens on a **recorded example**: canonical scenario 1, replayed
-from a stored run, so a visitor sees a complete investigation the moment the
-page loads and nothing is spent. It used the scripted stand-in for the AI model,
-and the page says so. A **Run it live** button starts a real investigation
-instead; its id goes into the URL (`?run=`), so a reload replays the stored run
-rather than starting another.
+The home page starts with the problem, not the pipeline: a compliance team has to
+decide which insider trades deserve an investigation. Flag everything and
+reviewers drown in false alarms; clear too easily and warning signs get missed.
+A short quiz puts two near-identical sales side by side, three failure modes
+show what goes wrong and which safeguard answers it, and ten **sample cases**
+lead to a page each. The pipeline is further down, under "Under the hood".
+
+Every case is a **synthetic trade checked against a synthetic firm policy**, and
+the page says so. The home page and the case pages do not call the API, so
+nothing is spent.
 
 <figure markdown>
-![The home page with its recorded example](../assets/screenshot-home.png#only-light)
-![The home page with its recorded example](../assets/screenshot-home-dark.png#only-dark)
-<figcaption markdown>The home page: what it is, how it works with an owner for each step, and the recorded example</figcaption>
+![The home page](../assets/screenshot-home.png#only-light)
+![The home page](../assets/screenshot-home-dark.png#only-dark)
+<figcaption markdown>The home page: the problem, the quiz, the failure modes and the sample cases</figcaption>
 </figure>
+
+## A sample case
+
+Each case page shows two investigations of the same filing and keeps them apart:
+
+- **What the AI investigator actually did** is a recorded live-model run
+  (`evals/recordings/live-*/`), scored against the scenario's expected answer.
+  Where it gets a case wrong, or publishes claims the evidence does not support,
+  the page says so and shows the safeguards beside it.
+- **Reference investigation** is the rules-based answer key (the scripted
+  stand-in), showing what a correct investigation looks like. It is not the
+  system's recommendation and not a measure of model quality.
+
+The evidence is drawn as pictures suited to the case (a timeline for a blackout
+window, a bar against a limit, one row per transaction line, the original beside
+its amendment), with the raw tool result one click away. A claim's citation links
+to the evidence it cites. When no trading history exists the page says so rather
+than inventing a comparison.
+
+A finding is published even when claims remain unsupported once the evidence
+passes run out. The page then says "human review required" rather than implying
+every claim was verified.
+
+<figure markdown>
+![A case page](../assets/screenshot-case.png#only-light)
+![A case page](../assets/screenshot-case-dark.png#only-dark)
+<figcaption markdown>A case page: the evidence, both investigations and the safeguards</figcaption>
+</figure>
+
+## Running a filing live
+
+**Investigate a filing** takes an accession number, or **Re-run this case live**
+on a case page fills one in. Starting a run uses the server's model credits. Its
+id goes into the URL (`?run=`), so a reload replays the stored run rather than
+starting another. The finished run shows the same evidence cards as a case page.
 
 ### 1. Starting and running
 

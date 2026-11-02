@@ -18,11 +18,11 @@ function Row({
   return (
     <li className="flex flex-wrap items-start justify-between gap-2 py-3 first:pt-0 last:pb-0">
       <div className="min-w-0 flex-1">
-        <p className="text-sm font-medium text-slate-900 dark:text-slate-100">
+        <p className="text-sm font-medium text-fg">
           {title}
           <InfoTip text={tip} label={`${title}.`} />
         </p>
-        <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">{detail}</p>
+        <p className="mt-0.5 text-xs text-muted">{detail}</p>
       </div>
       {badge}
     </li>
@@ -42,11 +42,11 @@ export function ProcessAuditPanel({ audit }: { audit: ProcessAudit }) {
         Process audit
         <InfoTip text={GLOSSARY.processAudit} label="Process audit." />
       </CardTitle>
-      <p className="text-xs text-slate-500 dark:text-slate-400">
+      <p className="text-xs text-muted">
         Checked in code, with no AI judgement. It records how the investigation worked; it never
         changes the finding.
       </p>
-      <ul className="divide-y divide-slate-200 dark:divide-slate-800">
+      <ul className="divide-y divide-line">
         <Row
           title="Required evidence gathered"
           tip="Every investigation must call all six read-only tools: transaction details, role limits, compliance rules, rolling 90-day volume, the insider's baseline, and material events."

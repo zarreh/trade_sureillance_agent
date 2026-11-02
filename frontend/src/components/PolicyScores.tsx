@@ -8,8 +8,8 @@ function Bar({ value, tone }: { value: number | null; tone: string }) {
   if (value === null) return <div className="h-2" aria-hidden />;
   const width = `${Math.min(1, Math.abs(value)) * 50}%`;
   return (
-    <div className="relative h-2 rounded bg-slate-100 dark:bg-slate-800" aria-hidden>
-      <div className="absolute inset-y-0 left-1/2 w-px bg-slate-400" />
+    <div className="relative h-2 rounded bg-surface-2" aria-hidden>
+      <div className="absolute inset-y-0 left-1/2 w-px bg-muted" />
       <div
         className={`absolute inset-y-0 rounded ${tone}`}
         style={value >= 0 ? { left: "50%", width } : { right: "50%", width }}
@@ -25,20 +25,20 @@ export function PolicyScores({ data }: { data: RlPolicies }) {
         {data.policies.map((p) => (
           <li key={p.policy} className="space-y-1">
             <div className="flex flex-wrap items-baseline justify-between gap-2">
-              <span className="font-mono text-sm font-medium text-slate-900 dark:text-white">{p.policy}</span>
-              <span className="text-xs text-slate-500 dark:text-slate-400">{p.description}</span>
+              <span className="font-mono text-sm font-medium text-fg">{p.policy}</span>
+              <span className="text-xs text-muted">{p.description}</span>
             </div>
-            <Bar value={p.outcome_only_mean} tone="bg-slate-400" />
-            <Bar value={p.reward_mean} tone="bg-sky-600" />
+            <Bar value={p.outcome_only_mean} tone="bg-muted" />
+            <Bar value={p.reward_mean} tone="bg-accent-600" />
           </li>
         ))}
       </ul>
-      <p className="flex gap-4 text-xs text-slate-500 dark:text-slate-400">
+      <p className="flex gap-4 text-xs text-muted">
         <span className="flex items-center gap-1">
-          <span className="h-2 w-4 rounded bg-slate-400" aria-hidden /> Outcome only
+          <span className="h-2 w-4 rounded bg-muted" aria-hidden /> Outcome only
         </span>
         <span className="flex items-center gap-1">
-          <span className="h-2 w-4 rounded bg-sky-600" aria-hidden /> Trajectory-aware
+          <span className="h-2 w-4 rounded bg-accent-600" aria-hidden /> Trajectory-aware
         </span>
       </p>
 
@@ -46,14 +46,14 @@ export function PolicyScores({ data }: { data: RlPolicies }) {
         <table className="w-full text-left text-sm">
           <caption className="sr-only">Scores per scripted policy, n={data.n}</caption>
           <thead>
-            <tr className="border-b border-slate-200 text-xs uppercase tracking-wide text-slate-500 dark:border-slate-800 dark:text-slate-400">
+            <tr className="border-b border-line text-xs uppercase tracking-wide text-muted">
               <th className="py-2 pr-4 font-medium">Policy</th>
               <th className="py-2 pr-4 font-medium">Reward</th>
               <th className="py-2 pr-4 font-medium">Outcome only</th>
               <th className="py-2 font-medium">Flag recall</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+          <tbody className="divide-y divide-line">
             {data.policies.map((p) => (
               <tr key={p.policy}>
                 <td className="py-2 pr-4 font-mono text-xs">{p.policy}</td>

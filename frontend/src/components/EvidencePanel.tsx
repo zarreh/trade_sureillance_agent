@@ -12,7 +12,7 @@ const TONE: Record<ComplianceFinding["disposition"], CardTone> = {
 
 // Never rendered as an absence of a plan: unknown means the filing never
 // established it either way (docs/PLAN.md §3.4).
-const REPORTED_10B5_1: Record<ComplianceFinding["reported_under_10b5_1"], string> = {
+export const REPORTED_10B5_1: Record<ComplianceFinding["reported_under_10b5_1"], string> = {
   true: "Reported under a 10b5-1 plan",
   false: "Reported as not under a 10b5-1 plan",
   unknown: "10b5-1 status: not established",
@@ -29,7 +29,7 @@ export function EvidencePanel({ finding }: { finding: ComplianceFinding }) {
         <DispositionBadge disposition={finding.disposition} />
         {finding.severity && <Badge variant="slate">Severity: {finding.severity}</Badge>}
         <Badge variant="slate">Confidence: {finding.confidence}</Badge>
-        <Badge variant="sky">
+        <Badge variant="accent">
           {REPORTED_10B5_1[finding.reported_under_10b5_1]}
           <InfoTip text={GLOSSARY.reportedUnder10b5_1} label="10b5-1 status." />
         </Badge>
@@ -41,13 +41,13 @@ export function EvidencePanel({ finding }: { finding: ComplianceFinding }) {
         </p>
       )}
 
-      <p className="text-[15px] leading-relaxed text-slate-800 dark:text-slate-100">
+      <p className="text-[15px] leading-relaxed text-fg">
         {finding.finding_text}
       </p>
 
       {finding.rules_cited.length > 0 && (
         <div>
-          <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+          <h3 className="text-xs font-semibold uppercase tracking-wide text-muted">
             Rules cited
           </h3>
           <ul className="mt-1 space-y-1 text-sm">
@@ -62,7 +62,7 @@ export function EvidencePanel({ finding }: { finding: ComplianceFinding }) {
 
       {finding.exculpatory_factors.length > 0 && (
         <div>
-          <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+          <h3 className="text-xs font-semibold uppercase tracking-wide text-muted">
             Exculpatory factors
             <InfoTip text={GLOSSARY.exculpatoryFactor} label="Exculpatory factors." />
           </h3>

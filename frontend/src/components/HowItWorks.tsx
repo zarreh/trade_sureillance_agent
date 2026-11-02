@@ -25,7 +25,7 @@ const STEPS: { title: string; body: string; owner: Owner }[] = [
 export function HowItWorks() {
   return (
     <section aria-label="How it works">
-      <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+      <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted">
         How it works
       </h2>
       <ol className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -33,15 +33,15 @@ export function HowItWorks() {
           <li key={step.title}>
             <Card className="h-full space-y-2">
               <div className="flex items-center justify-between gap-2">
-                <span className="flex items-center gap-2 text-sm font-semibold text-slate-900 dark:text-white">
-                  <span className="flex h-6 w-6 items-center justify-center rounded-full bg-sky-600 text-xs text-white">
+                <span className="flex items-center gap-2 text-sm font-semibold text-fg">
+                  <span className="flex h-6 w-6 items-center justify-center rounded-full bg-accent-400 text-xs text-accent-fg">
                     {i + 1}
                   </span>
                   {step.title}
                 </span>
                 <OwnerBadge owner={step.owner} />
               </div>
-              <p className="text-sm text-slate-600 dark:text-slate-300">{step.body}</p>
+              <p className="text-sm text-muted">{step.body}</p>
             </Card>
           </li>
         ))}

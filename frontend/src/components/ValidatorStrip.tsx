@@ -19,7 +19,7 @@ export function ValidatorStrip({ finding }: { finding: ComplianceFinding }) {
     <Callout variant={report.unsupported === 0 ? "success" : "warning"} role="status">
       <span>
         Grounding: {supported}/{report.claims.length} claims supported, confidence: {report.confidence}
-        {report.unsupported > 0 && `, ${report.unsupported} unsupported`}
+        {report.unsupported > 0 && `, ${report.unsupported} unsupported. Unverified claims remain: human review required`}
         <InfoTip text={GLOSSARY.grounding} label="Grounding." />
       </span>
     </Callout>

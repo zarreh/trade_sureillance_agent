@@ -6,19 +6,19 @@ export function CostMeter({ investigation }: { investigation: InvestigationRespo
     <Card aria-label="Cost" className="space-y-3">
       <div className="flex items-baseline justify-between">
         <CardTitle>Cost for this investigation</CardTitle>
-        <span className="font-mono text-sm text-slate-900 dark:text-white">
+        <span className="font-mono text-sm text-fg">
           ${investigation.total_cost_usd.toFixed(4)}
         </span>
       </div>
       {investigation.costs.length === 0 ? (
-        <p className="text-xs text-slate-500 dark:text-slate-400">
+        <p className="text-xs text-muted">
           No model cost was recorded for this run. Rules, tools and checks cost nothing; only the AI
           steps do.
         </p>
       ) : (
         <table className="w-full text-xs">
           <thead>
-            <tr className="text-left text-slate-500 dark:text-slate-400">
+            <tr className="text-left text-muted">
               <th className="font-normal">Step</th>
               <th className="font-normal">Model</th>
               <th className="font-normal">Tokens</th>

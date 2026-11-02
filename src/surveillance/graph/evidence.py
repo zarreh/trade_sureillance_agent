@@ -42,6 +42,26 @@ def extract_tool_call_records(messages: Sequence[BaseMessage]) -> list[ToolCallR
     return records
 
 
+EVIDENCE_EXCERPT_CHARS = 600
+
+
+def format_evidence_index(
+    records: Sequence[ToolCallRecord], excerpt_chars: int = EVIDENCE_EXCERPT_CHARS
+) -> str:
+    """One line per tool call: id, tool name, arguments and a truncated result.
+
+    The claim extractor needs this to match a claim to the call that supports it;
+    given bare ids alone it cited nothing on half the live runs."""
+    lines = []
+    for r in records:
+        result = " ".join(r.result.split())
+        if len(result) > excerpt_chars:
+            result = result[:excerpt_chars] + " …"
+        args = json.dumps(r.args, sort_keys=True, default=str)
+        lines.append(f"- {r.tool_call_id}: {r.tool_name}({args}) -> {result}")
+    return "\n".join(lines) if lines else "(no tool calls were made)"
+
+
 def _latest(records: list[ToolCallRecord], tool_name: str) -> ToolCallRecord | None:
     matches = [r for r in records if r.tool_name == tool_name]
     return matches[-1] if matches else None

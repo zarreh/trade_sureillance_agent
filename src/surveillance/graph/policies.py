@@ -8,10 +8,22 @@ or tool-calling defect.
 
 from __future__ import annotations
 
+import warnings
+
 from langchain_openai import ChatOpenAI
 from pydantic import SecretStr
 
 from surveillance.settings import Settings
+
+# Streaming a structured-output call makes langchain-openai call `chunk.model_dump()`
+# on an OpenAI parsed message whose `parsed` field is typed `None`. The output is
+# correct; only the serializer warns (openai-python#2872). Scoped to that field.
+warnings.filterwarnings(
+    "ignore",
+    message=r"(?s)Pydantic serializer warnings:.*field_name='parsed'",
+    category=UserWarning,
+    module=r"pydantic\.main",
+)
 
 FAST_MODEL = "gpt-4o-mini"
 REASONING_MODEL = "gpt-4o"

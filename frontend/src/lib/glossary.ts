@@ -24,7 +24,7 @@ export const GLOSSARY = {
   scriptedStandIn:
     "A fixed, rules-based stand-in for the AI model, used so results can be reproduced exactly. It is not a measure of how a real model performs.",
   syntheticPolicy:
-    "The trades are real SEC filings. The role limits, rules and corporate calendar the investigation checks them against are synthetic.",
+    "The ten sample trades are synthetic. The role limits, rules and corporate calendar every investigation checks them against are synthetic too; only the wider filings dataset is public SEC data.",
 } as const;
 
 export type GlossaryTerm = keyof typeof GLOSSARY;

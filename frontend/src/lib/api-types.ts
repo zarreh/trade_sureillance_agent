@@ -53,7 +53,8 @@ export interface paths {
         /**
          * Create Investigation
          * @description Starts one investigation as a background task and returns immediately
-         *     — poll `GET /{id}` or stream `GET /{id}/events` for progress.
+         *     — poll `GET /{id}` or stream `GET /{id}/events` for progress. Two POSTs
+         *     for the same accession start two independent runs (see docs/HARVEST.md).
          */
         post: operations["create_investigation_investigations_post"];
         delete?: never;
@@ -96,10 +97,145 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/cases": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Cases
+         * @description The ten labelled scenarios plus every accession that has been investigated,
+         *     most recently investigated first, then the untouched scenarios.
+         */
+        get: operations["list_cases_cases_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/cases/{accession_number}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Case */
+        get: operations["get_case_cases__accession_number__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/cases/{accession_number}/decision": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Put Decision
+         * @description Records the analyst's accept or override for one completed run. Record-only:
+         *     the AI finding is never changed and the decision never feeds the evaluations.
+         */
+        put: operations["put_decision_cases__accession_number__decision_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** AnalystDecisionRequest */
+        AnalystDecisionRequest: {
+            /** Run Id */
+            run_id: string;
+            /**
+             * Decision
+             * @enum {string}
+             */
+            decision: "accept" | "override";
+            /** Override Disposition */
+            override_disposition?: ("clear" | "flag" | "escalate") | null;
+            /**
+             * Note
+             * @default
+             */
+            note: string;
+        };
+        /** AnalystDecisionResponse */
+        AnalystDecisionResponse: {
+            /** Run Id */
+            run_id: string;
+            /**
+             * Decision
+             * @enum {string}
+             */
+            decision: "accept" | "override";
+            /** Override Disposition */
+            override_disposition: ("clear" | "flag" | "escalate") | null;
+            /** Note */
+            note: string;
+            /** Updated At */
+            updated_at: string;
+            /**
+             * Stale
+             * @description True when a newer completed run exists than the one the decision was made on.
+             */
+            stale: boolean;
+        };
+        /** CaseListResponse */
+        CaseListResponse: {
+            /** Cases */
+            cases: components["schemas"]["CaseRow"][];
+        };
+        /** CaseRow */
+        CaseRow: {
+            /** Accession Number */
+            accession_number: string;
+            /** Is Scenario */
+            is_scenario: boolean;
+            filing: components["schemas"]["FilingSummary"] | null;
+            latest_run: components["schemas"]["CaseRunSummary"] | null;
+            /** Run Count */
+            run_count: number;
+            decision: components["schemas"]["AnalystDecisionResponse"] | null;
+        };
+        /** CaseRunSummary */
+        CaseRunSummary: {
+            /** Id */
+            id: string;
+            /** Status */
+            status: string;
+            /** Created At */
+            created_at: string;
+            /** Updated At */
+            updated_at: string;
+            /** Finding Kind */
+            finding_kind: string | null;
+            /** Disposition */
+            disposition: ("clear" | "flag" | "escalate") | null;
+            /** Severity */
+            severity: string | null;
+            /** Trajectory Score */
+            trajectory_score: number | null;
+            /** Unsupported Claims */
+            unsupported_claims: number | null;
+        };
         /** CostSummaryEntry */
         CostSummaryEntry: {
             /** Node */
@@ -124,6 +260,27 @@ export interface components {
             id: string;
             /** Status */
             status: string;
+        };
+        /** FilingSummary */
+        FilingSummary: {
+            /** Insider Name */
+            insider_name: string;
+            /** Relationship */
+            relationship: string | null;
+            /** Issuer Name */
+            issuer_name: string;
+            /** Issuer Ticker */
+            issuer_ticker: string | null;
+            /** Trade Date */
+            trade_date: string;
+            /** Transaction Codes */
+            transaction_codes: string[];
+            /** Total Shares */
+            total_shares: number;
+            /** Total Value */
+            total_value: number | null;
+            /** Lines */
+            lines: number;
         };
         /** HTTPValidationError */
         HTTPValidationError: {
@@ -312,6 +469,92 @@ export interface operations {
                 };
                 content: {
                     "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_cases_cases_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CaseListResponse"];
+                };
+            };
+        };
+    };
+    get_case_cases__accession_number__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                accession_number: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CaseRow"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    put_decision_cases__accession_number__decision_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                accession_number: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AnalystDecisionRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CaseRow"];
                 };
             };
             /** @description Validation Error */

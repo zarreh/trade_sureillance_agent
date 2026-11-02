@@ -1,0 +1,363 @@
+{
+  "scorer": "live model, scored with compute_reward; not gated",
+  "label_source": "canonical scenarios in data/scenarios.py, designed with their labels",
+  "runs": [
+    {
+      "run_date": "2026-11-01",
+      "n": 10,
+      "models": [
+        "gpt-4o-2024-08-06",
+        "gpt-4o-mini-2024-07-18"
+      ],
+      "claim_extractor": "v2",
+      "disposition_accuracy": 0.5,
+      "reward_mean": 0.1534,
+      "outcome_only_mean": 0.215,
+      "audit_zero_runs": 0,
+      "unsupported_claims_mean": 1.5,
+      "total_cost_usd": 0.3965,
+      "mean_latency_seconds": 29.68,
+      "uncertainty": "none computed; n=10 supports no precision claim",
+      "scenarios": [
+        {
+          "scenario_id": "scenario-01-blackout-sale",
+          "expected": "flag",
+          "submitted": "escalate",
+          "correct": false,
+          "reward": -0.12,
+          "outcome_only": -0.1,
+          "trajectory_score": 0.5,
+          "unsupported_claims": 2
+        },
+        {
+          "scenario_id": "scenario-02-volume-spike",
+          "expected": "flag",
+          "submitted": "clear",
+          "correct": false,
+          "reward": -0.79,
+          "outcome_only": -0.75,
+          "trajectory_score": 0.8571,
+          "unsupported_claims": 1
+        },
+        {
+          "scenario_id": "scenario-03-over-limit",
+          "expected": "escalate",
+          "submitted": "escalate",
+          "correct": true,
+          "reward": 1.0,
+          "outcome_only": 1.0,
+          "trajectory_score": 1.0,
+          "unsupported_claims": 0
+        },
+        {
+          "scenario_id": "scenario-04-late-filing",
+          "expected": "flag",
+          "submitted": "clear",
+          "correct": false,
+          "reward": -0.78,
+          "outcome_only": -0.75,
+          "trajectory_score": 0.8571,
+          "unsupported_claims": 1
+        },
+        {
+          "scenario_id": "scenario-05-10b5-1-sale",
+          "expected": "clear",
+          "submitted": "escalate",
+          "correct": false,
+          "reward": -0.51,
+          "outcome_only": -0.5,
+          "trajectory_score": 0.6667,
+          "unsupported_claims": 2
+        },
+        {
+          "scenario_id": "scenario-06-tax-withholding",
+          "expected": "clear",
+          "submitted": "clear",
+          "correct": true,
+          "reward": 0.8689,
+          "outcome_only": 1.0,
+          "trajectory_score": 0.8889,
+          "unsupported_claims": 2
+        },
+        {
+          "scenario_id": "scenario-07-f-does-not-clear-s",
+          "expected": "escalate",
+          "submitted": "escalate",
+          "correct": true,
+          "reward": 1.0,
+          "outcome_only": 1.0,
+          "trajectory_score": 1.0,
+          "unsupported_claims": 0
+        },
+        {
+          "scenario_id": "scenario-08-rolling-90d-over-limit",
+          "expected": "flag",
+          "submitted": "clear",
+          "correct": false,
+          "reward": -0.77,
+          "outcome_only": -0.75,
+          "trajectory_score": 0.8182,
+          "unsupported_claims": 2
+        },
+        {
+          "scenario_id": "scenario-09-amend-away",
+          "expected": "clear",
+          "submitted": "clear",
+          "correct": true,
+          "reward": 0.8371,
+          "outcome_only": 1.0,
+          "trajectory_score": 0.8571,
+          "unsupported_claims": 2
+        },
+        {
+          "scenario_id": "scenario-10-ordinary-purchase",
+          "expected": "clear",
+          "submitted": "clear",
+          "correct": true,
+          "reward": 0.7982,
+          "outcome_only": 1.0,
+          "trajectory_score": 0.8182,
+          "unsupported_claims": 3
+        }
+      ]
+    },
+    {
+      "run_date": "2026-10-31",
+      "n": 10,
+      "models": [
+        "gpt-4o-2024-08-06",
+        "gpt-4o-mini-2024-07-18"
+      ],
+      "claim_extractor": "v1",
+      "disposition_accuracy": 0.5,
+      "reward_mean": -0.237,
+      "outcome_only_mean": 0.28,
+      "audit_zero_runs": 8,
+      "unsupported_claims_mean": 3.2,
+      "total_cost_usd": 0.4052,
+      "mean_latency_seconds": 26.17,
+      "uncertainty": "none computed; n=10 supports no precision claim",
+      "scenarios": [
+        {
+          "scenario_id": "scenario-01-blackout-sale",
+          "expected": "flag",
+          "submitted": "escalate",
+          "correct": false,
+          "reward": -0.11,
+          "outcome_only": -0.1,
+          "trajectory_score": 0.0,
+          "unsupported_claims": 5
+        },
+        {
+          "scenario_id": "scenario-02-volume-spike",
+          "expected": "flag",
+          "submitted": "clear",
+          "correct": false,
+          "reward": -0.77,
+          "outcome_only": -0.75,
+          "trajectory_score": 1.0,
+          "unsupported_claims": 0
+        },
+        {
+          "scenario_id": "scenario-03-over-limit",
+          "expected": "escalate",
+          "submitted": "escalate",
+          "correct": true,
+          "reward": -0.01,
+          "outcome_only": 1.0,
+          "trajectory_score": 0.0,
+          "unsupported_claims": 2
+        },
+        {
+          "scenario_id": "scenario-04-late-filing",
+          "expected": "flag",
+          "submitted": "clear",
+          "correct": false,
+          "reward": -0.77,
+          "outcome_only": -0.75,
+          "trajectory_score": 1.0,
+          "unsupported_claims": 3
+        },
+        {
+          "scenario_id": "scenario-05-10b5-1-sale",
+          "expected": "clear",
+          "submitted": "escalate",
+          "correct": false,
+          "reward": -0.5,
+          "outcome_only": -0.5,
+          "trajectory_score": 0.0,
+          "unsupported_claims": 0
+        },
+        {
+          "scenario_id": "scenario-06-tax-withholding",
+          "expected": "clear",
+          "submitted": "clear",
+          "correct": true,
+          "reward": -0.02,
+          "outcome_only": 1.0,
+          "trajectory_score": 0.0,
+          "unsupported_claims": 2
+        },
+        {
+          "scenario_id": "scenario-07-f-does-not-clear-s",
+          "expected": "escalate",
+          "submitted": "escalate",
+          "correct": true,
+          "reward": -0.02,
+          "outcome_only": 1.0,
+          "trajectory_score": 0.0,
+          "unsupported_claims": 9
+        },
+        {
+          "scenario_id": "scenario-08-rolling-90d-over-limit",
+          "expected": "flag",
+          "submitted": "escalate",
+          "correct": false,
+          "reward": -0.12,
+          "outcome_only": -0.1,
+          "trajectory_score": 0.0,
+          "unsupported_claims": 3
+        },
+        {
+          "scenario_id": "scenario-09-amend-away",
+          "expected": "clear",
+          "submitted": "clear",
+          "correct": true,
+          "reward": -0.02,
+          "outcome_only": 1.0,
+          "trajectory_score": 0.0,
+          "unsupported_claims": 2
+        },
+        {
+          "scenario_id": "scenario-10-ordinary-purchase",
+          "expected": "clear",
+          "submitted": "clear",
+          "correct": true,
+          "reward": -0.03,
+          "outcome_only": 1.0,
+          "trajectory_score": 0.0,
+          "unsupported_claims": 6
+        }
+      ]
+    },
+    {
+      "run_date": "2026-10-29",
+      "n": 10,
+      "models": [
+        "gpt-4o-2024-08-06",
+        "gpt-4o-mini-2024-07-18"
+      ],
+      "claim_extractor": "v1",
+      "disposition_accuracy": 0.4,
+      "reward_mean": -0.032,
+      "outcome_only_mean": 0.09,
+      "audit_zero_runs": 5,
+      "unsupported_claims_mean": 3.2,
+      "total_cost_usd": 0.4264,
+      "mean_latency_seconds": 33.54,
+      "uncertainty": "none computed; n=10 supports no precision claim",
+      "scenarios": [
+        {
+          "scenario_id": "scenario-01-blackout-sale",
+          "expected": "flag",
+          "submitted": "escalate",
+          "correct": false,
+          "reward": -0.12,
+          "outcome_only": -0.1,
+          "trajectory_score": 0.0,
+          "unsupported_claims": 5
+        },
+        {
+          "scenario_id": "scenario-02-volume-spike",
+          "expected": "flag",
+          "submitted": "clear",
+          "correct": false,
+          "reward": -0.77,
+          "outcome_only": -0.75,
+          "trajectory_score": 1.0,
+          "unsupported_claims": 3
+        },
+        {
+          "scenario_id": "scenario-03-over-limit",
+          "expected": "escalate",
+          "submitted": "escalate",
+          "correct": true,
+          "reward": 0.98,
+          "outcome_only": 1.0,
+          "trajectory_score": 1.0,
+          "unsupported_claims": 1
+        },
+        {
+          "scenario_id": "scenario-04-late-filing",
+          "expected": "flag",
+          "submitted": "clear",
+          "correct": false,
+          "reward": -0.78,
+          "outcome_only": -0.75,
+          "trajectory_score": 1.0,
+          "unsupported_claims": 3
+        },
+        {
+          "scenario_id": "scenario-05-10b5-1-sale",
+          "expected": "clear",
+          "submitted": "escalate",
+          "correct": false,
+          "reward": -0.52,
+          "outcome_only": -0.5,
+          "trajectory_score": 0.0,
+          "unsupported_claims": 4
+        },
+        {
+          "scenario_id": "scenario-06-tax-withholding",
+          "expected": "clear",
+          "submitted": "clear",
+          "correct": true,
+          "reward": 1.0,
+          "outcome_only": 1.0,
+          "trajectory_score": 1.0,
+          "unsupported_claims": 3
+        },
+        {
+          "scenario_id": "scenario-07-f-does-not-clear-s",
+          "expected": "escalate",
+          "submitted": "escalate",
+          "correct": true,
+          "reward": -0.02,
+          "outcome_only": 1.0,
+          "trajectory_score": 0.0,
+          "unsupported_claims": 3
+        },
+        {
+          "scenario_id": "scenario-08-rolling-90d-over-limit",
+          "expected": "flag",
+          "submitted": "clear",
+          "correct": false,
+          "reward": -0.77,
+          "outcome_only": -0.75,
+          "trajectory_score": 0.0,
+          "unsupported_claims": 4
+        },
+        {
+          "scenario_id": "scenario-09-amend-away",
+          "expected": "clear",
+          "submitted": "flag",
+          "correct": false,
+          "reward": -0.29,
+          "outcome_only": -0.25,
+          "trajectory_score": 0.0,
+          "unsupported_claims": 4
+        },
+        {
+          "scenario_id": "scenario-10-ordinary-purchase",
+          "expected": "clear",
+          "submitted": "clear",
+          "correct": true,
+          "reward": 0.97,
+          "outcome_only": 1.0,
+          "trajectory_score": 1.0,
+          "unsupported_claims": 2
+        }
+      ]
+    }
+  ]
+}

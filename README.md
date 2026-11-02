@@ -35,6 +35,15 @@ a documentation site. Quality gates (ruff, mypy --strict, import-linter,
 pytest, `make eval`, mkdocs --strict, Playwright) are green on every commit;
 see CI/CD status via GitHub Actions on this repo.
 
+**v5 (2026-11-01)** added a case-review queue with record-only analyst
+accept/override decisions tied to a run (D-A2-12, D-A2-13), an amber
+dark-by-default theme with a light toggle, and a claim-extractor fix found by
+the process audit: given each tool call's name and result excerpt, the extractor
+now cites evidence, and live runs with a zero audit score went from 8/10 to 0/10.
+The `/evaluation` page shows every recorded live-model run next to the scripted
+policies (not gated). Disposition accuracy is still 5/10: the model clears most
+`flag` cases.
+
 **Not done, deliberately deferred** (see
 [docs/architecture/decisions/](docs/architecture/decisions/index.md) and
 `docs/PLAN.md` §7 Stretch for the reasoning on each):
@@ -47,7 +56,7 @@ see CI/CD status via GitHub Actions on this repo.
   precision/recall with a confidence interval) — needs a live LLM and real
   human labelling effort; see `docs/evidence/evaluation.md`. The harness for
   it (`evals/metrics.py`) is ready.
-- The `pro` tier (alert triage queue, investigation replay, MCP export,
+- The `pro` tier (batch alert triage, investigation replay, MCP export,
   Postgres/Langfuse) — gated on base being deployed and Layer 2 existing,
   per `docs/PLAN.md`.
 - The shared portfolio-wide site (`/writing`, `/methodology`, the per-app

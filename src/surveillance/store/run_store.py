@@ -12,7 +12,7 @@ from pathlib import Path
 
 from zarreh_agentkit.runs import RunEventLog, utc_now
 
-from surveillance.store.models import RunRecord
+from surveillance.store.models import AnalystDecision, RunRecord
 
 _SCHEMA = """
 CREATE TABLE IF NOT EXISTS runs (
@@ -25,7 +25,20 @@ CREATE TABLE IF NOT EXISTS runs (
     finding_json TEXT,
     error TEXT
 );
+CREATE INDEX IF NOT EXISTS runs_by_accession ON runs (accession_number, created_at);
+CREATE TABLE IF NOT EXISTS analyst_decisions (
+    accession_number TEXT PRIMARY KEY,
+    run_id TEXT NOT NULL REFERENCES runs (id),
+    decision TEXT NOT NULL CHECK (decision IN ('accept', 'override')),
+    override_disposition TEXT CHECK (override_disposition IN ('clear', 'flag', 'escalate')),
+    note TEXT NOT NULL DEFAULT '',
+    updated_at TEXT NOT NULL
+);
 """
+
+_RUN_COLUMNS = (
+    "id, accession_number, status, created_at, updated_at, finding_kind, finding_json, error"
+)
 
 
 def _run_from_row(row: tuple[object, ...]) -> RunRecord:
@@ -63,11 +76,57 @@ class RunStore(RunEventLog):
 
     def get_run(self, run_id: str) -> RunRecord | None:
         row = self._conn.execute(
-            "SELECT id, accession_number, status, created_at, updated_at, "
-            "finding_kind, finding_json, error FROM runs WHERE id = ?",
-            (run_id,),
+            f"SELECT {_RUN_COLUMNS} FROM runs WHERE id = ?", (run_id,)
         ).fetchone()
         return _run_from_row(row) if row else None
+
+    def list_runs(self, accession_number: str) -> list[RunRecord]:
+        """Every run for one accession, newest first."""
+        rows = self._conn.execute(
+            f"SELECT {_RUN_COLUMNS} FROM runs WHERE accession_number = ? "
+            "ORDER BY created_at DESC, rowid DESC",
+            (accession_number,),
+        ).fetchall()
+        return [_run_from_row(r) for r in rows]
+
+    def investigated_accessions(self) -> list[str]:
+        rows = self._conn.execute(
+            "SELECT accession_number FROM runs GROUP BY accession_number "
+            "ORDER BY MAX(created_at) DESC"
+        ).fetchall()
+        return [r[0] for r in rows]
+
+    def get_decision(self, accession_number: str) -> AnalystDecision | None:
+        row = self._conn.execute(
+            "SELECT accession_number, run_id, decision, override_disposition, note, updated_at "
+            "FROM analyst_decisions WHERE accession_number = ?",
+            (accession_number,),
+        ).fetchone()
+        return AnalystDecision(*row) if row else None
+
+    def set_decision(
+        self,
+        accession_number: str,
+        run_id: str,
+        decision: str,
+        override_disposition: str | None,
+        note: str,
+    ) -> AnalystDecision:
+        """One decision per accession; a new one replaces the last. Record-only:
+        the run's finding is never touched (D-A2-12)."""
+        self._conn.execute(
+            "INSERT INTO analyst_decisions "
+            "(accession_number, run_id, decision, override_disposition, note, updated_at) "
+            "VALUES (?, ?, ?, ?, ?, ?) ON CONFLICT (accession_number) DO UPDATE SET "
+            "run_id = excluded.run_id, decision = excluded.decision, "
+            "override_disposition = excluded.override_disposition, note = excluded.note, "
+            "updated_at = excluded.updated_at",
+            (accession_number, run_id, decision, override_disposition, note, utc_now()),
+        )
+        self._conn.commit()
+        result = self.get_decision(accession_number)
+        assert result is not None
+        return result
 
     def complete_run(self, run_id: str, finding_kind: str, finding_json: str) -> None:
         self._conn.execute(

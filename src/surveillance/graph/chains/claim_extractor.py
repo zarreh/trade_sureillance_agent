@@ -18,10 +18,11 @@ from surveillance.schemas.grounding import ExtractedClaims
 def build_claim_extractor_chain(model: BaseChatModel) -> ClaimExtractorChain:
     prompt = ChatPromptTemplate.from_messages(
         [
-            ("system", load_prompt("claim_extractor_v1")),
+            ("system", load_prompt("claim_extractor_v2")),
             (
                 "human",
-                "Finding text:\n{finding_text}\n\nAvailable tool_call_ids: {tool_call_ids}",
+                "Finding text:\n{finding_text}\n\n"
+                "Evidence index (tool_call_id: tool(args) -> result excerpt):\n{evidence_index}",
             ),
         ]
     )
