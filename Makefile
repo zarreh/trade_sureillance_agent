@@ -1,5 +1,5 @@
 # `run` needs data/facts.db (make data) and SURVEILLANCE_OPENAI_API_KEY in .env.
-.PHONY: run check dev test lint typecheck imports eval eval-live up down data docs docs-assets docs-screenshots frontend-dev frontend-build frontend-types frontend-e2e
+.PHONY: run check dev test lint typecheck imports eval eval-live up down up-prod down-prod data docs docs-assets docs-screenshots frontend-dev frontend-build frontend-types frontend-e2e
 
 run:
 	$(MAKE) -j2 dev frontend-dev
@@ -36,6 +36,14 @@ up:
 
 down:
 	docker compose down
+
+PROD_COMPOSE = docker compose -f compose.prod.yaml -f compose.nginx.yaml
+
+up-prod:
+	$(PROD_COMPOSE) up -d --build
+
+down-prod:
+	$(PROD_COMPOSE) down
 
 data:
 	uv run python -m data.fetch_edgar
