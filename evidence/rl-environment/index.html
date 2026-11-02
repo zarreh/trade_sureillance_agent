@@ -851,6 +851,10 @@
       
         
       
+        
+      
+        
+      
     
     
     
@@ -1157,6 +1161,62 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/decisions/D-A2-12-case-review-queue/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    D-A2-12 Case-review queue
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/decisions/D-A2-13-analyst-decision-record-only/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    D-A2-13 Analyst decision is record-only
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1402,10 +1462,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#live-model-run-not-gated" class="md-nav__link">
+  <a href="#live-model-runs-not-gated" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Live-model run (not gated)
+        Live-model runs (not gated)
       
     </span>
   </a>
@@ -1724,10 +1784,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#live-model-run-not-gated" class="md-nav__link">
+  <a href="#live-model-runs-not-gated" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Live-model run (not gated)
+        Live-model runs (not gated)
       
     </span>
   </a>
@@ -2007,70 +2067,76 @@ pull request. It fails if any of these is false:</p>
 <p>A further CI step fails if the generated results file differs from the
 committed one. The scorer is the scripted stand-in; <strong>no live-model number is
 gated.</strong></p>
-<h2 id="live-model-run-not-gated">Live-model run (not gated)<a class="headerlink" href="#live-model-run-not-gated" title="Permanent link">¶</a></h2>
-<p>The same ten scenarios were run once through the real graph with real models and
+<h2 id="live-model-runs-not-gated">Live-model runs (not gated)<a class="headerlink" href="#live-model-runs-not-gated" title="Permanent link">¶</a></h2>
+<p>The same ten scenarios were run through the real graph with real models and
 scored with the same <code>compute_reward</code> (<code>make eval-live</code>, <code>evals/live_run.py</code>).
-It is <strong>not</strong> part of <code>make eval</code> and no CI check depends on it.</p>
+This is <strong>not</strong> part of <code>make eval</code> and no CI check depends on it. Models:
+<code>gpt-4o-mini-2024-07-18</code> (plan, investigate, claims) and <code>gpt-4o-2024-08-06</code>
+(finding, judge). Labels were designed with the scenarios, as above.</p>
 <table>
 <thead>
 <tr>
-<th></th>
-<th></th>
+<th>Run</th>
+<th>Claim extractor</th>
+<th>Correct</th>
+<th>Audit = 0</th>
+<th>Unsupported claims per run</th>
+<th>Mean reward (outcome only)</th>
+<th>Cost</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>n</td>
-<td>10 canonical scenarios</td>
-</tr>
-<tr>
-<td>Models</td>
-<td><code>gpt-4o-mini-2024-07-18</code> (plan, investigate, claims), <code>gpt-4o-2024-08-06</code> (finding, judge)</td>
-</tr>
-<tr>
-<td>Run date</td>
 <td>2026-10-29</td>
+<td>v1</td>
+<td>4/10</td>
+<td>5/10</td>
+<td>3.2</td>
+<td>-0.03 (0.09)</td>
+<td>$0.43</td>
 </tr>
 <tr>
-<td>Labels</td>
-<td>designed with the scenarios, as above</td>
+<td>2026-10-31</td>
+<td>v1</td>
+<td>5/10</td>
+<td>8/10</td>
+<td>3.2</td>
+<td>-0.24 (0.28)</td>
+<td>$0.41</td>
 </tr>
 <tr>
-<td>Disposition accuracy</td>
-<td>4 of 10</td>
-</tr>
-<tr>
-<td>Mean reward</td>
-<td>-0.03 (outcome only: 0.09)</td>
-</tr>
-<tr>
-<td>Cost</td>
-<td>$0.43 in total, about $0.04 per investigation</td>
-</tr>
-<tr>
-<td>Mean latency</td>
-<td>33.5 s per investigation</td>
-</tr>
-<tr>
-<td>Uncertainty</td>
-<td>none computed; n=10 supports no precision claim, and one run varies from the next</td>
+<td>2026-11-01</td>
+<td><strong>v2</strong></td>
+<td>5/10</td>
+<td><strong>0/10</strong></td>
+<td><strong>1.5</strong></td>
+<td><strong>+0.15</strong> (0.22)</td>
+<td>$0.40</td>
 </tr>
 </tbody>
 </table>
-<p>Per-scenario results and every transcript are in
-<code>evals/recordings/live-2026-10-29/</code>. Two things stand out.</p>
+<p>n=10 per run, one run each. No uncertainty is computed; n=10 supports no
+precision claim, and one run varies from the next. Per-scenario results and every
+transcript are in <code>evals/recordings/live-*/</code>, and the <code>/evaluation</code> page renders
+the same numbers from <code>frontend/src/generated/live-runs.json</code>.</p>
+<p>What the runs show:</p>
 <ul>
-<li><strong>The model missed three of the four <code>flag</code> cases</strong> by clearing them, which the
-  outcome table penalises hardest. The accuracy figure says nothing about model
-  quality in general: ten cases, one run, one prompt version.</li>
-<li><strong>The process audit scored 0 on five of ten runs, and for a real reason.</strong> In
-  those five the claim extractor cited no tool-call ids at all, so the audit's
-  citation check failed. The grounding judge also marked many claims unsupported
-  (between 1 and 5 per run), and those findings were still published once the
-  two evidence passes were spent, with the unsupported count visible. A
-  record-only audit and a judge that sees only the claims it is given are doing
-  different jobs; here the audit surfaced a weakness in the claim extractor that
-  the grounding report alone did not.</li>
+<li><strong>The audit found a real defect, and it was fixed.</strong> In the v1 runs the claim
+  extractor cited no tool-call ids on 5 and then 8 of 10 runs, so the audit's
+  citation check scored those runs 0 and the grounding judge rejected the claims
+  as uncited. Structured output was already strict, so the field wasn't missing:
+  the model chose an empty list because it saw only opaque ids like
+  <code>call_E40B…</code>. Extractor v2 (<code>prompts/claim_extractor_v2.md</code>) gets one line per
+  call: id, tool name, arguments and a truncated result. With that, no run scored
+  0 and unsupported claims halved. Invented ids are still left in place for the
+  audit to report, not filtered out.</li>
+<li><strong>The fix did not change the answers.</strong> Accuracy stayed at 5 of 10, and the
+  model still clears three of the four <code>flag</code> cases, which the outcome table
+  penalises hardest. That is a disposition-reasoning problem, not a citation one,
+  and it is still open.</li>
+<li><strong>A record-only audit and the grounding judge do different jobs.</strong> The judge
+  sees only the claims it is given; the audit surfaced the extractor weakness that
+  the grounding report alone did not explain.</li>
 </ul>
 <p>The recorded transcripts are what a later replay harness would use to replace the
 scripted stand-in (<code>evals/oracle.py</code>) with real responses. That replacement is not

@@ -633,7 +633,29 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="What a visitor sees, without typing anything">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#a-sample-case" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A sample case
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#running-a-filing-live" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Running a filing live
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Running a filing live">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -997,6 +1019,10 @@
       
         
       
+        
+      
+        
+      
     
     
     
@@ -1290,6 +1316,62 @@
     
   
     D-A2-9 Gymnasium dev-only
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/decisions/D-A2-12-case-review-queue/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    D-A2-12 Case-review queue
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/decisions/D-A2-13-analyst-decision-record-only/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    D-A2-13 Analyst decision is record-only
   
 
     
@@ -1672,7 +1754,29 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="What a visitor sees, without typing anything">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#a-sample-case" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A sample case
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#running-a-filing-live" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Running a filing live
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Running a filing live">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1791,19 +1895,53 @@ Playwright smoke test uses, in light and dark. They are never hand-edited,
 so they can't drift from what the UI actually renders.</p>
 </div>
 <h2 id="what-a-visitor-sees-without-typing-anything">What a visitor sees, without typing anything<a class="headerlink" href="#what-a-visitor-sees-without-typing-anything" title="Permanent link">¶</a></h2>
-<p>The home page opens on a <strong>recorded example</strong>: canonical scenario 1, replayed
-from a stored run, so a visitor sees a complete investigation the moment the
-page loads and nothing is spent. It used the scripted stand-in for the AI model,
-and the page says so. A <strong>Run it live</strong> button starts a real investigation
-instead; its id goes into the URL (<code>?run=</code>), so a reload replays the stored run
-rather than starting another.</p>
+<p>The home page starts with the problem, not the pipeline: a compliance team has to
+decide which insider trades deserve an investigation. Flag everything and
+reviewers drown in false alarms; clear too easily and warning signs get missed.
+A short quiz puts two near-identical sales side by side, three failure modes
+show what goes wrong and which safeguard answers it, and ten <strong>sample cases</strong>
+lead to a page each. The pipeline is further down, under "Under the hood".</p>
+<p>Every case is a <strong>synthetic trade checked against a synthetic firm policy</strong>, and
+the page says so. The home page and the case pages do not call the API, so
+nothing is spent.</p>
 <figure>
-<p><a class="glightbox" data-type="image" data-width="auto" data-height="auto" href="../../assets/screenshot-home.png#only-light" data-desc-position="bottom"><img alt="The home page with its recorded example" src="../../assets/screenshot-home.png#only-light"></a>
-<a class="glightbox" data-type="image" data-width="auto" data-height="auto" href="../../assets/screenshot-home-dark.png#only-dark" data-desc-position="bottom"><img alt="The home page with its recorded example" src="../../assets/screenshot-home-dark.png#only-dark"></a></p>
+<p><a class="glightbox" data-type="image" data-width="auto" data-height="auto" href="../../assets/screenshot-home.png#only-light" data-desc-position="bottom"><img alt="The home page" src="../../assets/screenshot-home.png#only-light"></a>
+<a class="glightbox" data-type="image" data-width="auto" data-height="auto" href="../../assets/screenshot-home-dark.png#only-dark" data-desc-position="bottom"><img alt="The home page" src="../../assets/screenshot-home-dark.png#only-dark"></a></p>
 <figcaption>
-<p>The home page: what it is, how it works with an owner for each step, and the recorded example</p>
+<p>The home page: the problem, the quiz, the failure modes and the sample cases</p>
 </figcaption>
 </figure>
+<h2 id="a-sample-case">A sample case<a class="headerlink" href="#a-sample-case" title="Permanent link">¶</a></h2>
+<p>Each case page shows two investigations of the same filing and keeps them apart:</p>
+<ul>
+<li><strong>What the AI investigator actually did</strong> is a recorded live-model run
+  (<code>evals/recordings/live-*/</code>), scored against the scenario's expected answer.
+  Where it gets a case wrong, or publishes claims the evidence does not support,
+  the page says so and shows the safeguards beside it.</li>
+<li><strong>Reference investigation</strong> is the rules-based answer key (the scripted
+  stand-in), showing what a correct investigation looks like. It is not the
+  system's recommendation and not a measure of model quality.</li>
+</ul>
+<p>The evidence is drawn as pictures suited to the case (a timeline for a blackout
+window, a bar against a limit, one row per transaction line, the original beside
+its amendment), with the raw tool result one click away. A claim's citation links
+to the evidence it cites. When no trading history exists the page says so rather
+than inventing a comparison.</p>
+<p>A finding is published even when claims remain unsupported once the evidence
+passes run out. The page then says "human review required" rather than implying
+every claim was verified.</p>
+<figure>
+<p><a class="glightbox" data-type="image" data-width="auto" data-height="auto" href="../../assets/screenshot-case.png#only-light" data-desc-position="bottom"><img alt="A case page" src="../../assets/screenshot-case.png#only-light"></a>
+<a class="glightbox" data-type="image" data-width="auto" data-height="auto" href="../../assets/screenshot-case-dark.png#only-dark" data-desc-position="bottom"><img alt="A case page" src="../../assets/screenshot-case-dark.png#only-dark"></a></p>
+<figcaption>
+<p>A case page: the evidence, both investigations and the safeguards</p>
+</figcaption>
+</figure>
+<h2 id="running-a-filing-live">Running a filing live<a class="headerlink" href="#running-a-filing-live" title="Permanent link">¶</a></h2>
+<p><strong>Investigate a filing</strong> takes an accession number, or <strong>Re-run this case live</strong>
+on a case page fills one in. Starting a run uses the server's model credits. Its
+id goes into the URL (<code>?run=</code>), so a reload replays the stored run rather than
+starting another. The finished run shows the same evidence cards as a case page.</p>
 <h3 id="1-starting-and-running">1. Starting and running<a class="headerlink" href="#1-starting-and-running" title="Permanent link">¶</a></h3>
 <figure>
 <p><a class="glightbox" data-type="image" data-width="auto" data-height="auto" href="../../assets/screenshot-loading.png#only-light" data-desc-position="bottom"><img alt="Loading state" src="../../assets/screenshot-loading.png#only-light"></a>

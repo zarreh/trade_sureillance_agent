@@ -851,6 +851,10 @@
       
         
       
+        
+      
+        
+      
     
     
     
@@ -1144,6 +1148,62 @@
     
   
     D-A2-9 Gymnasium dev-only
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture/decisions/D-A2-12-case-review-queue/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    D-A2-12 Case-review queue
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture/decisions/D-A2-13-analyst-decision-record-only/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    D-A2-13 Analyst decision is record-only
   
 
     
@@ -1521,6 +1581,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#case-queue-and-analyst-decisions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Case queue and analyst decisions
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#frontend" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1664,6 +1735,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#case-queue-and-analyst-decisions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Case queue and analyst decisions
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#frontend" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1734,27 +1816,46 @@ start and then tails new ones until the run finishes — reconnecting later
 just replays from <code>RunStore</code> (<code>data/runs.db</code>), no run is lost. Requests are
 rate-limited (<code>SURVEILLANCE_RATE_LIMIT_PER_MINUTE</code>, default 20/minute) and
 request bodies are capped (<code>SURVEILLANCE_MAX_REQUEST_BODY_BYTES</code>, default 16KB).</p>
-<h2 id="frontend">Frontend<a class="headerlink" href="#frontend" title="Permanent link">¶</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nb">cd</span><span class="w"> </span>frontend
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>npm<span class="w"> </span>install
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>cp<span class="w"> </span>.env.local.example<span class="w"> </span>.env.local<span class="w">   </span><span class="c1"># NEXT_PUBLIC_API_BASE, defaults to :8000</span>
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>npm<span class="w"> </span>run<span class="w"> </span>dev
+<h2 id="case-queue-and-analyst-decisions">Case queue and analyst decisions<a class="headerlink" href="#case-queue-and-analyst-decisions" title="Permanent link">¶</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>curl<span class="w"> </span>-s<span class="w"> </span>localhost:8000/cases<span class="w">                        </span><span class="c1"># scenarios + investigated filings</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>curl<span class="w"> </span>-s<span class="w"> </span>localhost:8000/cases/&lt;accession&gt;<span class="w">            </span><span class="c1"># one row</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>curl<span class="w"> </span>-sX<span class="w"> </span>PUT<span class="w"> </span>localhost:8000/cases/&lt;accession&gt;/decision<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">  </span>-H<span class="w"> </span><span class="s1">'content-type: application/json'</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">  </span>-d<span class="w"> </span><span class="s1">'{"run_id": "&lt;id&gt;", "decision": "override", "override_disposition": "escalate", "note": "…"}'</span>
 </code></pre></div>
-<p>Visit <code>http://localhost:3000</code>. The home page opens on a recorded example, so it
-shows a full investigation without calling the API. <strong>Run it live</strong> starts a real
-one and streams it step by step; its id goes into the URL, so a reload replays
-the stored run. A real finding needs the backend running with a real
+<p>A decision is tied to the completed run it was made on and becomes <em>stale</em> once a
+newer run completes. It is record-only: it never changes the finding or feeds the
+evaluations (<a href="../architecture/decisions/D-A2-12-case-review-queue/">D-A2-12</a>,
+<a href="../architecture/decisions/D-A2-13-analyst-decision-record-only/">D-A2-13</a>).
+Decisions are stored in <code>data/runs.db</code> next to the runs.</p>
+<h2 id="frontend">Frontend<a class="headerlink" href="#frontend" title="Permanent link">¶</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nb">cd</span><span class="w"> </span>frontend
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>npm<span class="w"> </span>install
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>cp<span class="w"> </span>.env.local.example<span class="w"> </span>.env.local<span class="w">   </span><span class="c1"># NEXT_PUBLIC_API_BASE, defaults to :8000</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>npm<span class="w"> </span>run<span class="w"> </span>dev
+</code></pre></div>
+<p>Visit <code>http://localhost:3000</code>. The home page and the ten case pages are built
+from <code>frontend/src/generated/cases.json</code>, so they show full investigations
+without calling the API. <strong>Investigate a filing</strong> (or <strong>Re-run this case live</strong> on
+a case page) starts a real run and streams it step by step; its id goes into the
+URL, so a reload replays the stored run. A real finding needs the backend running with a real
 <code>SURVEILLANCE_OPENAI_API_KEY</code>; against a placeholder key the run still streams
 but ultimately fails, exercising the error state honestly rather than faking one.
-The <strong>How we know it works</strong> page reads <code>frontend/src/generated/rl-policies.json</code>.</p>
+The <strong>Case queue</strong> (<code>/queue</code>) lists the scenarios and every investigated filing from
+<code>GET /cases</code>; open a run to accept or override the AI suggestion. The UI is dark by
+default; the header toggle switches to light and is remembered in <code>localStorage</code>.
+The <strong>How we know it works</strong> page reads <code>frontend/src/generated/rl-policies.json</code>
+and <code>frontend/src/generated/live-runs.json</code>.</p>
 <p><code>NEXT_PUBLIC_API_BASE</code> and <code>NEXT_PUBLIC_DOCS_URL</code> are baked in at build time.</p>
-<p>The generated files in <code>frontend/src/generated/</code> (the example run and the RL
-results) are written by <code>make eval</code> and checked for drift in CI.</p>
+<p>The generated files in <code>frontend/src/generated/</code> (<code>cases.json</code>, the RL
+results and <code>live-runs.json</code>) are written by <code>make eval</code> and checked for drift in CI. <code>cases.json</code>
+holds each case's reference run plus the latest live recording under
+<code>evals/recordings/</code>; <code>make eval-live</code> (needs an API key) records a new one.</p>
 <p>Types are generated from the FastAPI OpenAPI schema, never hand-written:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>make<span class="w"> </span>frontend-types<span class="w">    </span><span class="c1"># backend schema -&gt; frontend/src/lib/api-types.ts</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>make<span class="w"> </span>frontend-types<span class="w">    </span><span class="c1"># backend schema -&gt; frontend/src/lib/api-types.ts</span>
 </code></pre></div>
-<p><code>make frontend-e2e</code> runs the Playwright smoke test (the recorded example, loading,
-success, reload replay, empty, error, a failed audit and the evaluation page)
+<p><code>make frontend-e2e</code> runs the Playwright smoke test (the home page, every case page,
+loading, success, reload replay, empty, error, a failed audit and the evaluation page)
 against a fully mocked backend, with no live LLM, network or Python process.
 <code>make docs-screenshots</code> captures every page and state in light and dark and fails
 on any console error.</p>

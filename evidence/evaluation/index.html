@@ -8,7 +8,7 @@
       
       
       
-        <link rel="prev" href="../../architecture/decisions/D-A2-9-gymnasium-dev-only/">
+        <link rel="prev" href="../../architecture/decisions/D-A2-13-analyst-decision-record-only/">
       
       
         <link rel="next" href="../rl-environment/">
@@ -851,6 +851,10 @@
       
         
       
+        
+      
+        
+      
     
     
     
@@ -1144,6 +1148,62 @@
     
   
     D-A2-9 Gymnasium dev-only
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/decisions/D-A2-12-case-review-queue/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    D-A2-12 Case-review queue
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/decisions/D-A2-13-analyst-decision-record-only/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    D-A2-13 Analyst decision is record-only
   
 
     
@@ -1844,7 +1904,7 @@ scenario genuinely exercises supersession-exclusion
 (<code>FactStore.transactions_in_window</code>) rather than trivially clearing.</p>
 <h2 id="process-audit-and-rl-gate">Process audit and RL gate<a class="headerlink" href="#process-audit-and-rl-gate" title="Permanent link">¶</a></h2>
 <p><code>make eval</code> also runs <code>evals/run_rl.py</code>, which scores nine scripted policies
-through a Gymnasium environment to show that shortcuts cannot score well. See
+through a Gymnasium environment to show that the tested shortcut strategies score far below a proper investigation. See
 <a href="../rl-environment/">RL environment</a>.</p>
 <h2 id="layer-2-stratified-evaluation-set">Layer 2 — stratified evaluation set<a class="headerlink" href="#layer-2-stratified-evaluation-set" title="Permanent link">¶</a></h2>
 <p><strong>Not populated.</strong> A published precision/recall figure needs a hand-labelled,
